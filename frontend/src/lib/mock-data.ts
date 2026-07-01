@@ -285,37 +285,15 @@ export const EVENTS: Event[] = [
   // Concerts
   createEvent(
     "e1",
-    "James LIVE in Dhaka 2025",
-    "james-live-dhaka-2025",
-    "Legendary Bangladeshi rock star James performs live at ICCB. Experience an unforgettable night of music!",
-    "James, the legendary Bangladeshi rock guitarist and vocalist, is back with a spectacular live performance. Known for his soulful voice and electrifying guitar solos, James has been dominating the music scene for decades. This concert will feature his greatest hits including 'Bijli', 'Din Bari Jay', and many more fan favorites. The event will be held at the prestigious International Convention City Bashundhara with state-of-the-art sound and lighting systems. Don't miss this opportunity to witness the legend perform live!",
-    "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=800&h=600&fit=crop",
+    "এইচএসসি ৯৬ সোসাইটির ২০ বছর পূর্তি উদযাপন উপলক্ষে আয়োজিত এই বিশেষ অনুষ্ঠানে প্রাক্তন শিক্ষার্থীদের এক মিলনমেলার আয়োজন করা হয়েছে। দীর্ঘ দুই দশকের পথচলায় গড়ে ওঠা বন্ধুত্ব, স্মৃতি ও অভিজ্ঞতাকে একত্রে উদযাপন করাই এই আয়োজনের মূল উদ্দেশ্য। দেশের বিভিন্ন প্রান্ত ও বিদেশে অবস্থানরত এইচএসসি ৯৬ ব্যাচের সদস্যরা একত্রিত হয়ে পুরোনো দিনের স্মৃতিচারণ, আনন্দঘন আড্ডা এবং নতুন প্রজন্মের সঙ্গে সম্পর্ক আরও দৃঢ় করার সুযোগ পাবেন। অনুষ্ঠানে থাকবে মনোমুগ্ধকর সাংস্কৃতিক পরিবেশনা, স্মৃতিচারণ পর্ব, সম্মাননা প্রদান, আকর্ষণীয় র‍্যাফেল ড্র, ফটোসেশন, সুস্বাদু মধ্যাহ্ন ও নৈশভোজ এবং বিভিন্ন বিনোদনমূলক আয়োজন। পাশাপাশি অংশগ্রহণকারীদের জন্য থাকবে নেটওয়ার্কিং ও পারস্পরিক যোগাযোগের বিশেষ সুযোগ, যা ভবিষ্যতে সামাজিক ও পেশাগত সম্পর্ক আরও সমৃদ্ধ করতে সহায়ক হবে।",
+  "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=800&h=600&fit=crop",
+
     "o3",
     "v1",
     "1",
     new Date("2025-03-15T19:00:00"),
     new Date("2025-03-15T23:00:00"),
     [
-      {
-        id: "t1",
-        name: "VIP Pass",
-        description: "Front row seats with meet & greet",
-        price: 5000,
-        currency: "BDT",
-        available: 50,
-        maxPerPurchase: 4,
-        benefits: ["Front row seating", "Meet & greet", "Exclusive merchandise", "Complimentary refreshments"],
-      },
-      {
-        id: "t2",
-        name: "Premium",
-        description: "Premium seating with great view",
-        price: 2500,
-        currency: "BDT",
-        available: 200,
-        maxPerPurchase: 6,
-        benefits: ["Premium seating", "Early entry", "Exclusive merchandise"],
-      },
       {
         id: "t3",
         name: "Regular",
@@ -331,6 +309,7 @@ export const EVENTS: Event[] = [
     2450,
     true,
     true
+    
   ),
   createEvent(
     "e2",
