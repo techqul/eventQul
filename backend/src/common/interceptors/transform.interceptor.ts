@@ -17,9 +17,7 @@ import { ResponseMeta } from '../interfaces/response.interface';
  * All controller responses are automatically wrapped with success: true
  */
 @Injectable()
-export class TransformInterceptor<T>
-  implements NestInterceptor<T, any>
-{
+export class TransformInterceptor<T> implements NestInterceptor<T, any> {
   private readonly logger = new Logger(TransformInterceptor.name);
 
   constructor(@Optional() private reflector?: Reflector) {}
@@ -50,9 +48,7 @@ export class TransformInterceptor<T>
 
         // Log response in development
         if (process.env.NODE_ENV === 'development') {
-          this.logger.log(
-            `${request.method} ${request.url} - Status: ${statusCode}`,
-          );
+          this.logger.log(`${request.method} ${request.url} - Status: ${statusCode}`);
         }
 
         return response;

@@ -18,8 +18,11 @@ let PermissionGuard = class PermissionGuard {
     constructor(reflector) {
         this.reflector = reflector;
     }
-    async canActivate(context) {
-        const requiredPermissions = this.reflector.getAllAndOverride(permissions_decorator_1.PERMISSIONS_KEY, [context.getHandler(), context.getClass()]);
+    canActivate(context) {
+        const requiredPermissions = this.reflector.getAllAndOverride(permissions_decorator_1.PERMISSIONS_KEY, [
+            context.getHandler(),
+            context.getClass(),
+        ]);
         if (!requiredPermissions || requiredPermissions.length === 0) {
             return true;
         }
@@ -40,7 +43,7 @@ exports.PermissionGuard = PermissionGuard = __decorate([
     __metadata("design:paramtypes", [core_1.Reflector])
 ], PermissionGuard);
 let ResourceOwnerGuard = class ResourceOwnerGuard {
-    async canActivate(context) {
+    canActivate(_context) {
         throw new common_1.ForbiddenException('Resource ownership guard not yet implemented');
     }
 };

@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.dataSourceOptions = void 0;
+const typeorm_1 = require("typeorm");
 const dotenv_1 = require("dotenv");
 (0, dotenv_1.config)();
-exports.dataSourceOptions = {
+exports.default = new typeorm_1.DataSource({
     type: 'postgres',
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432', 10),
@@ -15,7 +15,5 @@ exports.dataSourceOptions = {
     synchronize: process.env.DB_SYNCHRONIZE === 'true',
     logging: process.env.DB_LOGGING === 'true',
     ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-};
-exports.default = exports.dataSourceOptions;
-module.exports = exports.dataSourceOptions;
+});
 //# sourceMappingURL=migrations-source.js.map

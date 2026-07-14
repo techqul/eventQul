@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
 
@@ -23,12 +18,12 @@ import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
 export class PermissionGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  canActivate(context: ExecutionContext): boolean {
     // Get required permissions from decorator
-    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
-      PERMISSIONS_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(PERMISSIONS_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
     // If no permissions required, allow access
     if (!requiredPermissions || requiredPermissions.length === 0) {
@@ -51,9 +46,7 @@ export class PermissionGuard implements CanActivate {
     }
 
     // Placeholder: Throw error until permissions are implemented
-    throw new ForbiddenException(
-      'Permission system will be implemented in Phase 5',
-    );
+    throw new ForbiddenException('Permission system will be implemented in Phase 5');
   }
 }
 
@@ -66,12 +59,10 @@ export class PermissionGuard implements CanActivate {
  */
 @Injectable()
 export class ResourceOwnerGuard implements CanActivate {
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  canActivate(_context: ExecutionContext): boolean {
     // TODO: Implement resource ownership checking
     // This will be implemented per-module as needed
 
-    throw new ForbiddenException(
-      'Resource ownership guard not yet implemented',
-    );
+    throw new ForbiddenException('Resource ownership guard not yet implemented');
   }
 }

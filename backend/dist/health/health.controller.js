@@ -73,7 +73,10 @@ __decorate([
     (0, terminus_1.HealthCheck)(),
     (0, swagger_1.ApiOperation)({ summary: 'Detailed health check with component status' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'All components are healthy' }),
-    (0, swagger_1.ApiResponse)({ status: 503, description: 'One or more components are unhealthy' }),
+    (0, swagger_1.ApiResponse)({
+        status: 503,
+        description: 'One or more components are unhealthy',
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)

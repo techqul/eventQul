@@ -1,3 +1,3 @@
-import { DataSourceOptions } from 'typeorm';
-export declare const dataSourceOptions: DataSourceOptions;
-export default dataSourceOptions;
+import { DataSource } from 'typeorm';
+declare const _default: DataSource;
+export default _default;

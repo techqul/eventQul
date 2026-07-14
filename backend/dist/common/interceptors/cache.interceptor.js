@@ -53,12 +53,12 @@ let HttpCacheInterceptor = HttpCacheInterceptor_1 = class HttpCacheInterceptor e
         const userId = request.user?.id || 'anonymous';
         return `http:${route}:${query}:${userId}`;
     }
-    async isRequestCachable(context) {
+    isRequestCachable(context) {
         const request = context.switchToHttp().getRequest();
         if (!['GET', 'HEAD'].includes(request.method)) {
             return false;
         }
-        const isPublic = this.reflector.get('skipAuth', context.getHandler());
+        this.reflector.get('skipAuth', context.getHandler());
         const noCache = this.reflector.get('noCache', context.getHandler());
         if (noCache) {
             return false;

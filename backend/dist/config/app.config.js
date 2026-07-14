@@ -6,7 +6,7 @@ const dotenv_1 = require("dotenv");
 exports.appConfig = {
     env: process.env.NODE_ENV || 'development',
     port: parseInt(process.env.PORT || '3001', 10),
-    apiPrefix: process.env.API_PREFIX || 'api/v1',
+    apiPrefix: process.env.API_PREFIX || 'api',
     appName: process.env.APP_NAME || 'EventQul',
     appUrl: process.env.APP_URL || 'http://localhost:3001',
     frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',

@@ -13,7 +13,8 @@ export const jwtConfig = {
 };
 
 export const jwtRefreshConfig = {
-  secret: process.env.JWT_REFRESH_SECRET || 'your-super-secret-refresh-jwt-key-change-this-in-production',
+  secret:
+    process.env.JWT_REFRESH_SECRET || 'your-super-secret-refresh-jwt-key-change-this-in-production',
   expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   signOptions: {
     algorithm: 'HS256',

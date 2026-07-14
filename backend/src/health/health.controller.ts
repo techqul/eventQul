@@ -1,9 +1,4 @@
-import {
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-} from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
 import {
   HealthCheck,
   HealthCheckService,
@@ -54,7 +49,10 @@ export class HealthController {
   @HealthCheck()
   @ApiOperation({ summary: 'Detailed health check with component status' })
   @ApiResponse({ status: 200, description: 'All components are healthy' })
-  @ApiResponse({ status: 503, description: 'One or more components are unhealthy' })
+  @ApiResponse({
+    status: 503,
+    description: 'One or more components are unhealthy',
+  })
   detailedHealth() {
     return this.health.check([
       // Database health check
@@ -64,12 +62,10 @@ export class HealthController {
         }),
 
       // Memory health check (heap memory should not exceed 500MB)
-      () =>
-        this.memory.checkHeap('memory_heap', 500 * 1024 * 1024),
+      () => this.memory.checkHeap('memory_heap', 500 * 1024 * 1024),
 
       // Memory health check (RSS memory should not exceed 1GB)
-      () =>
-        this.memory.checkRSS('memory_rss', 1024 * 1024 * 1024),
+      () => this.memory.checkRSS('memory_rss', 1024 * 1024 * 1024),
 
       // Disk health check (storage should not exceed 90% usage)
       () =>

@@ -24,12 +24,8 @@ let HttpExceptionFilter = HttpExceptionFilter_1 = class HttpExceptionFilter {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse();
         const request = ctx.getRequest();
-        const status = exception instanceof common_1.HttpException
-            ? exception.getStatus()
-            : common_1.HttpStatus.INTERNAL_SERVER_ERROR;
-        const message = exception instanceof common_1.HttpException
-            ? exception.message
-            : 'Internal server error';
+        const status = exception instanceof common_1.HttpException ? exception.getStatus() : common_1.HttpStatus.INTERNAL_SERVER_ERROR;
+        const message = exception instanceof common_1.HttpException ? exception.message : 'Internal server error';
         const isDevelopment = this.configService.get('NODE_ENV') === 'development';
         this.logger.error(`${request.method} ${request.url} - Status: ${status} - Message: ${message}`, exception instanceof Error && !isDevelopment ? exception.stack : '');
         const errorResponse = (0, response_interface_1.createErrorResponse)(message, status);

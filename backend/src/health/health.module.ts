@@ -5,10 +5,7 @@ import { HealthController } from './health.controller';
 import { dataSourceOptions } from '../config/database.config';
 
 @Module({
-  imports: [
-    TerminusModule,
-    TypeOrmModule.forRoot(dataSourceOptions),
-  ],
+  imports: [TerminusModule, TypeOrmModule.forRoot(dataSourceOptions)],
   controllers: [HealthController],
 })
 export class HealthModule {}

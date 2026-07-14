@@ -1,12 +1,11 @@
-import { DataSource, DataSourceOptions } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
-import { join } from 'path';
 
 // Load environment variables
 config();
 
-// Import the data source options
-export const dataSourceOptions: DataSourceOptions = {
+// Create DataSource instance for migrations
+export default new DataSource({
   type: 'postgres',
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '5432', 10),
@@ -18,10 +17,4 @@ export const dataSourceOptions: DataSourceOptions = {
   synchronize: process.env.DB_SYNCHRONIZE === 'true',
   logging: process.env.DB_LOGGING === 'true',
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-};
-
-// Create and export data source
-export default dataSourceOptions;
-
-// For TypeORM CLI
-module.exports = dataSourceOptions;
+});

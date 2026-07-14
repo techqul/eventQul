@@ -48,10 +48,14 @@ export class JwtAuthGuard implements CanActivate {
       });
 
       // Attach user to request
+      // Include both 'id' and 'sub' for compatibility
       request['user'] = {
+        sub: payload.sub,
         id: payload.sub,
         email: payload.email,
         role: payload.role,
+        firstName: payload.firstName,
+        lastName: payload.lastName,
         iat: payload.iat,
         exp: payload.exp,
       };

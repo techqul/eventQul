@@ -42,9 +42,12 @@ let JwtAuthGuard = JwtAuthGuard_1 = class JwtAuthGuard {
                 secret: jwt_config_1.jwtConfig.secret,
             });
             request['user'] = {
+                sub: payload.sub,
                 id: payload.sub,
                 email: payload.email,
                 role: payload.role,
+                firstName: payload.firstName,
+                lastName: payload.lastName,
                 iat: payload.iat,
                 exp: payload.exp,
             };

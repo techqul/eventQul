@@ -5,7 +5,7 @@ config();
 export const appConfig = {
   env: process.env.NODE_ENV || 'development',
   port: parseInt(process.env.PORT || '3001', 10),
-  apiPrefix: process.env.API_PREFIX || 'api/v1',
+  apiPrefix: process.env.API_PREFIX || 'api',
   appName: process.env.APP_NAME || 'EventQul',
   appUrl: process.env.APP_URL || 'http://localhost:3001',
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -16,7 +16,9 @@ export const appConfig = {
 export const storageConfig = {
   type: process.env.STORAGE_TYPE || 'local', // 'local' or 's3'
   maxFileSize: parseInt(process.env.MAX_FILE_SIZE || '5242880', 10), // 5MB
-  allowedFileTypes: (process.env.ALLOWED_FILE_TYPES || 'image/jpeg,image/png,image/webp').split(','),
+  allowedFileTypes: (process.env.ALLOWED_FILE_TYPES || 'image/jpeg,image/png,image/webp').split(
+    ',',
+  ),
   uploadPath: process.env.UPLOAD_PATH || './uploads',
 };
 

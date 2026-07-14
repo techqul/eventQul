@@ -1,12 +1,4 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-  Logger,
-  Inject,
-} from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { Injectable, ExecutionContext, Logger, Inject } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -24,11 +16,7 @@ export const CACHE_TTL = 'cacheTTL';
  * Usage: @CacheKey('events:list')
  */
 export function CacheKey(key: string) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor,
-  ) {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     Reflect.defineMetadata(CACHE_KEY, key, descriptor.value);
   };
 }
@@ -39,11 +27,7 @@ export function CacheKey(key: string) {
  * Usage: @CacheTTL(300) // 5 minutes
  */
 export function CacheTTL(ttl: number) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor,
-  ) {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     Reflect.defineMetadata(CACHE_TTL, ttl, descriptor.value);
   };
 }
@@ -63,10 +47,7 @@ export class HttpCacheInterceptor extends CacheInterceptor {
     super(cacheManager, reflector);
   }
 
-  protected generateCacheKey(
-    context: ExecutionContext,
-    trackingId?: string,
-  ): string {
+  protected generateCacheKey(context: ExecutionContext, trackingId?: string): string {
     // Get custom cache key from decorator
     const customKey = this.reflector.get(CACHE_KEY, context.getHandler());
 
@@ -83,7 +64,7 @@ export class HttpCacheInterceptor extends CacheInterceptor {
     return `http:${route}:${query}:${userId}`;
   }
 
-  protected async isRequestCachable(context: ExecutionContext): Promise<boolean> {
+  protected isRequestCachable(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
 
     // Don't cache POST, PUT, DELETE, PATCH requests
@@ -92,7 +73,7 @@ export class HttpCacheInterceptor extends CacheInterceptor {
     }
 
     // Check for @Public() decorator - public endpoints can be cached
-    const isPublic = this.reflector.get('skipAuth', context.getHandler());
+    this.reflector.get('skipAuth', context.getHandler());
 
     // For authenticated requests, we can cache but key will include user ID
     // For public requests, cache is shared across all users

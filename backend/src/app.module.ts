@@ -7,8 +7,10 @@ import * as redisStore from 'cache-manager-redis-store';
 import { dataSourceOptions } from './config/database.config';
 import { redisOptions, RedisTTL } from './config/redis.config';
 import { HealthModule } from './health/health.module';
+import { UsersModule } from './modules/users/users.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './modules/auth/auth.module';
 
 /**
  * Global Configuration Module
@@ -61,9 +63,9 @@ import { AppService } from './app.service';
     // Feature Modules
     // ============================================================================
     HealthModule,
+    AuthModule,
+    UsersModule,
     // More modules will be added in subsequent phases:
-    // AuthModule
-    // UserModule
     // OrganizerModule
     // CategoryModule
     // VenueModule

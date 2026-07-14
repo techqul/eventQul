@@ -3,8 +3,8 @@ import { Reflector } from '@nestjs/core';
 export declare class PermissionGuard implements CanActivate {
     private reflector;
     constructor(reflector: Reflector);
-    canActivate(context: ExecutionContext): Promise<boolean>;
+    canActivate(context: ExecutionContext): boolean;
 }
 export declare class ResourceOwnerGuard implements CanActivate {
-    canActivate(context: ExecutionContext): Promise<boolean>;
+    canActivate(_context: ExecutionContext): boolean;
 }

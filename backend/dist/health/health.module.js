@@ -17,10 +17,7 @@ let HealthModule = class HealthModule {
 exports.HealthModule = HealthModule;
 exports.HealthModule = HealthModule = __decorate([
     (0, common_1.Module)({
-        imports: [
-            terminus_1.TerminusModule,
-            typeorm_1.TypeOrmModule.forRoot(database_config_1.dataSourceOptions),
-        ],
+        imports: [terminus_1.TerminusModule, typeorm_1.TypeOrmModule.forRoot(database_config_1.dataSourceOptions)],
         controllers: [health_controller_1.HealthController],
     })
 ], HealthModule);

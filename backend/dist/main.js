@@ -45,8 +45,8 @@ async function bootstrap() {
     app.enableVersioning({
         type: common_1.VersioningType.URI,
         defaultVersion: '1',
-        prefix: configService.get('API_PREFIX', 'api/v1'),
     });
+    app.setGlobalPrefix(configService.get('API_PREFIX', 'api'));
     app.useGlobalPipes(new common_1.ValidationPipe(validation_pipe_1.validationPipeOptions));
     app.useGlobalFilters(new http_exception_filter_1.HttpExceptionFilter(configService), new query_exception_filter_1.QueryExceptionFilter());
     app.useGlobalInterceptors(new transform_interceptor_1.TransformInterceptor(reflector), new transform_interceptor_1.ExcludeFieldsInterceptor());
@@ -67,7 +67,6 @@ async function bootstrap() {
                 tryItOutEnabled: true,
             },
         });
-        console.log(`📚 API Documentation: http://localhost:${configService.get('PORT')}/api/docs`);
     }
     app.enableShutdownHooks();
     const port = configService.get('PORT', 3001);

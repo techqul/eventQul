@@ -21,14 +21,11 @@ export class QueryExceptionFilter implements ExceptionFilter {
     const parameters = exception.parameters;
     const driverError = exception.driverError as any;
 
-    this.logger.error(
-      `Query failed: ${request.method} ${request.url}`,
-      {
-        query,
-        parameters,
-        error: driverError,
-      },
-    );
+    this.logger.error(`Query failed: ${request.method} ${request.url}`, {
+      query,
+      parameters,
+      error: driverError,
+    });
 
     // Parse common database errors
     let message = 'Database operation failed';

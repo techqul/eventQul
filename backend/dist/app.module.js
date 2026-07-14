@@ -49,8 +49,10 @@ const redisStore = __importStar(require("cache-manager-redis-store"));
 const database_config_1 = require("./config/database.config");
 const redis_config_1 = require("./config/redis.config");
 const health_module_1 = require("./health/health.module");
+const users_module_1 = require("./modules/users/users.module");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
+const auth_module_1 = require("./modules/auth/auth.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -83,6 +85,8 @@ exports.AppModule = AppModule = __decorate([
                 },
             ]),
             health_module_1.HealthModule,
+            auth_module_1.AuthModule,
+            users_module_1.UsersModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

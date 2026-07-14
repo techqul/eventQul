@@ -6,41 +6,7 @@ config();
 // Swagger document builder
 export const swaggerConfig = new DocumentBuilder()
   .setTitle('EventQul API')
-  .setDescription(`
-    ## SaaS Event Ticketing Platform API
-
-    A production-grade REST API for the EventQul event marketplace platform.
-
-    ### Authentication
-    Most endpoints require authentication using JWT tokens. Include the token in the Authorization header:
-    \`Authorization: Bearer <your-jwt-token>\`
-
-    ### Roles
-    - **user**: Regular event attendees
-    - **organizer**: Event creators and managers
-    - **admin**: Platform administrators
-
-    ### Rate Limiting
-    API requests are rate-limited to 100 requests per minute per IP.
-
-    ### Pagination
-    List endpoints support pagination via query parameters:
-    - \`page\`: Page number (default: 1)
-    - \`limit\`: Items per page (default: 20, max: 100)
-
-    ### Error Handling
-    All errors follow a consistent format:
-    \`\`\`json
-    {
-      "success": false,
-      "message": "Error description",
-      "errors": [...],
-      "statusCode": 400
-    }
-    \`\`\`
-
-    **Base URL:** \`${process.env.API_PREFIX || 'api/v1'}\`
-  `)
+  .setDescription('SaaS Event Ticketing Platform API')
   .setVersion('1.0.0')
   .addTag('Auth', 'Authentication and authorization endpoints')
   .addTag('Users', 'User profile and management')
@@ -67,10 +33,7 @@ export const swaggerConfig = new DocumentBuilder()
     },
     'JWT-auth', // This is the key used in @ApiBearerAuth() decorator
   )
-  .addServer(
-    `${process.env.APP_URL || 'http://localhost:3001'}/${process.env.API_PREFIX || 'api/v1'}`,
-    'Development Server',
-  )
+  .addServer(process.env.APP_URL || 'http://localhost:3002', 'Development Server')
   .build();
 
 // Custom options for Swagger

@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsOptional, IsInt, IsPositive, Min, Max, IsIn, IsString } from 'class-validator';
+import { IsOptional, IsInt, IsPositive, Max, IsIn, IsString } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { PaginationQuery } from './response.interface';
 

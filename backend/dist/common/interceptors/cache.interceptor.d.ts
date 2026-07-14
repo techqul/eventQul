@@ -12,5 +12,5 @@ export declare class HttpCacheInterceptor extends CacheInterceptor {
     private readonly logger;
     constructor(cacheManager: Cache, reflector: Reflector);
     protected generateCacheKey(context: ExecutionContext, trackingId?: string): string;
-    protected isRequestCachable(context: ExecutionContext): Promise<boolean>;
+    protected isRequestCachable(context: ExecutionContext): boolean;
 }
