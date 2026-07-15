@@ -41,7 +41,7 @@ __decorate([
     (0, class_validator_1.MinLength)(8),
     (0, class_validator_1.MaxLength)(100),
     (0, class_validator_1.Matches)(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
-        message: 'Password must contain at least one uppercase letter, one lowercase letter, and one number',
+        message: 'Password must contain at least one uppercase letter, one lowercase letter and one number',
     }),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "password", void 0);

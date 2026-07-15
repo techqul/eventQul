@@ -12,6 +12,40 @@ import { jwtConfig } from '../../config/jwt.config';
 import { SKIP_AUTH_KEY } from '../decorators/skip-auth.decorator';
 
 /**
+ * JWT Payload interface
+ */
+interface JwtPayload {
+  sub: string;
+  email: string;
+  role: string;
+  firstName: string;
+  lastName: string;
+  iat: number;
+  exp: number;
+}
+
+/**
+ * Authenticated User interface attached to request
+ */
+interface AuthenticatedUser {
+  sub: string;
+  id: string;
+  email: string;
+  role: string;
+  firstName: string;
+  lastName: string;
+  iat: number;
+  exp: number;
+}
+
+/**
+ * Extended Request interface with user property
+ */
+interface AuthenticatedRequest extends Request {
+  user?: AuthenticatedUser;
+}
+
+/**
  * JWT Authentication Guard
  * Validates JWT tokens and attaches user to request
  */
@@ -35,7 +69,7 @@ export class JwtAuthGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest<Request>();
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
@@ -43,13 +77,13 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
+      const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
         secret: jwtConfig.secret,
       });
 
       // Attach user to request
       // Include both 'id' and 'sub' for compatibility
-      request['user'] = {
+      request.user = {
         sub: payload.sub,
         id: payload.sub,
         email: payload.email,
@@ -62,13 +96,14 @@ export class JwtAuthGuard implements CanActivate {
 
       return true;
     } catch (error) {
-      this.logger.error(`JWT verification failed: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`JWT verification failed: ${errorMessage}`);
 
-      if (error.name === 'TokenExpiredError') {
+      if (error instanceof Error && error.name === 'TokenExpiredError') {
         throw new UnauthorizedException('Access token has expired');
       }
 
-      if (error.name === 'JsonWebTokenError') {
+      if (error instanceof Error && error.name === 'JsonWebTokenError') {
         throw new UnauthorizedException('Invalid access token');
       }
 

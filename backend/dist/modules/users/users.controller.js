@@ -28,65 +28,30 @@ let UsersController = class UsersController {
         this.usersService = usersService;
     }
     async create(createUserDto) {
-        const user = await this.usersService.create(createUserDto);
-        return {
-            success: true,
-            message: 'User created successfully',
-            data: user,
-        };
+        return this.usersService.create(createUserDto);
     }
     async register(registerDto) {
-        const user = await this.usersService.register(registerDto);
-        return {
-            success: true,
-            message: 'User registered successfully',
-            data: user,
-        };
+        return this.usersService.register(registerDto);
     }
-    async findAll(req) {
-        const page = req.query.page ? parseInt(req.query.page, 10) : 1;
-        const limit = req.query.limit ? parseInt(req.query.limit, 10) : 20;
-        const result = await this.usersService.findAll(page, limit);
-        return {
-            success: true,
-            message: 'Users retrieved successfully',
-            ...result,
-        };
+    async findAll(page, limit) {
+        const pageNum = page ? parseInt(page, 10) : 1;
+        const limitNum = limit ? parseInt(limit, 10) : 20;
+        return this.usersService.findAll(pageNum, limitNum);
     }
     async getProfile(req) {
-        const user = await this.usersService.findOne(req.user.sub);
-        return {
-            success: true,
-            message: 'Profile retrieved successfully',
-            data: user,
-        };
+        return this.usersService.getProfile(req.user?.id || '');
     }
     async findOne(id) {
-        const user = await this.usersService.findOne(id);
-        return {
-            success: true,
-            message: 'User retrieved successfully',
-            data: user,
-        };
+        return this.usersService.findOne(id);
     }
     async updateProfile(req, updateUserDto) {
-        const user = await this.usersService.update(req.user.sub, updateUserDto);
-        return {
-            success: true,
-            message: 'Profile updated successfully',
-            data: user,
-        };
+        return this.usersService.update(req.user?.id || '', updateUserDto);
     }
     async update(id, updateUserDto) {
-        const user = await this.usersService.update(id, updateUserDto);
-        return {
-            success: true,
-            message: 'User updated successfully',
-            data: user,
-        };
+        return this.usersService.update(id, updateUserDto);
     }
     async remove(id) {
-        await this.usersService.remove(id);
+        return this.usersService.remove(id);
     }
 };
 exports.UsersController = UsersController;
@@ -104,7 +69,7 @@ __decorate([
     (0, common_1.Post)('register'),
     (0, swagger_1.ApiOperation)({ summary: 'Register a new user' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'User registered successfully' }),
-    (0, swagger_1.ApiResponse)({ status: 409, description: 'Email already exists' }),
+    (0, swagger_1.ApiResponse)({ status: 409, description: 'Email already registered' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_user_dto_1.RegisterDto]),
@@ -117,9 +82,12 @@ __decorate([
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Get all users (Admin only)' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Users retrieved successfully' }),
-    __param(0, (0, common_1.Req)()),
+    (0, swagger_1.ApiQuery)({ name: 'page', required: false, type: Number }),
+    (0, swagger_1.ApiQuery)({ name: 'limit', required: false, type: Number }),
+    __param(0, (0, common_1.Query)('page')),
+    __param(1, (0, common_1.Query)('limit')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "findAll", null);
 __decorate([

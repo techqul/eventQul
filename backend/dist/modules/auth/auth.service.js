@@ -32,8 +32,8 @@ let AuthService = AuthService_1 = class AuthService {
         if (existingUser) {
             throw new common_1.ConflictException('Email already registered');
         }
-        const user = await this.usersService.register(registerDto);
-        await this.usersService.updateStatus(user.id, types_1.UserStatus.ACTIVE);
+        const response = await this.usersService.register(registerDto);
+        const user = response.data;
         const tokens = await this.generateTokens(user);
         return {
             success: true,
@@ -92,7 +92,8 @@ let AuthService = AuthService_1 = class AuthService {
                 this.refreshTokens.delete(refreshTokenDto.refreshToken);
                 throw new common_1.UnauthorizedException('Refresh token expired');
             }
-            const user = await this.usersService.findOne(payload.sub);
+            const response = await this.usersService.findOne(payload.sub);
+            const user = response.data;
             if (!user || user.status !== types_1.UserStatus.ACTIVE) {
                 throw new common_1.UnauthorizedException('User not found or inactive');
             }
@@ -105,7 +106,8 @@ let AuthService = AuthService_1 = class AuthService {
             };
         }
         catch (error) {
-            this.logger.error(`Refresh token error: ${error.message}`);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            this.logger.error(`Refresh token error: ${errorMessage}`);
             throw new common_1.UnauthorizedException('Invalid or expired refresh token');
         }
     }
@@ -118,7 +120,8 @@ let AuthService = AuthService_1 = class AuthService {
             };
         }
         catch (error) {
-            this.logger.error(`Logout error: ${error.message}`);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            this.logger.error(`Logout error: ${errorMessage}`);
             throw new common_1.UnauthorizedException('Logout failed');
         }
     }
@@ -151,7 +154,8 @@ let AuthService = AuthService_1 = class AuthService {
         };
     }
     async validateUser(userId) {
-        const user = await this.usersService.findOne(userId);
+        const response = await this.usersService.findOne(userId);
+        const user = response.data;
         if (!user) {
             throw new common_1.UnauthorizedException('User not found');
         }

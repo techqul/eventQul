@@ -4,6 +4,7 @@ import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { User } from '../users/entities/user.entity';
 export declare class AuthService {
     private readonly usersService;
     private readonly jwtService;
@@ -57,5 +58,5 @@ export declare class AuthService {
         message: string;
     }>;
     private generateTokens;
-    validateUser(userId: string): Promise<any>;
+    validateUser(userId: string): Promise<User>;
 }

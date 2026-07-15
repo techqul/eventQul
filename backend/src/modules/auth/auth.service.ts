@@ -7,6 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
+import { ServiceResponse } from '../../common/utils/types';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -35,11 +36,9 @@ export class AuthService {
       throw new ConflictException('Email already registered');
     }
 
-    // Create new user
-    const user = await this.usersService.register(registerDto);
-
-    // Update user status to ACTIVE after registration
-    await this.usersService.updateStatus(user.id, UserStatus.ACTIVE);
+    // Create new user - register now handles status update internally
+    const response = await this.usersService.register(registerDto);
+    const user = response.data as User;
 
     // Generate tokens
     const tokens = await this.generateTokens(user);
@@ -61,7 +60,7 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    // Find user by email
+    // Find user by email - returns User or null directly
     const user = await this.usersService.findByEmail(loginDto.email);
 
     if (!user) {
@@ -125,8 +124,9 @@ export class AuthService {
         throw new UnauthorizedException('Refresh token expired');
       }
 
-      // Get user
-      const user = await this.usersService.findOne(payload.sub);
+      // Get user - findOne now returns ServiceResponse
+      const response = await this.usersService.findOne(payload.sub);
+      const user = response.data as User;
 
       if (!user || user.status !== UserStatus.ACTIVE) {
         throw new UnauthorizedException('User not found or inactive');
@@ -144,7 +144,8 @@ export class AuthService {
         data: tokens,
       };
     } catch (error) {
-      this.logger.error(`Refresh token error: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Refresh token error: ${errorMessage}`);
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
   }
@@ -159,7 +160,8 @@ export class AuthService {
         message: 'Logged out successfully',
       };
     } catch (error) {
-      this.logger.error(`Logout error: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Logout error: ${errorMessage}`);
       throw new UnauthorizedException('Logout failed');
     }
   }
@@ -205,8 +207,9 @@ export class AuthService {
     };
   }
 
-  async validateUser(userId: string): Promise<any> {
-    const user = await this.usersService.findOne(userId);
+  async validateUser(userId: string): Promise<User> {
+    const response = await this.usersService.findOne(userId);
+    const user = response.data as User;
     if (!user) {
       throw new UnauthorizedException('User not found');
     }

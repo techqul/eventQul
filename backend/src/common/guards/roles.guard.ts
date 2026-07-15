@@ -1,7 +1,29 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Request } from 'express';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { USER_ROLES } from '../constants/pagination.constant';
+
+/**
+ * Authenticated User interface
+ */
+interface AuthenticatedUser {
+  sub: string;
+  id: string;
+  email: string;
+  role: string;
+  firstName: string;
+  lastName: string;
+  iat: number;
+  exp: number;
+}
+
+/**
+ * Extended Request interface with user property
+ */
+interface AuthenticatedRequest extends Request {
+  user?: AuthenticatedUser;
+}
 
 /**
  * Roles Guard
@@ -24,7 +46,7 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
     const user = request.user;
 
     // Check if user exists (should be attached by JwtAuthGuard)
@@ -52,7 +74,7 @@ export class AdminGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
     const user = request.user;
 
     if (!user) {
@@ -74,14 +96,14 @@ export class AdminGuard implements CanActivate {
 @Injectable()
 export class OrganizerGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
     const user = request.user;
 
     if (!user) {
       throw new ForbiddenException('User not authenticated');
     }
 
-    const allowedRoles = [USER_ROLES.ORGANIZER, USER_ROLES.ADMIN];
+    const allowedRoles: string[] = [USER_ROLES.ORGANIZER, USER_ROLES.ADMIN];
     const hasRole = allowedRoles.includes(user.role);
 
     if (!hasRole) {

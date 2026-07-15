@@ -41,7 +41,7 @@ let JwtAuthGuard = JwtAuthGuard_1 = class JwtAuthGuard {
             const payload = await this.jwtService.verifyAsync(token, {
                 secret: jwt_config_1.jwtConfig.secret,
             });
-            request['user'] = {
+            request.user = {
                 sub: payload.sub,
                 id: payload.sub,
                 email: payload.email,
@@ -54,11 +54,12 @@ let JwtAuthGuard = JwtAuthGuard_1 = class JwtAuthGuard {
             return true;
         }
         catch (error) {
-            this.logger.error(`JWT verification failed: ${error.message}`);
-            if (error.name === 'TokenExpiredError') {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            this.logger.error(`JWT verification failed: ${errorMessage}`);
+            if (error instanceof Error && error.name === 'TokenExpiredError') {
                 throw new common_1.UnauthorizedException('Access token has expired');
             }
-            if (error.name === 'JsonWebTokenError') {
+            if (error instanceof Error && error.name === 'JsonWebTokenError') {
                 throw new common_1.UnauthorizedException('Invalid access token');
             }
             throw new common_1.UnauthorizedException('Authentication failed');

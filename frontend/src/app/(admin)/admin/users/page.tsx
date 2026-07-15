@@ -1,7 +1,8 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, MoreHorizontal, Ban, Shield } from "lucide-react";
+import { Search, MoreHorizontal, Shield, Edit, Trash2, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -12,60 +13,142 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { USERS } from "@/lib/mock-data";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { usersApi } from "@/lib/api/users";
+import type { User } from "@/types/user";
 import { formatDate } from "@/lib/utils";
 
-const mockUsers = [
-  ...USERS,
-  {
-    id: "u3",
-    name: "Rakib Islam",
-    email: "rakib@example.com",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop",
-    role: "organizer",
-    joinedDate: new Date("2024-02-10"),
-  },
-  {
-    id: "u4",
-    name: "Sarah Khan",
-    email: "sarah@example.com",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop",
-    role: "user",
-    joinedDate: new Date("2024-03-15"),
-  },
-  {
-    id: "u5",
-    name: "Admin User",
-    email: "admin@eventqul.com",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop",
-    role: "admin",
-    joinedDate: new Date("2024-01-01"),
-  },
-];
-
 export default function AdminUsersPage() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    totalPages: 0,
+    limit: 20,
+  });
+
+  const fetchUsers = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await usersApi.getAll(page, 20);
+
+      if (response.success && response.data) {
+        setUsers(response.data);
+        setPagination(response.pagination || {
+          total: 0,
+          totalPages: 0,
+          limit: 20,
+        });
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch users");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, [page]);
+
+  const filteredUsers = users.filter((user) =>
+    user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const getInitials = (firstName: string, lastName: string) => {
+    return `${firstName[0]}${lastName[0]}`.toUpperCase();
+  };
+
+  const getRoleBadgeVariant = (role: string) => {
+    switch (role) {
+      case "admin":
+        return "default";
+      case "organizer":
+        return "secondary";
+      default:
+        return "outline";
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!confirm("Are you sure you want to delete this user?")) {
+      return;
+    }
+
+    try {
+      await usersApi.delete(userId);
+      await fetchUsers();
+    } catch (err: any) {
+      setError(err.message || "Failed to delete user");
+    }
+  };
+
+  const handleToggleUserStatus = async (userId: string, currentStatus: string) => {
+    const newStatus = currentStatus === "active" ? "suspended" : "active";
+    try {
+      await usersApi.updateStatus(userId, newStatus);
+      await fetchUsers();
+    } catch (err: any) {
+      setError(err.message || "Failed to update user status");
+    }
+  };
+
+  if (isLoading && users.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
+        className="mb-8 flex justify-between items-center"
       >
-        <h1 className="text-3xl font-bold mb-2">User Management</h1>
-        <p className="text-muted-foreground">
-          Manage all users and their permissions
-        </p>
+        <div>
+          <h1 className="text-3xl font-bold mb-2">User Management</h1>
+          <p className="text-muted-foreground">
+            Manage all users and their permissions
+          </p>
+        </div>
+        <Button>
+          <UserPlus className="h-4 w-4 mr-2" />
+          Add User
+        </Button>
       </motion.div>
+
+      {error && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
-            <CardTitle>All Users</CardTitle>
+            <CardTitle>
+              All Users ({pagination.total} total)
+            </CardTitle>
             <div className="flex gap-3">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search users..." className="pl-10 w-64" />
+                <Input
+                  placeholder="Search users..."
+                  className="pl-10 w-64"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
             </div>
           </div>
@@ -78,12 +161,13 @@ export default function AdminUsersPage() {
                   <th className="text-left pb-3 font-medium">User</th>
                   <th className="text-left pb-3 font-medium">Email</th>
                   <th className="text-left pb-3 font-medium">Role</th>
+                  <th className="text-left pb-3 font-medium">Status</th>
                   <th className="text-left pb-3 font-medium">Joined</th>
                   <th className="text-right pb-3 font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {mockUsers.map((user, index) => (
+                {filteredUsers.map((user, index) => (
                   <motion.tr
                     key={user.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -94,32 +178,32 @@ export default function AdminUsersPage() {
                     <td className="py-4">
                       <div className="flex items-center gap-3">
                         <Avatar>
-                          <AvatarImage src={user.avatar} />
                           <AvatarFallback>
-                            {user.name[0]}
+                            {getInitials(user.firstName, user.lastName)}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="font-medium">{user.name}</span>
+                        <span className="font-medium">
+                          {user.firstName} {user.lastName}
+                        </span>
                       </div>
                     </td>
                     <td className="py-4 text-muted-foreground">
                       {user.email}
                     </td>
                     <td className="py-4">
-                      <Badge
-                        variant={
-                          user.role === "admin"
-                            ? "default"
-                            : user.role === "organizer"
-                            ? "secondary"
-                            : "outline"
-                        }
-                      >
+                      <Badge variant={getRoleBadgeVariant(user.role)}>
                         {user.role}
                       </Badge>
                     </td>
+                    <td className="py-4">
+                      <Badge
+                        variant={user.status === "active" ? "default" : "secondary"}
+                      >
+                        {user.status}
+                      </Badge>
+                    </td>
                     <td className="py-4 text-muted-foreground">
-                      {formatDate(user.joinedDate)}
+                      {formatDate(new Date(user.createdAt))}
                     </td>
                     <td className="py-4 text-right">
                       <DropdownMenu>
@@ -130,12 +214,21 @@ export default function AdminUsersPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem>
-                            <Shield className="h-4 w-4 mr-2" />
-                            Change Role
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit User
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
-                            <Ban className="h-4 w-4 mr-2" />
-                            Ban User
+                          <DropdownMenuItem
+                            onClick={() => handleToggleUserStatus(user.id, user.status)}
+                          >
+                            <Shield className="h-4 w-4 mr-2" />
+                            {user.status === "active" ? "Suspend" : "Activate"}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={() => handleDeleteUser(user.id)}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete User
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -144,7 +237,39 @@ export default function AdminUsersPage() {
                 ))}
               </tbody>
             </table>
+
+            {filteredUsers.length === 0 && (
+              <div className="text-center py-12 text-muted-foreground">
+                No users found
+              </div>
+            )}
           </div>
+
+          {pagination.totalPages > 1 && (
+            <div className="flex items-center justify-between mt-4">
+              <p className="text-sm text-muted-foreground">
+                Page {page} of {pagination.totalPages}
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
+                  disabled={page === pagination.totalPages}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

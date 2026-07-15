@@ -1,0 +1,37 @@
+Client
+   |
+   | JWT Token
+   |
+   v
+JwtAuthGuard
+   |
+   | Verify Token
+   |
+   v
+request.user = {
+    id:1,
+    role:"ADMIN"
+}
+   |
+   v
+RolesGuard
+   |
+   | Read @Roles("ADMIN")
+   |
+   v
+Compare
+
+ADMIN == ADMIN ?
+
+Yes
+ |
+ v
+Controller
+
+----------------
+
+ADMIN == USER ?
+
+No
+
+403 Forbidden

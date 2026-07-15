@@ -11,6 +11,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BaseEntity = void 0;
 const typeorm_1 = require("typeorm");
+const dateTransformer = {
+    to(value) {
+        if (value instanceof Date) {
+            return value.toISOString();
+        }
+        return value;
+    },
+    from(value) {
+        if (value) {
+            return new Date(value);
+        }
+        return null;
+    },
+};
 class BaseEntity {
     createdAt;
     updatedAt;
@@ -18,11 +32,19 @@ class BaseEntity {
 }
 exports.BaseEntity = BaseEntity;
 __decorate([
-    (0, typeorm_1.CreateDateColumn)({ name: 'created_at', type: 'timestamp' }),
+    (0, typeorm_1.CreateDateColumn)({
+        name: 'created_at',
+        type: 'timestamp',
+        transformer: dateTransformer,
+    }),
     __metadata("design:type", Date)
 ], BaseEntity.prototype, "createdAt", void 0);
 __decorate([
-    (0, typeorm_1.UpdateDateColumn)({ name: 'updated_at', type: 'timestamp' }),
+    (0, typeorm_1.UpdateDateColumn)({
+        name: 'updated_at',
+        type: 'timestamp',
+        transformer: dateTransformer,
+    }),
     __metadata("design:type", Date)
 ], BaseEntity.prototype, "updatedAt", void 0);
 __decorate([
@@ -30,6 +52,7 @@ __decorate([
         name: 'deleted_at',
         type: 'timestamp',
         nullable: true,
+        transformer: dateTransformer,
     }),
     __metadata("design:type", Date)
 ], BaseEntity.prototype, "deletedAt", void 0);
