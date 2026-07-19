@@ -1,19 +1,15 @@
-import { PaginationDto as NestJSPaginationDto } from './pagination.dto';
-
 export * from './pagination.dto';
 
-/**
- * Standard Service Response interface
- * Used for consistent API responses across all services
- */
-export interface ServiceResponse<T = any> {
+export interface ServiceResponse<T = unknown> {
   success: boolean;
   message: string;
   data?: T;
-  pagination?: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
+  meta?: PaginationMeta;
+}
+
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
 }

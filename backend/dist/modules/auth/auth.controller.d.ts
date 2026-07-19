@@ -5,51 +5,10 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
-    register(registerDto: RegisterDto): Promise<{
-        success: boolean;
-        message: string;
-        data: {
-            accessToken: string;
-            refreshToken: string;
-            expiresIn: string;
-            user: {
-                id: string;
-                email: string;
-                firstName: string;
-                lastName: string;
-                role: import("../users/types").UserRole;
-            };
-        };
-    }>;
-    login(loginDto: LoginDto): Promise<{
-        success: boolean;
-        message: string;
-        data: {
-            accessToken: string;
-            refreshToken: string;
-            expiresIn: string;
-            user: {
-                id: string;
-                email: string;
-                firstName: string;
-                lastName: string;
-                role: import("../users/types").UserRole;
-            };
-        };
-    }>;
-    refresh(refreshTokenDto: RefreshTokenDto): Promise<{
-        success: boolean;
-        message: string;
-        data: {
-            accessToken: string;
-            refreshToken: string;
-            expiresIn: string;
-        };
-    }>;
-    logout(refreshTokenDto: RefreshTokenDto): Promise<{
-        success: boolean;
-        message: string;
-    }>;
+    register(registerDto: RegisterDto): Promise<import("./auth.service").AuthResponse>;
+    login(loginDto: LoginDto): Promise<import("./auth.service").AuthResponse>;
+    refresh(refreshTokenDto: RefreshTokenDto): Promise<import("./auth.service").AuthTokens>;
+    logout(refreshTokenDto: RefreshTokenDto): Promise<void>;
     getCurrentUser(req: any): Promise<{
         success: boolean;
         message: string;

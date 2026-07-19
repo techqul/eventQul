@@ -32,22 +32,17 @@ let AuthService = AuthService_1 = class AuthService {
         if (existingUser) {
             throw new common_1.ConflictException('Email already registered');
         }
-        const response = await this.usersService.register(registerDto);
-        const user = response.data;
+        const user = await this.usersService.register(registerDto);
         const tokens = await this.generateTokens(user);
         return {
-            success: true,
-            message: 'User registered successfully',
-            data: {
-                user: {
-                    id: user.id,
-                    email: user.email,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    role: user.role,
-                },
-                ...tokens,
+            user: {
+                id: user.id,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                role: user.role,
             },
+            ...tokens,
         };
     }
     async login(loginDto) {
@@ -65,65 +60,38 @@ let AuthService = AuthService_1 = class AuthService {
         await this.usersService.updateLastLogin(user.id);
         const tokens = await this.generateTokens(user);
         return {
-            success: true,
-            message: 'Login successful',
-            data: {
-                user: {
-                    id: user.id,
-                    email: user.email,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    role: user.role,
-                },
-                ...tokens,
+            user: {
+                id: user.id,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                role: user.role,
             },
+            ...tokens,
         };
     }
     async refreshAccessToken(refreshTokenDto) {
-        try {
-            const payload = await this.jwtService.verifyAsync(refreshTokenDto.refreshToken, {
-                secret: this.configService.get('JWT_REFRESH_SECRET'),
-            });
-            const storedToken = this.refreshTokens.get(refreshTokenDto.refreshToken);
-            if (!storedToken || storedToken.userId !== payload.sub) {
-                throw new common_1.UnauthorizedException('Invalid refresh token');
-            }
-            if (new Date() > storedToken.expiry) {
-                this.refreshTokens.delete(refreshTokenDto.refreshToken);
-                throw new common_1.UnauthorizedException('Refresh token expired');
-            }
-            const response = await this.usersService.findOne(payload.sub);
-            const user = response.data;
-            if (!user || user.status !== types_1.UserStatus.ACTIVE) {
-                throw new common_1.UnauthorizedException('User not found or inactive');
-            }
-            const tokens = await this.generateTokens(user);
+        const payload = await this.jwtService.verifyAsync(refreshTokenDto.refreshToken, {
+            secret: this.configService.get('JWT_REFRESH_SECRET'),
+        });
+        const storedToken = this.refreshTokens.get(refreshTokenDto.refreshToken);
+        if (!storedToken || storedToken.userId !== payload.sub) {
+            throw new common_1.UnauthorizedException('Invalid refresh token');
+        }
+        if (new Date() > storedToken.expiry) {
             this.refreshTokens.delete(refreshTokenDto.refreshToken);
-            return {
-                success: true,
-                message: 'Tokens refreshed successfully',
-                data: tokens,
-            };
+            throw new common_1.UnauthorizedException('Refresh token expired');
         }
-        catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            this.logger.error(`Refresh token error: ${errorMessage}`);
-            throw new common_1.UnauthorizedException('Invalid or expired refresh token');
+        const user = await this.usersService.findOne(payload.sub);
+        if (!user || user.status !== types_1.UserStatus.ACTIVE) {
+            throw new common_1.UnauthorizedException('User not found or inactive');
         }
+        const tokens = await this.generateTokens(user);
+        this.refreshTokens.delete(refreshTokenDto.refreshToken);
+        return tokens;
     }
     async logout(refreshTokenDto) {
-        try {
-            this.refreshTokens.delete(refreshTokenDto.refreshToken);
-            return {
-                success: true,
-                message: 'Logged out successfully',
-            };
-        }
-        catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            this.logger.error(`Logout error: ${errorMessage}`);
-            throw new common_1.UnauthorizedException('Logout failed');
-        }
+        this.refreshTokens.delete(refreshTokenDto.refreshToken);
     }
     async generateTokens(user) {
         const payload = {
@@ -154,8 +122,7 @@ let AuthService = AuthService_1 = class AuthService {
         };
     }
     async validateUser(userId) {
-        const response = await this.usersService.findOne(userId);
-        const user = response.data;
+        const user = await this.usersService.findOne(userId);
         if (!user) {
             throw new common_1.UnauthorizedException('User not found');
         }

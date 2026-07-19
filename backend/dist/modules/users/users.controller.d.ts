@@ -1,5 +1,4 @@
 import { UsersService } from './users.service';
-import { ServiceResponse } from '../../common/utils/types';
 import { CreateUserDto, RegisterDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 interface AuthenticatedRequest extends Request {
@@ -13,13 +12,13 @@ interface AuthenticatedRequest extends Request {
 export declare class UsersController {
     private readonly usersService;
     constructor(usersService: UsersService);
-    create(createUserDto: CreateUserDto): Promise<ServiceResponse>;
-    register(registerDto: RegisterDto): Promise<ServiceResponse>;
-    findAll(page?: string, limit?: string): Promise<ServiceResponse>;
-    getProfile(req: AuthenticatedRequest): Promise<ServiceResponse>;
-    findOne(id: string): Promise<ServiceResponse>;
-    updateProfile(req: AuthenticatedRequest, updateUserDto: UpdateUserDto): Promise<ServiceResponse>;
-    update(id: string, updateUserDto: UpdateUserDto): Promise<ServiceResponse>;
-    remove(id: string): Promise<ServiceResponse>;
+    create(createUserDto: CreateUserDto): Promise<import("./entities/user.entity").User>;
+    register(registerDto: RegisterDto): Promise<import("./entities/user.entity").User>;
+    findAll(page?: string, limit?: string): Promise<import("./users.service").PaginatedResult<import("./entities/user.entity").User>>;
+    getProfile(req: AuthenticatedRequest): Promise<import("./entities/user.entity").User>;
+    findOne(id: string): Promise<import("./entities/user.entity").User>;
+    updateProfile(req: AuthenticatedRequest, updateUserDto: UpdateUserDto): Promise<import("./entities/user.entity").User>;
+    update(id: string, updateUserDto: UpdateUserDto): Promise<import("./entities/user.entity").User>;
+    remove(id: string): Promise<void>;
 }
 export {};

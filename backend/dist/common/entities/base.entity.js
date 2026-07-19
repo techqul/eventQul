@@ -9,20 +9,22 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BaseEntity = void 0;
+exports.BaseEntity = exports.dateTransformer = void 0;
 const typeorm_1 = require("typeorm");
-const dateTransformer = {
+exports.dateTransformer = {
     to(value) {
         if (value instanceof Date) {
             return value.toISOString();
         }
-        return value;
+        return value ?? null;
     },
     from(value) {
-        if (value) {
-            return new Date(value);
+        if (!value)
+            return null;
+        if (value instanceof Date) {
+            return value.toISOString();
         }
-        return null;
+        return value;
     },
 };
 class BaseEntity {
@@ -35,25 +37,25 @@ __decorate([
     (0, typeorm_1.CreateDateColumn)({
         name: 'created_at',
         type: 'timestamp',
-        transformer: dateTransformer,
+        transformer: exports.dateTransformer,
     }),
-    __metadata("design:type", Date)
+    __metadata("design:type", String)
 ], BaseEntity.prototype, "createdAt", void 0);
 __decorate([
     (0, typeorm_1.UpdateDateColumn)({
         name: 'updated_at',
         type: 'timestamp',
-        transformer: dateTransformer,
+        transformer: exports.dateTransformer,
     }),
-    __metadata("design:type", Date)
+    __metadata("design:type", String)
 ], BaseEntity.prototype, "updatedAt", void 0);
 __decorate([
     (0, typeorm_1.DeleteDateColumn)({
         name: 'deleted_at',
         type: 'timestamp',
         nullable: true,
-        transformer: dateTransformer,
+        transformer: exports.dateTransformer,
     }),
-    __metadata("design:type", Date)
+    __metadata("design:type", String)
 ], BaseEntity.prototype, "deletedAt", void 0);
 //# sourceMappingURL=base.entity.js.map

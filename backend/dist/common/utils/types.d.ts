@@ -1,12 +1,13 @@
 export * from './pagination.dto';
-export interface ServiceResponse<T = any> {
+export interface ServiceResponse<T = unknown> {
     success: boolean;
     message: string;
     data?: T;
-    pagination?: {
-        page: number;
-        limit: number;
-        total: number;
-        totalPages: number;
-    };
+    meta?: PaginationMeta;
+}
+export interface PaginationMeta {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
 }

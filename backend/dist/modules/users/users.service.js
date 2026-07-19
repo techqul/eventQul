@@ -60,220 +60,86 @@ let UsersService = UsersService_1 = class UsersService {
         this.userRepository = userRepository;
     }
     async create(createUserDto) {
-        try {
-            const existingUser = await this.userRepository.findOne({
-                where: { email: createUserDto.email },
-            });
-            if (existingUser) {
-                throw new common_1.ConflictException('Email already exists');
-            }
-            const saltRounds = process.env.BCRYPT_ROUNDS ? parseInt(process.env.BCRYPT_ROUNDS, 10) : 10;
-            const hashedPassword = await bcrypt.hash(createUserDto.password, saltRounds);
-            const user = this.userRepository.create({
-                ...createUserDto,
-                password: hashedPassword,
-            });
-            const savedUser = await this.userRepository.save(user);
-            this.logger.log(`User created successfully: ${savedUser.email}`);
-            return {
-                success: true,
-                message: 'User created successfully',
-                data: savedUser,
-            };
+        const existingUser = await this.userRepository.findOne({
+            where: { email: createUserDto.email },
+        });
+        if (existingUser) {
+            throw new common_1.ConflictException('Email already exists');
         }
-        catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            this.logger.error(`Error creating user: ${errorMessage}`);
-            if (error instanceof common_1.ConflictException) {
-                throw error;
-            }
-            throw new common_1.InternalServerErrorException('Failed to create user');
-        }
+        const saltRounds = process.env.BCRYPT_ROUNDS ? parseInt(process.env.BCRYPT_ROUNDS, 10) : 10;
+        const hashedPassword = await bcrypt.hash(createUserDto.password, saltRounds);
+        const user = this.userRepository.create({
+            ...createUserDto,
+            password: hashedPassword,
+        });
+        const savedUser = await this.userRepository.save(user);
+        this.logger.log(`User created successfully: ${savedUser.email}`);
+        return savedUser;
     }
     async register(registerDto) {
-        try {
-            const result = await this.create(registerDto);
-            const user = result.data;
-            await this.updateStatus(user.id, types_1.UserStatus.ACTIVE);
-            return {
-                success: true,
-                message: 'User registered successfully',
-                data: user,
-            };
-        }
-        catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            this.logger.error(`Error registering user: ${errorMessage}`);
-            throw error;
-        }
+        const user = await this.create(registerDto);
+        await this.updateStatus(user.id, types_1.UserStatus.ACTIVE);
+        return user;
     }
     async findAll(page = 1, limit = 20) {
-        try {
-            const [users, total] = await this.userRepository.findAndCount({
-                skip: (page - 1) * limit,
-                take: limit,
-                order: { createdAt: 'DESC' },
-            });
-            return {
-                success: true,
-                message: 'Users retrieved successfully',
-                data: users,
-                pagination: {
-                    page,
-                    limit,
-                    total,
-                    totalPages: Math.ceil(total / limit),
-                },
-            };
-        }
-        catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            this.logger.error(`Error fetching users: ${errorMessage}`);
-            throw new common_1.InternalServerErrorException('Failed to fetch users');
-        }
+        const [users, total] = await this.userRepository.findAndCount({
+            skip: (page - 1) * limit,
+            take: limit,
+            order: { createdAt: 'DESC' },
+        });
+        return {
+            data: users,
+            page,
+            size: limit,
+            total,
+        };
     }
     async findOne(id) {
-        try {
-            const user = await this.userRepository.findOne({
-                where: { id },
-            });
-            if (!user) {
-                throw new common_1.NotFoundException('User not found');
-            }
-            return {
-                success: true,
-                message: 'User retrieved successfully',
-                data: user,
-            };
+        const user = await this.userRepository.findOne({
+            where: { id },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
         }
-        catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            this.logger.error(`Error fetching user: ${errorMessage}`);
-            if (error instanceof common_1.NotFoundException) {
-                throw error;
-            }
-            throw new common_1.InternalServerErrorException('Failed to fetch user');
-        }
+        return user;
     }
     async findByEmail(email) {
-        try {
-            return await this.userRepository.findOne({
-                where: { email },
-            });
-        }
-        catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            this.logger.error(`Error finding user by email: ${errorMessage}`);
-            return null;
-        }
+        return this.userRepository.findOne({
+            where: { email },
+        });
     }
     async getProfile(userId) {
-        try {
-            const user = await this.userRepository.findOne({
-                where: { id: userId },
-            });
-            if (!user) {
-                throw new common_1.NotFoundException('User not found');
-            }
-            return {
-                success: true,
-                message: 'Profile retrieved successfully',
-                data: user,
-            };
+        const user = await this.userRepository.findOne({
+            where: { id: userId },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
         }
-        catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            this.logger.error(`Error fetching profile: ${errorMessage}`);
-            if (error instanceof common_1.NotFoundException) {
-                throw error;
-            }
-            throw new common_1.InternalServerErrorException('Failed to fetch profile');
-        }
+        return user;
     }
     async update(id, updateUserDto) {
-        try {
-            const user = await this.userRepository.findOne({
-                where: { id },
-            });
-            if (!user) {
-                throw new common_1.NotFoundException('User not found');
-            }
-            Object.assign(user, updateUserDto);
-            const updatedUser = await this.userRepository.save(user);
-            this.logger.log(`User updated successfully: ${updatedUser.email}`);
-            return {
-                success: true,
-                message: 'User updated successfully',
-                data: updatedUser,
-            };
-        }
-        catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            this.logger.error(`Error updating user: ${errorMessage}`);
-            if (error instanceof common_1.NotFoundException) {
-                throw error;
-            }
-            throw new common_1.InternalServerErrorException('Failed to update user');
-        }
+        const user = await this.findOne(id);
+        Object.assign(user, updateUserDto);
+        const updatedUser = await this.userRepository.save(user);
+        this.logger.log(`User updated successfully: ${updatedUser.email}`);
+        return updatedUser;
     }
     async updateLastLogin(id) {
-        try {
-            await this.userRepository.update(id, { lastLoginAt: new Date() });
-        }
-        catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            this.logger.error(`Error updating last login: ${errorMessage}`);
-        }
+        await this.userRepository.update(id, { lastLoginAt: new Date().toISOString() });
     }
     async remove(id) {
-        try {
-            const user = await this.userRepository.findOne({
-                where: { id },
-            });
-            if (!user) {
-                throw new common_1.NotFoundException('User not found');
-            }
-            await this.userRepository.softRemove(user);
-            this.logger.log(`User deleted successfully: ${id}`);
-            return {
-                success: true,
-                message: 'User deleted successfully',
-            };
+        const user = await this.findOne(id);
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
         }
-        catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            this.logger.error(`Error deleting user: ${errorMessage}`);
-            if (error instanceof common_1.NotFoundException) {
-                throw error;
-            }
-            throw new common_1.InternalServerErrorException('Failed to delete user');
-        }
+        await this.userRepository.delete(id);
     }
     async updateStatus(id, status) {
-        try {
-            const user = await this.userRepository.findOne({
-                where: { id },
-            });
-            if (!user) {
-                throw new common_1.NotFoundException('User not found');
-            }
-            user.status = status;
-            const updatedUser = await this.userRepository.save(user);
-            this.logger.log(`User status updated: ${id} -> ${status}`);
-            return {
-                success: true,
-                message: 'User status updated successfully',
-                data: updatedUser,
-            };
-        }
-        catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            this.logger.error(`Error updating user status: ${errorMessage}`);
-            if (error instanceof common_1.NotFoundException) {
-                throw error;
-            }
-            throw new common_1.InternalServerErrorException('Failed to update user status');
-        }
+        const user = await this.findOne(id);
+        user.status = status;
+        const updatedUser = await this.userRepository.save(user);
+        this.logger.log(`User status updated: ${id} -> ${status}`);
+        return updatedUser;
     }
 };
 exports.UsersService = UsersService;

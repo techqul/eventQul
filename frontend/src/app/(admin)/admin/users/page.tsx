@@ -15,15 +15,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AddUserDialog } from "@/components/users/AddUserDialog";
 import { usersApi } from "@/lib/api/users";
 import type { User } from "@/types/user";
+import type { UserFormData } from "@/lib/validations/user.schema";
 import { formatDate } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({
     total: 0,
@@ -39,7 +44,7 @@ export default function AdminUsersPage() {
 
       if (response.success && response.data) {
         setUsers(response.data);
-        setPagination(response.pagination || {
+        setPagination(response.meta || {
           total: 0,
           totalPages: 0,
           limit: 20,
@@ -76,6 +81,20 @@ export default function AdminUsersPage() {
     }
   };
 
+  const handleCreateUser = async (data: UserFormData) => {
+    setIsCreating(true);
+    try {
+      await usersApi.create(data);
+      toast.success("User created successfully");
+      await fetchUsers();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to create user");
+      throw err;
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
   const handleDeleteUser = async (userId: string) => {
     if (!confirm("Are you sure you want to delete this user?")) {
       return;
@@ -83,9 +102,10 @@ export default function AdminUsersPage() {
 
     try {
       await usersApi.delete(userId);
+      toast.success("User deleted successfully");
       await fetchUsers();
     } catch (err: any) {
-      setError(err.message || "Failed to delete user");
+      toast.error(err.message || "Failed to delete user");
     }
   };
 
@@ -93,9 +113,10 @@ export default function AdminUsersPage() {
     const newStatus = currentStatus === "active" ? "suspended" : "active";
     try {
       await usersApi.updateStatus(userId, newStatus);
+      toast.success(`User ${newStatus === "active" ? "activated" : "suspended"} successfully`);
       await fetchUsers();
     } catch (err: any) {
-      setError(err.message || "Failed to update user status");
+      toast.error(err.message || "Failed to update user status");
     }
   };
 
@@ -122,7 +143,7 @@ export default function AdminUsersPage() {
             Manage all users and their permissions
           </p>
         </div>
-        <Button>
+        <Button onClick={() => setIsAddDialogOpen(true)}>
           <UserPlus className="h-4 w-4 mr-2" />
           Add User
         </Button>
@@ -272,6 +293,14 @@ export default function AdminUsersPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Add User Dialog */}
+      <AddUserDialog
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+        onSubmit={handleCreateUser}
+        isLoading={isCreating}
+      />
     </div>
   );
 }

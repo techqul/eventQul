@@ -1,21 +1,25 @@
-import { Column, CreateDateColumn, DeleteDateColumn, UpdateDateColumn } from 'typeorm';
+import { CreateDateColumn, DeleteDateColumn, UpdateDateColumn } from 'typeorm';
 import { ValueTransformer } from 'typeorm';
 
 /**
  * Date transformer for TypeORM to properly serialize/deserialize dates
+ * Converts Date objects to ISO strings for proper JSON serialization
  */
-const dateTransformer: ValueTransformer = {
-  to(value?: Date): Date | string | null {
+export const dateTransformer: ValueTransformer = {
+  to(value?: Date | string): Date | string | null {
     if (value instanceof Date) {
       return value.toISOString();
     }
-    return value;
+    return value ?? null;
   },
-  from(value?: string): Date | null {
-    if (value) {
-      return new Date(value);
+  from(value?: string | Date): string | null {
+    if (!value) return null;
+    // If it's already a Date, convert to ISO string
+    if (value instanceof Date) {
+      return value.toISOString();
     }
-    return null;
+    // If it's a string, return it as-is (it should already be ISO format from DB)
+    return value;
   },
 };
 
@@ -25,14 +29,14 @@ export abstract class BaseEntity {
     type: 'timestamp',
     transformer: dateTransformer,
   })
-  createdAt!: Date;
+  createdAt!: string;
 
   @UpdateDateColumn({
     name: 'updated_at',
     type: 'timestamp',
     transformer: dateTransformer,
   })
-  updatedAt!: Date;
+  updatedAt!: string;
 
   @DeleteDateColumn({
     name: 'deleted_at',
@@ -40,5 +44,5 @@ export abstract class BaseEntity {
     nullable: true,
     transformer: dateTransformer,
   })
-  deletedAt?: Date;
+  deletedAt?: string;
 }

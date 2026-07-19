@@ -21,6 +21,7 @@ const update_user_dto_1 = require("./dto/update-user.dto");
 const jwt_auth_guard_1 = require("../../common/guards/jwt-auth.guard");
 const roles_guard_1 = require("../../common/guards/roles.guard");
 const roles_decorator_1 = require("../../common/decorators/roles.decorator");
+const response_message_decorator_1 = require("../../common/decorators/response-message.decorator");
 const types_1 = require("./types");
 let UsersController = class UsersController {
     usersService;
@@ -57,6 +58,7 @@ let UsersController = class UsersController {
 exports.UsersController = UsersController;
 __decorate([
     (0, common_1.Post)(),
+    (0, response_message_decorator_1.ResponseMessage)('User created successfully'),
     (0, swagger_1.ApiOperation)({ summary: 'Create a new user' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'User created successfully' }),
     (0, swagger_1.ApiResponse)({ status: 409, description: 'Email already exists' }),
@@ -67,6 +69,7 @@ __decorate([
 ], UsersController.prototype, "create", null);
 __decorate([
     (0, common_1.Post)('register'),
+    (0, response_message_decorator_1.ResponseMessage)('User registered successfully'),
     (0, swagger_1.ApiOperation)({ summary: 'Register a new user' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'User registered successfully' }),
     (0, swagger_1.ApiResponse)({ status: 409, description: 'Email already registered' }),
@@ -80,6 +83,7 @@ __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)(types_1.UserRole.ADMIN),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, response_message_decorator_1.ResponseMessage)('Users retrieved successfully'),
     (0, swagger_1.ApiOperation)({ summary: 'Get all users (Admin only)' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Users retrieved successfully' }),
     (0, swagger_1.ApiQuery)({ name: 'page', required: false, type: Number }),
@@ -94,6 +98,7 @@ __decorate([
     (0, common_1.Get)('me'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, response_message_decorator_1.ResponseMessage)('Profile retrieved successfully'),
     (0, swagger_1.ApiOperation)({ summary: 'Get current user profile' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Profile retrieved successfully' }),
     __param(0, (0, common_1.Req)()),
@@ -106,6 +111,7 @@ __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)(types_1.UserRole.ADMIN),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, response_message_decorator_1.ResponseMessage)('User retrieved successfully'),
     (0, swagger_1.ApiOperation)({ summary: 'Get user by ID (Admin only)' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'User retrieved successfully' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
@@ -118,6 +124,7 @@ __decorate([
     (0, common_1.Patch)('me'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, response_message_decorator_1.ResponseMessage)('Profile updated successfully'),
     (0, swagger_1.ApiOperation)({ summary: 'Update current user profile' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Profile updated successfully' }),
     __param(0, (0, common_1.Req)()),
@@ -131,6 +138,7 @@ __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)(types_1.UserRole.ADMIN),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, response_message_decorator_1.ResponseMessage)('User updated successfully'),
     (0, swagger_1.ApiOperation)({ summary: 'Update user (Admin only)' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'User updated successfully' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
@@ -146,6 +154,7 @@ __decorate([
     (0, roles_decorator_1.Roles)(types_1.UserRole.ADMIN),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
+    (0, response_message_decorator_1.ResponseMessage)('User deleted successfully'),
     (0, swagger_1.ApiOperation)({ summary: 'Delete user (Admin only)' }),
     (0, swagger_1.ApiResponse)({ status: 204, description: 'User deleted successfully' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),

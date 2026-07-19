@@ -1,5 +1,7 @@
+import { ValueTransformer } from 'typeorm';
+export declare const dateTransformer: ValueTransformer;
 export declare abstract class BaseEntity {
-    createdAt: Date;
-    updatedAt: Date;
-    deletedAt?: Date;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt?: string;
 }

@@ -13,7 +13,6 @@ const app_module_1 = require("./app.module");
 const http_exception_filter_1 = require("./common/filters/http-exception.filter");
 const query_exception_filter_1 = require("./common/filters/query-exception.filter");
 const validation_pipe_1 = require("./common/pipes/validation.pipe");
-const transform_interceptor_1 = require("./common/interceptors/transform.interceptor");
 const swagger_config_1 = require("./config/swagger.config");
 const app_config_1 = require("./config/app.config");
 async function bootstrap() {
@@ -21,7 +20,6 @@ async function bootstrap() {
         logger: ['error', 'warn', 'log', 'debug', 'verbose'],
     });
     const configService = app.get(config_1.ConfigService);
-    const reflector = app.get(core_1.Reflector);
     app.use((0, helmet_1.default)({
         contentSecurityPolicy: {
             directives: {
@@ -35,9 +33,7 @@ async function bootstrap() {
     }));
     app.use((0, compression_1.default)());
     app.enableCors({
-        origin: configService.get('CORS_ENABLED') === 'true'
-            ? configService.get('CORS_ORIGIN', '*')
-            : '*',
+        origin: configService.get('CORS_ENABLED') === 'true' ? configService.get('CORS_ORIGIN', '*') : '*',
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
@@ -49,7 +45,6 @@ async function bootstrap() {
     app.setGlobalPrefix(configService.get('API_PREFIX', 'api'));
     app.useGlobalPipes(new common_1.ValidationPipe(validation_pipe_1.validationPipeOptions));
     app.useGlobalFilters(new http_exception_filter_1.HttpExceptionFilter(configService), new query_exception_filter_1.QueryExceptionFilter());
-    app.useGlobalInterceptors(new transform_interceptor_1.TransformInterceptor(reflector), new transform_interceptor_1.ExcludeFieldsInterceptor());
     if (configService.get('NODE_ENV') !== 'production') {
         const document = swagger_1.SwaggerModule.createDocument(app, swagger_config_1.swaggerConfig);
         swagger_1.SwaggerModule.setup('api/docs', app, document, {

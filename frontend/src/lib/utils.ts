@@ -14,29 +14,38 @@ export function formatPrice(price: number, currency: string = "BDT"): string {
   }).format(price);
 }
 
-export function formatDate(date: Date | string): string {
+export function formatDate(date: Date | string | null | undefined): string {
+  if (!date) return "N/A";
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return "Invalid date";
   return new Intl.DateTimeFormat("en-BD", {
     year: "numeric",
     month: "long",
     day: "numeric",
-  }).format(new Date(date));
+  }).format(d);
 }
 
-export function formatTime(date: Date | string): string {
+export function formatTime(date: Date | string | null | undefined): string {
+  if (!date) return "N/A";
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return "Invalid date";
   return new Intl.DateTimeFormat("en-BD", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: true,
-  }).format(new Date(date));
+  }).format(d);
 }
 
-export function formatDateTime(date: Date | string): string {
+export function formatDateTime(date: Date | string | null | undefined): string {
   return `${formatDate(date)} at ${formatTime(date)}`;
 }
 
-export function formatRelativeTime(date: Date | string): string {
-  const now = new Date();
+export function formatRelativeTime(date: Date | string | null | undefined): string {
+  if (!date) return "N/A";
   const target = new Date(date);
+  if (isNaN(target.getTime())) return "Invalid date";
+
+  const now = new Date();
   const diffMs = target.getTime() - now.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 

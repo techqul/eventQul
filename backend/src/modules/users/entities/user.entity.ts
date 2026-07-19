@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { BaseEntity } from '../../../common/entities/base.entity';
+import { dateTransformer } from '../../../common/entities/base.entity';
 import { UserRole, UserStatus, BloodGroup, Gender, TShirtSize } from '../types';
 
 @Entity('users')
@@ -79,8 +80,8 @@ export class User extends BaseEntity {
   @Column({ name: 'avatar_url', nullable: true })
   avatarUrl?: string;
 
-  @Column({ name: 'last_login_at', type: 'timestamp', nullable: true })
-  lastLoginAt?: Date;
+  @Column({ name: 'last_login_at', type: 'timestamp', nullable: true, transformer: dateTransformer })
+  lastLoginAt?: string;
 
   // Method to validate password
   async validatePassword(password: string): Promise<boolean> {

@@ -1,4 +1,4 @@
-import { NestFactory, Reflector } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule } from '@nestjs/swagger';
@@ -8,10 +8,6 @@ import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { QueryExceptionFilter } from './common/filters/query-exception.filter';
 import { validationPipeOptions } from './common/pipes/validation.pipe';
-import {
-  TransformInterceptor,
-  ExcludeFieldsInterceptor,
-} from './common/interceptors/transform.interceptor';
 import { swaggerConfig } from './config/swagger.config';
 import { appConfig } from './config/app.config';
 
@@ -24,7 +20,6 @@ async function bootstrap() {
   });
 
   const configService = app.get(ConfigService);
-  const reflector = app.get(Reflector);
 
   // ============================================================================
   // Security
@@ -51,9 +46,7 @@ async function bootstrap() {
   // CORS - Enable cross-origin resource sharing
   app.enableCors({
     origin:
-      configService.get('CORS_ENABLED') === 'true'
-        ? configService.get('CORS_ORIGIN', '*')
-        : '*',
+      configService.get('CORS_ENABLED') === 'true' ? configService.get('CORS_ORIGIN', '*') : '*',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -84,20 +77,7 @@ async function bootstrap() {
   // ============================================================================
 
   // Global HTTP exception filter
-  app.useGlobalFilters(
-    new HttpExceptionFilter(configService),
-    new QueryExceptionFilter(),
-  );
-
-  // ============================================================================
-  // Interceptors
-  // ============================================================================
-
-  // Transform interceptor - wraps responses in consistent format
-  app.useGlobalInterceptors(
-    new TransformInterceptor(reflector),
-    new ExcludeFieldsInterceptor(),
-  );
+  app.useGlobalFilters(new HttpExceptionFilter(configService), new QueryExceptionFilter());
 
   // ============================================================================
   // Swagger Documentation

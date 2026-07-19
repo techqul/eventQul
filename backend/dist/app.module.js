@@ -45,6 +45,8 @@ const config_1 = require("@nestjs/config");
 const typeorm_1 = require("@nestjs/typeorm");
 const cache_manager_1 = require("@nestjs/cache-manager");
 const throttler_1 = require("@nestjs/throttler");
+const core_1 = require("@nestjs/core");
+const core_2 = require("@nestjs/core");
 const redisStore = __importStar(require("cache-manager-redis-store"));
 const database_config_1 = require("./config/database.config");
 const redis_config_1 = require("./config/redis.config");
@@ -53,6 +55,7 @@ const users_module_1 = require("./modules/users/users.module");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const auth_module_1 = require("./modules/auth/auth.module");
+const response_interceptor_1 = require("./common/interceptors/response.interceptor");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -89,7 +92,14 @@ exports.AppModule = AppModule = __decorate([
             users_module_1.UsersModule,
         ],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService],
+        providers: [
+            app_service_1.AppService,
+            {
+                provide: core_1.APP_INTERCEPTOR,
+                useFactory: (reflector) => new response_interceptor_1.ResponseInterceptor(reflector),
+                inject: [core_2.Reflector],
+            },
+        ],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map
