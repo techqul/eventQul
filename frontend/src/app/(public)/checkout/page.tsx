@@ -89,10 +89,10 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto p-4">
       <Link
         href={`/events/${event.slug}`}
-        className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6"
+        className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4"
       >
         <ArrowLeft className="h-4 w-4 mr-2" />
         Back to event
@@ -105,7 +105,7 @@ export default function CheckoutPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <h1 className="text-3xl font-bold mb-2">Checkout</h1>
+            <h1 className="text-2xl font-bold mb-1">Checkout</h1>
             <p className="text-muted-foreground">
               Complete your purchase to secure your tickets
             </p>
@@ -119,7 +119,7 @@ export default function CheckoutPage() {
           >
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-xl">
                   <User className="h-5 w-5" />
                   Attendee Information
                 </CardTitle>
@@ -167,7 +167,7 @@ export default function CheckoutPage() {
           >
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-xl">
                   <CreditCard className="h-5 w-5" />
                   Payment Method
                 </CardTitle>
@@ -269,7 +269,7 @@ export default function CheckoutPage() {
           >
             <Card>
               <CardHeader>
-                <CardTitle>Order Summary</CardTitle>
+                <CardTitle className="text-xl">Order Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Event */}

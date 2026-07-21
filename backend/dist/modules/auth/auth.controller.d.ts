@@ -9,9 +9,9 @@ export declare class AuthController {
     login(loginDto: LoginDto): Promise<import("./auth.service").AuthResponse>;
     refresh(refreshTokenDto: RefreshTokenDto): Promise<import("./auth.service").AuthTokens>;
     logout(refreshTokenDto: RefreshTokenDto): Promise<void>;
-    getCurrentUser(req: any): Promise<{
+    getCurrentUser(req: any): {
         success: boolean;
         message: string;
         data: any;
-    }>;
+    };
 }

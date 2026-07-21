@@ -20,5 +20,5 @@ export declare class User extends BaseEntity {
     avatarUrl?: string;
     lastLoginAt?: string;
     validatePassword(password: string): Promise<boolean>;
-    toJSON(): Omit<this, "password" | "validatePassword" | "toJSON">;
+    toJSON(): Omit<this, "password" | "setCreatedAt" | "setUpdatedAt" | "validatePassword" | "toJSON">;
 }

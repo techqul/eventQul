@@ -21,10 +21,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Helper to safely get localStorage items
+  const getStorageItem = useCallback((key: string): string | null => {
+    if (typeof window === 'undefined') return null;
+    try {
+      return localStorage.getItem(key);
+    } catch (e) {
+      return null;
+    }
+  }, []);
+
+  // Helper to safely set localStorage items
+  const setStorageItem = useCallback((key: string, value: string): boolean => {
+    if (typeof window === 'undefined') return false;
+    try {
+      localStorage.setItem(key, value);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }, []);
+
   // Check if user is authenticated on mount
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem('access_token');
+      const token = getStorageItem('access_token');
+
       if (!token) {
         setIsLoading(false);
         return;
@@ -35,17 +57,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (response.success && response.data) {
           setUser(response.data as User);
         }
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
+      } catch (error: any) {
+        // Only clear tokens if it's a 401/403 authentication error
+        const isAuthError = error?.message?.includes('401') ||
+                           error?.message?.includes('Unauthorized') ||
+                           error?.message?.includes('403');
+
+        if (isAuthError) {
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
     checkAuth();
-  }, []);
+  }, [getStorageItem]);
 
   const login = useCallback(async (credentials: LoginCredentials) => {
     try {
@@ -55,8 +83,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { user: userData, accessToken, refreshToken } = response.data;
 
         // Store tokens
-        localStorage.setItem('access_token', accessToken);
-        localStorage.setItem('refresh_token', refreshToken);
+        setStorageItem('access_token', accessToken);
+        setStorageItem('refresh_token', refreshToken);
 
         // Store user data
         setUser(userData as User);
@@ -65,20 +93,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         router.push('/admin');
       }
     } catch (error) {
-      console.error('Login failed:', error);
       throw error;
     }
-  }, [router]);
+  }, [router, setStorageItem]);
 
   const logout = useCallback(async () => {
-    const refreshToken = localStorage.getItem('refresh_token');
+    const refreshToken = getStorageItem('refresh_token');
 
     try {
       if (refreshToken) {
         await authApi.logout(refreshToken);
       }
-    } catch (error) {
-      console.error('Logout API call failed:', error);
     } finally {
       // Clear local storage regardless of API call result
       localStorage.removeItem('access_token');
@@ -86,7 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       router.push('/login');
     }
-  }, [router]);
+  }, [router, getStorageItem]);
 
   const refreshUser = useCallback(async () => {
     try {
@@ -95,7 +120,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(response.data as User);
       }
     } catch (error) {
-      console.error('Failed to refresh user:', error);
       throw error;
     }
   }, []);

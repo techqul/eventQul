@@ -118,12 +118,12 @@ export class UsersService {
   }
 
   async remove(id: string): Promise<void> {
-    const user = await this.findOne(id);
-    if(!user) {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
       throw new NotFoundException('User not found');
     }
     await this.userRepository.delete(id);
-
+    this.logger.log(`User permanently deleted: ${id}`);
   }
 
   async updateStatus(id: string, status: UserStatus): Promise<User> {

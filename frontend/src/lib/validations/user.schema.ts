@@ -64,15 +64,6 @@ export const userFormSchema = z.object({
   dob: z
     .string()
     .refine((val) => !val || !isNaN(Date.parse(val)), 'Invalid date format')
-    .refine((val) => {
-      if (!val) return true;
-      const date = new Date(val);
-      const minDate = new Date();
-      minDate.setFullYear(minDate.getFullYear() - 120); // Max 120 years old
-      const maxDate = new Date();
-      maxDate.setFullYear(maxDate.getFullYear() - 13); // Min 13 years old
-      return date >= minDate && date <= maxDate;
-    }, 'Date of birth must be between 13 and 120 years ago')
     .optional()
     .or(z.literal('')),
 
@@ -82,7 +73,7 @@ export const userFormSchema = z.object({
 
   tshirtSize: z.enum([TShirtSize.XS, TShirtSize.S, TShirtSize.M, TShirtSize.L, TShirtSize.XL, TShirtSize.XXL, TShirtSize.XXXL]).optional(),
 
-  role: z.enum([UserRole.USER, UserRole.ORGANIZER, UserRole.ADMIN]).default(UserRole.USER),
+  role: z.enum([UserRole.USER, UserRole.ORGANIZER, UserRole.ADMIN]),
 });
 
 export type UserFormData = z.infer<typeof userFormSchema>;

@@ -32,7 +32,8 @@ export const apiClient = {
       const error = await response.json().catch(() => ({
         message: response.statusText,
       }));
-      throw new Error(error.message || 'Request failed');
+      // Include status code in error message for better handling
+      throw new Error(error.message || `${response.status}: ${response.statusText}`);
     }
 
     return response.json();

@@ -6,6 +6,7 @@ import {
   HttpStatus,
   UseGuards,
   Req,
+  Get,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
@@ -55,13 +56,13 @@ export class AuthController {
     return this.authService.logout(refreshTokenDto);
   }
 
-  @Post('me')
+  @Get('me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get current user info' })
   @ApiResponse({ status: 200, description: 'User info retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getCurrentUser(@Req() req: any) {
+  getCurrentUser(@Req() req: any) {
     return {
       success: true,
       message: 'User info retrieved successfully',

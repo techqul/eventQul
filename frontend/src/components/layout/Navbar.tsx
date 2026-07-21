@@ -25,17 +25,17 @@ export function Navbar({ variant = "default" }: NavbarProps) {
           : "bg-background"
       )}
     >
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+      <div className="container mx-auto flex h-14 sm:h-16 items-center justify-between px-3 sm:px-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-purple-600">
-            <Ticket className="h-6 w-6 text-white" />
+        <Link href="/" className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-purple-600">
+            <Ticket className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
           </div>
-          <span className="text-xl font-bold text-gradient">EventQul</span>
+          <span className="text-lg sm:text-xl font-bold text-gradient hidden xs:inline">EventQul</span>
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-4 sm:gap-6">
           {navLinks.map((link) => (
             <Link
               key={link.name}

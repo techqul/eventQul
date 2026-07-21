@@ -2,7 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, MoreHorizontal, Shield, Edit, Trash2, UserPlus } from "lucide-react";
+import {
+  Search,
+  MoreHorizontal,
+  Shield,
+  Edit,
+  Trash2,
+  UserPlus,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +23,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AddUserDialog } from "@/components/users/AddUserDialog";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { usersApi } from "@/lib/api/users";
 import type { User } from "@/types/user";
 import type { UserFormData } from "@/lib/validations/user.schema";
@@ -44,11 +52,13 @@ export default function AdminUsersPage() {
 
       if (response.success && response.data) {
         setUsers(response.data);
-        setPagination(response.meta || {
-          total: 0,
-          totalPages: 0,
-          limit: 20,
-        });
+        setPagination(
+          response.meta || {
+            total: 0,
+            totalPages: 0,
+            limit: 20,
+          },
+        );
       }
     } catch (err: any) {
       setError(err.message || "Failed to fetch users");
@@ -61,9 +71,12 @@ export default function AdminUsersPage() {
     fetchUsers();
   }, [page]);
 
-  const filteredUsers = users.filter((user) =>
-    user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredUsers = users.filter(
+    (user) =>
+      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      `${user.firstName} ${user.lastName}`
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()),
   );
 
   const getInitials = (firstName: string, lastName: string) => {
@@ -82,11 +95,12 @@ export default function AdminUsersPage() {
   };
 
   const handleCreateUser = async (data: UserFormData) => {
+    console.log("data", data);
     setIsCreating(true);
     try {
-      await usersApi.create(data);
-      toast.success("User created successfully");
+      const response = await usersApi.create(data);
       await fetchUsers();
+      return response;
     } catch (err: any) {
       toast.error(err.message || "Failed to create user");
       throw err;
@@ -101,19 +115,26 @@ export default function AdminUsersPage() {
     }
 
     try {
-      await usersApi.delete(userId);
-      toast.success("User deleted successfully");
-      await fetchUsers();
+      const res: any = await usersApi.delete(userId);
+      if (res.success) {
+        toast.success(res.message || "User deleted successfully");
+        await fetchUsers();
+      }
     } catch (err: any) {
       toast.error(err.message || "Failed to delete user");
     }
   };
 
-  const handleToggleUserStatus = async (userId: string, currentStatus: string) => {
+  const handleToggleUserStatus = async (
+    userId: string,
+    currentStatus: string,
+  ) => {
     const newStatus = currentStatus === "active" ? "suspended" : "active";
     try {
       await usersApi.updateStatus(userId, newStatus);
-      toast.success(`User ${newStatus === "active" ? "activated" : "suspended"} successfully`);
+      toast.success(
+        `User ${newStatus === "active" ? "activated" : "suspended"} successfully`,
+      );
       await fetchUsers();
     } catch (err: any) {
       toast.error(err.message || "Failed to update user status");
@@ -131,55 +152,128 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-8 flex justify-between items-center"
+        className="mb-4 sm:mb-6"
       >
-        <div>
-          <h1 className="text-3xl font-bold mb-2">User Management</h1>
-          <p className="text-muted-foreground">
-            Manage all users and their permissions
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <h1 className="text-xl sm:text-2xl font-bold">User Management</h1>
+
+          <Breadcrumb
+            items={[{ label: "Admin", href: "/admin" }, { label: "Users" }]}
+          />
         </div>
-        <Button onClick={() => setIsAddDialogOpen(true)}>
-          <UserPlus className="h-4 w-4 mr-2" />
-          Add User
-        </Button>
       </motion.div>
 
       {error && (
-        <Alert variant="destructive" className="mb-6">
+        <Alert variant="destructive" className="mb-4 sm:mb-6">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
       <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle>
-              All Users ({pagination.total} total)
-            </CardTitle>
-            <div className="flex gap-3">
+        <CardHeader className="pb-4 sm:pb-0">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+            <div className="flex-1 w-full sm:max-w-sm">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search users..."
-                  className="pl-10 w-64"
+                  className="pl-10 h-10 sm:h-auto"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
             </div>
+            <Button onClick={() => setIsAddDialogOpen(true)} className="w-full sm:w-auto">
+              <UserPlus className="h-4 w-4 mr-1 sm:mr-2" />
+              <span>Add User</span>
+            </Button>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
+        <CardContent className="p-4">
+          {/* Mobile Card View */}
+          <div className="md:hidden space-y-3 sm:space-y-4">
+            {filteredUsers.map((user, index) => (
+              <motion.div
+                key={user.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="border rounded-lg p-3 sm:p-4 space-y-2 sm:space-y-3"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                    <Avatar className="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0">
+                      <AvatarFallback className="text-xs sm:text-sm">
+                        {getInitials(user.firstName, user.lastName)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm sm:text-base truncate">
+                        {user.firstName} {user.lastName}
+                      </p>
+                      <p className="text-xs sm:text-sm text-muted-foreground truncate">{user.email}</p>
+                    </div>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="flex-shrink-0">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="min-w-[160px]">
+                      <DropdownMenuItem className="cursor-pointer">
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit User
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() =>
+                          handleToggleUserStatus(user.id, user.status)
+                        }
+                      >
+                        <Shield className="h-4 w-4 mr-2" />
+                        {user.status === "active" ? "Suspend" : "Activate"}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-destructive cursor-pointer"
+                        onClick={() => handleDeleteUser(user.id)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete User
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                  <Badge variant={getRoleBadgeVariant(user.role)} className="text-xs">
+                    {user.role}
+                  </Badge>
+                  <Badge
+                    variant={
+                      user.status === "active" ? "default" : "secondary"
+                    }
+                    className="text-xs"
+                  >
+                    {user.status}
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
+                    {formatDate(new Date(user.createdAt))}
+                  </Badge>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left pb-3 font-medium">User</th>
+                  <th className="text-left pb-3 font-medium">Name</th>
                   <th className="text-left pb-3 font-medium">Email</th>
                   <th className="text-left pb-3 font-medium">Role</th>
                   <th className="text-left pb-3 font-medium">Status</th>
@@ -196,7 +290,7 @@ export default function AdminUsersPage() {
                     transition={{ delay: index * 0.05 }}
                     className="border-b last:border-0 hover:bg-muted/50"
                   >
-                    <td className="py-4">
+                    <td className="py-3">
                       <div className="flex items-center gap-3">
                         <Avatar>
                           <AvatarFallback>
@@ -208,25 +302,25 @@ export default function AdminUsersPage() {
                         </span>
                       </div>
                     </td>
-                    <td className="py-4 text-muted-foreground">
-                      {user.email}
-                    </td>
-                    <td className="py-4">
+                    <td className="py-3 text-muted-foreground">{user.email}</td>
+                    <td className="py-3">
                       <Badge variant={getRoleBadgeVariant(user.role)}>
                         {user.role}
                       </Badge>
                     </td>
-                    <td className="py-4">
+                    <td className="py-3">
                       <Badge
-                        variant={user.status === "active" ? "default" : "secondary"}
+                        variant={
+                          user.status === "active" ? "default" : "secondary"
+                        }
                       >
                         {user.status}
                       </Badge>
                     </td>
-                    <td className="py-4 text-muted-foreground">
+                    <td className="py-3 text-muted-foreground">
                       {formatDate(new Date(user.createdAt))}
                     </td>
-                    <td className="py-4 text-right">
+                    <td className="py-3 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
@@ -234,18 +328,21 @@ export default function AdminUsersPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem className="cursor-pointer">
                             <Edit className="h-4 w-4 mr-2" />
                             Edit User
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => handleToggleUserStatus(user.id, user.status)}
+                            className="cursor-pointer"
+                            onClick={() =>
+                              handleToggleUserStatus(user.id, user.status)
+                            }
                           >
                             <Shield className="h-4 w-4 mr-2" />
                             {user.status === "active" ? "Suspend" : "Activate"}
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            className="text-destructive"
+                            className="text-destructive cursor-pointer"
                             onClick={() => handleDeleteUser(user.id)}
                           >
                             <Trash2 className="h-4 w-4 mr-2" />
@@ -267,24 +364,28 @@ export default function AdminUsersPage() {
           </div>
 
           {pagination.totalPages > 1 && (
-            <div className="flex items-center justify-between mt-4">
-              <p className="text-sm text-muted-foreground">
-                Page {page} of {pagination.totalPages}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4 sm:mt-6 pt-4 border-t">
+              <p className="text-xs sm:text-sm text-muted-foreground text-center sm:text-left">
+                Page {page} of {pagination.totalPages} ({pagination.total} users)
               </p>
-              <div className="flex gap-2">
+              <div className="flex gap-2 justify-center sm:justify-end">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
+                  className="px-4 sm:px-6"
                 >
                   Previous
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
+                  onClick={() =>
+                    setPage((p) => Math.min(pagination.totalPages, p + 1))
+                  }
                   disabled={page === pagination.totalPages}
+                  className="px-4 sm:px-6"
                 >
                   Next
                 </Button>

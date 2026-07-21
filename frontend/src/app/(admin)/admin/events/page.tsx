@@ -76,7 +76,7 @@ export default function AdminEventsPage() {
                             {event.title}
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            {event.category.name}
+                            {event.category?.name}
                           </p>
                         </div>
                       </div>
@@ -84,8 +84,8 @@ export default function AdminEventsPage() {
                     <td className="py-4">
                       <div className="flex items-center gap-2">
                         <img
-                          src={event.organizer.logo}
-                          alt={event.organizer.name}
+                          src={event?.organizer?.logo}
+                          alt={event?.organizer?.name}
                           className="h-6 w-6 rounded"
                         />
                         <span className="text-sm">{event.organizer.name}</span>

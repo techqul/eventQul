@@ -93,17 +93,17 @@ const recentActivity = [
 
 export default function AdminDashboardPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
+        className="mb-6 sm:mb-8"
       >
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Admin Dashboard</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Overview of platform performance and metrics
             </p>
           </div>
@@ -115,7 +115,7 @@ export default function AdminDashboardPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+        className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8"
       >
         {platformStats.map((stat, index) => (
           <motion.div
@@ -125,20 +125,21 @@ export default function AdminDashboardPage() {
             transition={{ delay: 0.1 + index * 0.05 }}
           >
             <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-                    <stat.icon className={`h-6 w-6 ${stat.color}`} />
+              <CardContent className="p-3 sm:p-6">
+                <div className="flex items-center justify-between mb-3 sm:mb-4">
+                  <div className={`p-2 sm:p-3 rounded-lg ${stat.bgColor}`}>
+                    <stat.icon className={`h-5 w-5 sm:h-6 sm:w-6 ${stat.color}`} />
                   </div>
-                  <div className="flex items-center gap-1 text-sm text-green-500">
-                    <ArrowUpRight className="h-4 w-4" />
-                    <span>{stat.change}</span>
+                  <div className="flex items-center gap-0.5 sm:gap-1 text-xs sm:text-sm text-green-500">
+                    <ArrowUpRight className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden xs:inline">{stat.change}</span>
+                    <span className="xs:hidden">+{stat.change.split('.')[0]}%</span>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground mb-1">
+                <p className="text-xs sm:text-sm text-muted-foreground mb-1 line-clamp-1">
                   {stat.title}
                 </p>
-                <p className="text-2xl font-bold">{stat.value}</p>
+                <p className="text-lg sm:text-2xl font-bold truncate">{stat.value}</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -146,7 +147,7 @@ export default function AdminDashboardPage() {
       </motion.div>
 
       {/* Charts */}
-      <div className="grid lg:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
         {/* Revenue Chart */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -154,20 +155,29 @@ export default function AdminDashboardPage() {
           transition={{ delay: 0.3 }}
         >
           <Card>
-            <CardHeader>
-              <CardTitle>Platform Revenue</CardTitle>
+            <CardHeader className="pb-2 sm:pb-0">
+              <CardTitle className="text-base sm:text-lg">Platform Revenue</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height={200}>
                 <AreaChart data={revenueData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis dataKey="month" className="text-muted-foreground" />
-                  <YAxis className="text-muted-foreground" />
+                  <XAxis
+                    dataKey="month"
+                    className="text-muted-foreground"
+                    tick={{ fontSize: 12 }}
+                  />
+                  <YAxis
+                    className="text-muted-foreground"
+                    tick={{ fontSize: 11 }}
+                    tickFormatter={(value) => `৳${(value / 1000000).toFixed(0)}M`}
+                  />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "hsl(var(--card))",
                       border: "1px solid hsl(var(--border))",
                       borderRadius: "8px",
+                      fontSize: "12px",
                     }}
                     formatter={(value: number) => [
                       `৳ ${(value / 1000000).toFixed(1)}M`,
@@ -214,20 +224,29 @@ export default function AdminDashboardPage() {
           transition={{ delay: 0.4 }}
         >
           <Card>
-            <CardHeader>
-              <CardTitle>User Growth</CardTitle>
+            <CardHeader className="pb-2 sm:pb-0">
+              <CardTitle className="text-base sm:text-lg">User Growth</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height={200}>
                 <LineChart data={userGrowthData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis dataKey="month" className="text-muted-foreground" />
-                  <YAxis className="text-muted-foreground" />
+                  <XAxis
+                    dataKey="month"
+                    className="text-muted-foreground"
+                    tick={{ fontSize: 12 }}
+                  />
+                  <YAxis
+                    className="text-muted-foreground"
+                    tick={{ fontSize: 11 }}
+                    tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
+                  />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "hsl(var(--card))",
                       border: "1px solid hsl(var(--border))",
                       borderRadius: "8px",
+                      fontSize: "12px",
                     }}
                   />
                   <Line
@@ -235,7 +254,7 @@ export default function AdminDashboardPage() {
                     dataKey="users"
                     stroke="hsl(var(--primary))"
                     strokeWidth={2}
-                    dot={{ fill: "hsl(var(--primary))" }}
+                    dot={{ fill: "hsl(var(--primary))", r: 4 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -244,7 +263,7 @@ export default function AdminDashboardPage() {
         </motion.div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Category Distribution */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -252,25 +271,30 @@ export default function AdminDashboardPage() {
           transition={{ delay: 0.5 }}
         >
           <Card>
-            <CardHeader>
-              <CardTitle>Events by Category</CardTitle>
+            <CardHeader className="pb-2 sm:pb-0">
+              <CardTitle className="text-base sm:text-lg">Events by Category</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={categoryData} layout="vertical">
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={categoryData} layout="horizontal">
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis type="number" className="text-muted-foreground" />
-                  <YAxis
-                    dataKey="name"
+                  <XAxis
                     type="category"
-                    width={80}
+                    dataKey="name"
                     className="text-muted-foreground"
+                    tick={{ fontSize: 10 }}
+                    interval={0}
+                    angle={-45}
+                    textAnchor="end"
+                    height={40}
                   />
+                  <YAxis type="number" className="text-muted-foreground" tick={{ fontSize: 11 }} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "hsl(var(--card))",
                       border: "1px solid hsl(var(--border))",
                       borderRadius: "8px",
+                      fontSize: "12px",
                     }}
                   />
                   <Bar dataKey="value" fill="hsl(var(--primary))" />
@@ -288,24 +312,24 @@ export default function AdminDashboardPage() {
           className="lg:col-span-2"
         >
           <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
+            <CardHeader className="pb-2 sm:pb-0">
+              <CardTitle className="text-base sm:text-lg">Recent Activity</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {recentActivity.map((activity) => (
                   <div
                     key={activity.id}
-                    className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                    className="flex items-start gap-2 sm:gap-4 p-2 sm:p-3 rounded-lg hover:bg-muted/50 transition-colors"
                   >
-                    <div className="h-2 w-2 rounded-full bg-primary mt-2" />
-                    <div className="flex-1">
-                      <p className="font-medium">{activity.action}</p>
-                      <p className="text-sm text-muted-foreground">
+                    <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-primary mt-1.5 sm:mt-2 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm sm:font-medium truncate">{activity.action}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground truncate">
                         {activity.entity}
                       </p>
                     </div>
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
+                    <span className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0">
                       {activity.time}
                     </span>
                   </div>

@@ -6,8 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  HttpCode,
-  HttpStatus,
   UseGuards,
   Req,
   Query,
@@ -117,12 +115,12 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
-  @HttpCode(HttpStatus.NO_CONTENT)
   @ResponseMessage('User deleted successfully')
   @ApiOperation({ summary: 'Delete user (Admin only)' })
-  @ApiResponse({ status: 204, description: 'User deleted successfully' })
+  @ApiResponse({ status: 200, description: 'User deleted successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
   async remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+    await this.usersService.remove(id);
+    return { success: true };
   }
 }

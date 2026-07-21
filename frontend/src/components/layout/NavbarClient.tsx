@@ -61,40 +61,46 @@ export function NavbarClient({ variant = "default" }: NavbarClientProps) {
   return (
     <>
       {/* Desktop Actions */}
-      <div className="hidden md:flex items-center gap-3">
+      <div className="hidden md:flex items-center gap-2 sm:gap-3">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setIsSearchOpen(!isSearchOpen)}
+          className="h-8 w-8 sm:h-9 sm:w-9"
         >
-          <Search className="h-5 w-5" />
+          <Search className="h-4 w-4 sm:h-5 sm:w-5" />
         </Button>
 
-        <Button variant="ghost" size="icon" onClick={toggleTheme}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleTheme}
+          className="h-8 w-8 sm:h-9 sm:w-9"
+        >
           {isDark ? (
-            <Sun className="h-5 w-5" />
+            <Sun className="h-4 w-4 sm:h-5 sm:w-5" />
           ) : (
-            <Moon className="h-5 w-5" />
+            <Moon className="h-4 w-4 sm:h-5 sm:w-5" />
           )}
         </Button>
 
         {isLoggedIn ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Avatar className="h-8 w-8">
+              <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9">
+                <Avatar className="h-7 w-7 sm:h-8 sm:w-8">
                   <AvatarImage
                     src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop"
                   />
-                  <AvatarFallback>AH</AvatarFallback>
+                  <AvatarFallback className="text-xs">AH</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent align="end" className="w-52 sm:w-56">
               <DropdownMenuLabel>
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium">Ahmed Rahman</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground truncate">
                     ahmed@example.com
                   </p>
                 </div>
@@ -130,10 +136,10 @@ export function NavbarClient({ variant = "default" }: NavbarClientProps) {
           </DropdownMenu>
         ) : (
           <>
-            <Button variant="ghost" asChild>
+            <Button variant="ghost" asChild className="text-sm">
               <Link href="/login">Log in</Link>
             </Button>
-            <Button variant="gradient" asChild>
+            <Button variant="gradient" asChild className="text-sm">
               <Link href="/signup">Sign up</Link>
             </Button>
           </>
@@ -141,23 +147,25 @@ export function NavbarClient({ variant = "default" }: NavbarClientProps) {
       </div>
 
       {/* Mobile Menu Button */}
-      <div className="flex md:hidden items-center gap-2">
+      <div className="flex md:hidden items-center gap-1 sm:gap-2">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setIsSearchOpen(!isSearchOpen)}
+          className="h-8 w-8"
         >
-          <Search className="h-5 w-5" />
+          <Search className="h-4 w-4" />
         </Button>
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="h-8 w-8"
         >
           {isMenuOpen ? (
-            <X className="h-6 w-6" />
+            <X className="h-5 w-5" />
           ) : (
-            <Menu className="h-6 w-6" />
+            <Menu className="h-5 w-5" />
           )}
         </Button>
       </div>
@@ -172,12 +180,12 @@ export function NavbarClient({ variant = "default" }: NavbarClientProps) {
             transition={{ duration: 0.2 }}
             className="border-t bg-background/95 backdrop-blur"
           >
-            <div className="container mx-auto px-4 py-4">
+            <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search events, categories, organizers..."
-                  className="pl-10 h-12"
+                  className="pl-10 h-10 sm:h-12 text-sm"
                 />
               </div>
             </div>
@@ -195,7 +203,7 @@ export function NavbarClient({ variant = "default" }: NavbarClientProps) {
             transition={{ duration: 0.2 }}
             className="md:hidden border-t bg-background/95 backdrop-blur"
           >
-            <div className="container mx-auto px-4 py-4 space-y-4">
+            <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 space-y-2 sm:space-y-4">
               <Link
                 href="/events"
                 className="block py-2 text-sm font-medium"
@@ -237,7 +245,7 @@ export function NavbarClient({ variant = "default" }: NavbarClientProps) {
                 )}
               </Button>
 
-              <div className="pt-4 space-y-2">
+              <div className="pt-2 sm:pt-4 space-y-2">
                 {isLoggedIn ? (
                   <>
                     <Link

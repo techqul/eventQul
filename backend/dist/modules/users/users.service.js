@@ -128,11 +128,12 @@ let UsersService = UsersService_1 = class UsersService {
         await this.userRepository.update(id, { lastLoginAt: new Date().toISOString() });
     }
     async remove(id) {
-        const user = await this.findOne(id);
+        const user = await this.userRepository.findOneBy({ id });
         if (!user) {
             throw new common_1.NotFoundException('User not found');
         }
         await this.userRepository.delete(id);
+        this.logger.log(`User permanently deleted: ${id}`);
     }
     async updateStatus(id, status) {
         const user = await this.findOne(id);

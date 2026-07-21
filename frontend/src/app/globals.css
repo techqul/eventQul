@@ -111,3 +111,16 @@
 * {
   @apply transition-colors duration-200;
 }
+
+
+.flatpickr-wrapper {
+  width: 100%;
+}
+
+.flatpickr-wrapper input {
+  width: 100%;
+}
+
+.flatpickr-calendar {
+  z-index: 999999 !important;
+}

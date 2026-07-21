@@ -52,7 +52,8 @@ let UsersController = class UsersController {
         return this.usersService.update(id, updateUserDto);
     }
     async remove(id) {
-        return this.usersService.remove(id);
+        await this.usersService.remove(id);
+        return { success: true };
     }
 };
 exports.UsersController = UsersController;
@@ -153,10 +154,9 @@ __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)(types_1.UserRole.ADMIN),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
-    (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
     (0, response_message_decorator_1.ResponseMessage)('User deleted successfully'),
     (0, swagger_1.ApiOperation)({ summary: 'Delete user (Admin only)' }),
-    (0, swagger_1.ApiResponse)({ status: 204, description: 'User deleted successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'User deleted successfully' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),

@@ -1,4 +1,4 @@
-import { CreateDateColumn, DeleteDateColumn, UpdateDateColumn } from 'typeorm';
+import { CreateDateColumn, DeleteDateColumn, UpdateDateColumn, BeforeInsert, BeforeUpdate } from 'typeorm';
 import { ValueTransformer } from 'typeorm';
 
 /**
@@ -45,4 +45,19 @@ export abstract class BaseEntity {
     transformer: dateTransformer,
   })
   deletedAt?: string;
+
+  @BeforeInsert()
+  setCreatedAt() {
+    if (!this.createdAt) {
+      this.createdAt = new Date().toISOString();
+    }
+    if (!this.updatedAt) {
+      this.updatedAt = new Date().toISOString();
+    }
+  }
+
+  @BeforeUpdate()
+  setUpdatedAt() {
+    this.updatedAt = new Date().toISOString();
+  }
 }

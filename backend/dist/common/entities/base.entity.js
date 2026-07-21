@@ -31,6 +31,17 @@ class BaseEntity {
     createdAt;
     updatedAt;
     deletedAt;
+    setCreatedAt() {
+        if (!this.createdAt) {
+            this.createdAt = new Date().toISOString();
+        }
+        if (!this.updatedAt) {
+            this.updatedAt = new Date().toISOString();
+        }
+    }
+    setUpdatedAt() {
+        this.updatedAt = new Date().toISOString();
+    }
 }
 exports.BaseEntity = BaseEntity;
 __decorate([
@@ -58,4 +69,16 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], BaseEntity.prototype, "deletedAt", void 0);
+__decorate([
+    (0, typeorm_1.BeforeInsert)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], BaseEntity.prototype, "setCreatedAt", null);
+__decorate([
+    (0, typeorm_1.BeforeUpdate)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], BaseEntity.prototype, "setUpdatedAt", null);
 //# sourceMappingURL=base.entity.js.map

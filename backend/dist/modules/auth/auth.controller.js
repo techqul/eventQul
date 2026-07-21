@@ -37,7 +37,7 @@ let AuthController = class AuthController {
     async logout(refreshTokenDto) {
         return this.authService.logout(refreshTokenDto);
     }
-    async getCurrentUser(req) {
+    getCurrentUser(req) {
         return {
             success: true,
             message: 'User info retrieved successfully',
@@ -91,7 +91,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "logout", null);
 __decorate([
-    (0, common_1.Post)('me'),
+    (0, common_1.Get)('me'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({ summary: 'Get current user info' }),
@@ -100,7 +100,7 @@ __decorate([
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
+    __metadata("design:returntype", void 0)
 ], AuthController.prototype, "getCurrentUser", null);
 exports.AuthController = AuthController = __decorate([
     (0, swagger_1.ApiTags)('Auth'),

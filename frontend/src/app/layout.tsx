@@ -3,10 +3,11 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { Toaster } from "@/components/ui/toaster";
+
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { generateOrganizationStructuredData, generateWebSiteStructuredData } from "@/lib/structured-data";
+import { Toaster } from 'sonner';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -99,12 +100,12 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <ThemeProvider />
+          <Toaster />
           <div className="min-h-screen flex flex-col">
             <Navbar variant="glass" />
             <main className="flex-1">{children}</main>
             <Footer />
           </div>
-          <Toaster />
         </AuthProvider>
       </body>
     </html>
