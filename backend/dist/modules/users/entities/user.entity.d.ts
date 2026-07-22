@@ -19,6 +19,9 @@ export declare class User extends BaseEntity {
     emailVerified: boolean;
     avatarUrl?: string;
     lastLoginAt?: string;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt?: string;
     validatePassword(password: string): Promise<boolean>;
     toJSON(): Omit<this, "password" | "setCreatedAt" | "setUpdatedAt" | "validatePassword" | "toJSON">;
 }

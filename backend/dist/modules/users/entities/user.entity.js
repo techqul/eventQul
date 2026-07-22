@@ -171,6 +171,31 @@ __decorate([
     (0, typeorm_1.Column)({ name: 'last_login_at', type: 'timestamp', nullable: true, transformer: base_entity_2.dateTransformer }),
     __metadata("design:type", String)
 ], User.prototype, "lastLoginAt", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)({
+        name: 'created_at',
+        type: 'timestamp',
+        transformer: base_entity_2.dateTransformer,
+    }),
+    __metadata("design:type", String)
+], User.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.UpdateDateColumn)({
+        name: 'updated_at',
+        type: 'timestamp',
+        transformer: base_entity_2.dateTransformer,
+    }),
+    __metadata("design:type", String)
+], User.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.DeleteDateColumn)({
+        name: 'deleted_at',
+        type: 'timestamp',
+        nullable: true,
+        transformer: base_entity_2.dateTransformer,
+    }),
+    __metadata("design:type", String)
+], User.prototype, "deletedAt", void 0);
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)('users')
 ], User);

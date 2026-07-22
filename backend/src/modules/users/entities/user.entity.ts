@@ -1,11 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { BaseEntity } from '../../../common/entities/base.entity';
-import { dateTransformer } from '../../../common/entities/base.entity';
+import { dateTransformer } from '../../../common/utils/helper';
 import { UserRole, UserStatus, BloodGroup, Gender, TShirtSize } from '../types';
 
 @Entity('users')
-export class User extends BaseEntity {
+export class User {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -82,6 +81,28 @@ export class User extends BaseEntity {
 
   @Column({ name: 'last_login_at', type: 'timestamp', nullable: true, transformer: dateTransformer })
   lastLoginAt?: string;
+
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamp',
+    transformer: dateTransformer,
+  })
+  declare createdAt: string;
+
+  @UpdateDateColumn({
+    name: 'updated_at',
+    type: 'timestamp',
+    transformer: dateTransformer,
+  })
+  declare updatedAt: string;
+
+  @DeleteDateColumn({
+    name: 'deleted_at',
+    type: 'timestamp',
+    nullable: true,
+    transformer: dateTransformer,
+  })
+  declare deletedAt?: string;
 
   // Method to validate password
   async validatePassword(password: string): Promise<boolean> {

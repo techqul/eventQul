@@ -52,6 +52,11 @@ const database_config_1 = require("./config/database.config");
 const redis_config_1 = require("./config/redis.config");
 const health_module_1 = require("./health/health.module");
 const users_module_1 = require("./modules/users/users.module");
+const categories_module_1 = require("./modules/category/categories.module");
+const venues_module_1 = require("./modules/venue/venues.module");
+const organizers_module_1 = require("./modules/organizer/organizers.module");
+const events_module_1 = require("./modules/event/events.module");
+const orders_module_1 = require("./modules/order/orders.module");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const auth_module_1 = require("./modules/auth/auth.module");
@@ -90,6 +95,11 @@ exports.AppModule = AppModule = __decorate([
             health_module_1.HealthModule,
             auth_module_1.AuthModule,
             users_module_1.UsersModule,
+            categories_module_1.CategoriesModule,
+            venues_module_1.VenuesModule,
+            organizers_module_1.OrganizersModule,
+            events_module_1.EventsModule,
+            orders_module_1.OrdersModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [

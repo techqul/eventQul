@@ -10,6 +10,11 @@ import { dataSourceOptions } from './config/database.config';
 import { redisOptions, RedisTTL } from './config/redis.config';
 import { HealthModule } from './health/health.module';
 import { UsersModule } from './modules/users/users.module';
+import { CategoriesModule } from './modules/category/categories.module';
+import { VenuesModule } from './modules/venue/venues.module';
+import { OrganizersModule } from './modules/organizer/organizers.module';
+import { EventsModule } from './modules/event/events.module';
+import { OrdersModule } from './modules/order/orders.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
@@ -58,6 +63,11 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     HealthModule,
     AuthModule,
     UsersModule,
+    CategoriesModule,
+    VenuesModule,
+    OrganizersModule,
+    EventsModule,
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [

@@ -28,47 +28,12 @@ exports.dateTransformer = {
     },
 };
 class BaseEntity {
-    createdAt;
-    updatedAt;
-    deletedAt;
     setCreatedAt() {
-        if (!this.createdAt) {
-            this.createdAt = new Date().toISOString();
-        }
-        if (!this.updatedAt) {
-            this.updatedAt = new Date().toISOString();
-        }
     }
     setUpdatedAt() {
-        this.updatedAt = new Date().toISOString();
     }
 }
 exports.BaseEntity = BaseEntity;
-__decorate([
-    (0, typeorm_1.CreateDateColumn)({
-        name: 'created_at',
-        type: 'timestamp',
-        transformer: exports.dateTransformer,
-    }),
-    __metadata("design:type", String)
-], BaseEntity.prototype, "createdAt", void 0);
-__decorate([
-    (0, typeorm_1.UpdateDateColumn)({
-        name: 'updated_at',
-        type: 'timestamp',
-        transformer: exports.dateTransformer,
-    }),
-    __metadata("design:type", String)
-], BaseEntity.prototype, "updatedAt", void 0);
-__decorate([
-    (0, typeorm_1.DeleteDateColumn)({
-        name: 'deleted_at',
-        type: 'timestamp',
-        nullable: true,
-        transformer: exports.dateTransformer,
-    }),
-    __metadata("design:type", String)
-], BaseEntity.prototype, "deletedAt", void 0);
 __decorate([
     (0, typeorm_1.BeforeInsert)(),
     __metadata("design:type", Function),
