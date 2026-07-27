@@ -1,9 +1,17 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from 'typeorm';
 import { Order } from './order.entity';
 import { Event } from '../../event/entities/event.entity';
 import { TicketType } from '../../event/entities/ticket-type.entity';
 import { TicketStatus } from '../types/order-status.enum';
-import { dateTransformer } from '../../../common/utils/helper';
 
 @Entity('tickets')
 export class Ticket {
@@ -56,14 +64,12 @@ export class Ticket {
   @CreateDateColumn({
     name: 'created_at',
     type: 'timestamp',
-    transformer: dateTransformer,
   })
   declare createdAt: string;
 
   @UpdateDateColumn({
     name: 'updated_at',
     type: 'timestamp',
-    transformer: dateTransformer,
   })
   declare updatedAt: string;
 
@@ -71,7 +77,6 @@ export class Ticket {
     name: 'deleted_at',
     type: 'timestamp',
     nullable: true,
-    transformer: dateTransformer,
   })
   declare deletedAt?: string;
 }

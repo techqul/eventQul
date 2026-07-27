@@ -22,10 +22,7 @@ let EventsModule = class EventsModule {
 exports.EventsModule = EventsModule;
 exports.EventsModule = EventsModule = __decorate([
     (0, common_1.Module)({
-        imports: [
-            typeorm_1.TypeOrmModule.forFeature([event_entity_1.Event, ticket_type_entity_1.TicketType, organizer_entity_1.Organizer, venue_entity_1.Venue, category_entity_1.Category]),
-            auth_module_1.AuthModule,
-        ],
+        imports: [typeorm_1.TypeOrmModule.forFeature([event_entity_1.Event, ticket_type_entity_1.TicketType, organizer_entity_1.Organizer, venue_entity_1.Venue, category_entity_1.Category]), auth_module_1.AuthModule],
         controllers: [events_controller_1.EventsController, events_controller_1.TicketTypesController],
         providers: [events_service_1.EventsService],
         exports: [events_service_1.EventsService],

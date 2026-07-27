@@ -1,8 +1,17 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Ticket } from './ticket.entity';
 import { OrderStatus } from '../types/order-status.enum';
-import { dateTransformer } from '../../../common/utils/helper';
 
 @Entity('orders')
 export class Order {
@@ -53,14 +62,12 @@ export class Order {
   @CreateDateColumn({
     name: 'created_at',
     type: 'timestamp',
-    transformer: dateTransformer,
   })
   declare createdAt: string;
 
   @UpdateDateColumn({
     name: 'updated_at',
     type: 'timestamp',
-    transformer: dateTransformer,
   })
   declare updatedAt: string;
 
@@ -68,7 +75,6 @@ export class Order {
     name: 'deleted_at',
     type: 'timestamp',
     nullable: true,
-    transformer: dateTransformer,
   })
   declare deletedAt?: string;
 }

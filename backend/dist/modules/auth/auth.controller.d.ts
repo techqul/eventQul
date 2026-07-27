@@ -8,7 +8,10 @@ export declare class AuthController {
     register(registerDto: RegisterDto): Promise<import("./auth.service").AuthResponse>;
     login(loginDto: LoginDto): Promise<import("./auth.service").AuthResponse>;
     refresh(refreshTokenDto: RefreshTokenDto): Promise<import("./auth.service").AuthTokens>;
-    logout(refreshTokenDto: RefreshTokenDto): Promise<void>;
+    logout(refreshTokenDto: RefreshTokenDto): {
+        success: boolean;
+        message: string;
+    };
     getCurrentUser(req: any): {
         success: boolean;
         message: string;

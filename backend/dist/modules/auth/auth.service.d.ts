@@ -26,13 +26,12 @@ export declare class AuthService {
     private readonly usersService;
     private readonly jwtService;
     private readonly configService;
-    private readonly logger;
     private readonly refreshTokens;
     constructor(usersService: UsersService, jwtService: JwtService, configService: ConfigService);
     register(registerDto: RegisterDto): Promise<AuthResponse>;
     login(loginDto: LoginDto): Promise<AuthResponse>;
     refreshAccessToken(refreshTokenDto: RefreshTokenDto): Promise<AuthTokens>;
-    logout(refreshTokenDto: RefreshTokenDto): Promise<void>;
+    logout(refreshTokenDto: RefreshTokenDto): void;
     private generateTokens;
     validateUser(userId: string): Promise<User>;
 }

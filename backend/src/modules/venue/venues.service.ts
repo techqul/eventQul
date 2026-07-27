@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Venue } from './entities/venue.entity';
@@ -19,8 +14,6 @@ export interface PaginatedResult<T> {
 
 @Injectable()
 export class VenuesService {
-  private readonly logger = new Logger(VenuesService.name);
-
   constructor(
     @InjectRepository(Venue)
     private readonly venueRepository: Repository<Venue>,
@@ -37,8 +30,6 @@ export class VenuesService {
 
     const venue = this.venueRepository.create(createVenueDto);
     const savedVenue = await this.venueRepository.save(venue);
-
-    this.logger.log(`Venue created successfully: ${savedVenue.slug}`);
 
     return savedVenue;
   }
@@ -93,8 +84,6 @@ export class VenuesService {
     Object.assign(venue, updateVenueDto);
     const updatedVenue = await this.venueRepository.save(venue);
 
-    this.logger.log(`Venue updated successfully: ${updatedVenue.slug}`);
-
     return updatedVenue;
   }
 
@@ -104,6 +93,5 @@ export class VenuesService {
       throw new NotFoundException('Venue not found');
     }
     await this.venueRepository.delete(id);
-    this.logger.log(`Venue deleted: ${id}`);
   }
 }

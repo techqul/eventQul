@@ -57,7 +57,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({
         example: 'Leading tech event organizer in Bangladesh',
-        description: 'Organization description'
+        description: 'Organization description',
     }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
@@ -65,8 +65,11 @@ __decorate([
 ], CreateOrganizerDto.prototype, "description", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({
-        example: { facebook: 'https://fb.com/techevents', instagram: 'https://instagram.com/techevents' },
-        description: 'Social media links'
+        example: {
+            facebook: 'https://fb.com/techevents',
+            instagram: 'https://instagram.com/techevents',
+        },
+        description: 'Social media links',
     }),
     (0, class_validator_1.IsObject)(),
     (0, class_validator_1.IsOptional)(),

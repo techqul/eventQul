@@ -22,15 +22,6 @@ import { Public } from '../../common/decorators/skip-auth.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UserRole } from '../users/types';
 
-interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    sub: string;
-    email: string;
-    role: string;
-  };
-}
-
 @ApiTags('Organizers')
 @Controller('organizers')
 export class OrganizersController {

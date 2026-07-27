@@ -1,9 +1,8 @@
-import { BaseEntity } from '../../../common/entities/base.entity';
 import { Order } from './order.entity';
 import { Event } from '../../event/entities/event.entity';
 import { TicketType } from '../../event/entities/ticket-type.entity';
 import { TicketStatus } from '../types/order-status.enum';
-export declare class Ticket extends BaseEntity {
+export declare class Ticket {
     id: string;
     order: Order;
     orderId: string;

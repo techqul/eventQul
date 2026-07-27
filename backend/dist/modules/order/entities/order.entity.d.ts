@@ -1,8 +1,7 @@
-import { BaseEntity } from '../../../common/entities/base.entity';
 import { User } from '../../users/entities/user.entity';
 import { Ticket } from './ticket.entity';
 import { OrderStatus } from '../types/order-status.enum';
-export declare class Order extends BaseEntity {
+export declare class Order {
     id: string;
     user: User;
     userId: string;

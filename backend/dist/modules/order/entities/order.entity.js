@@ -11,12 +11,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Order = void 0;
 const typeorm_1 = require("typeorm");
-const base_entity_1 = require("../../../common/entities/base.entity");
 const user_entity_1 = require("../../users/entities/user.entity");
 const ticket_entity_1 = require("./ticket.entity");
 const order_status_enum_1 = require("../types/order-status.enum");
-const base_entity_2 = require("../../../common/entities/base.entity");
-let Order = class Order extends base_entity_1.BaseEntity {
+let Order = class Order {
     id;
     user;
     userId;
@@ -93,7 +91,6 @@ __decorate([
     (0, typeorm_1.CreateDateColumn)({
         name: 'created_at',
         type: 'timestamp',
-        transformer: base_entity_2.dateTransformer,
     }),
     __metadata("design:type", String)
 ], Order.prototype, "createdAt", void 0);
@@ -101,7 +98,6 @@ __decorate([
     (0, typeorm_1.UpdateDateColumn)({
         name: 'updated_at',
         type: 'timestamp',
-        transformer: base_entity_2.dateTransformer,
     }),
     __metadata("design:type", String)
 ], Order.prototype, "updatedAt", void 0);
@@ -110,7 +106,6 @@ __decorate([
         name: 'deleted_at',
         type: 'timestamp',
         nullable: true,
-        transformer: base_entity_2.dateTransformer,
     }),
     __metadata("design:type", String)
 ], Order.prototype, "deletedAt", void 0);

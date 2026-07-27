@@ -34,8 +34,9 @@ let AuthController = class AuthController {
     async refresh(refreshTokenDto) {
         return this.authService.refreshAccessToken(refreshTokenDto);
     }
-    async logout(refreshTokenDto) {
-        return this.authService.logout(refreshTokenDto);
+    logout(refreshTokenDto) {
+        this.authService.logout(refreshTokenDto);
+        return { success: true, message: 'Logged out successfully' };
     }
     getCurrentUser(req) {
         return {
@@ -88,7 +89,7 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [refresh_token_dto_1.RefreshTokenDto]),
-    __metadata("design:returntype", Promise)
+    __metadata("design:returntype", void 0)
 ], AuthController.prototype, "logout", null);
 __decorate([
     (0, common_1.Get)('me'),

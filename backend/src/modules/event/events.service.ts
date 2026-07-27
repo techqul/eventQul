@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Event } from './entities/event.entity';
@@ -13,7 +8,6 @@ import { UpdateEventDto } from './dto/update-event.dto';
 import { Organizer } from '../organizer/entities/organizer.entity';
 import { Venue } from '../venue/entities/venue.entity';
 import { Category } from '../category/entities/category.entity';
-import { EventStatus } from './types/event-status.enum';
 
 export interface PaginatedResult<T> {
   data: T[];
@@ -106,8 +100,6 @@ export class EventsService {
     await this.organizerRepository.increment({ id: organizer.id }, 'totalEvents', 1);
     await this.categoryRepository.increment({ id: category.id }, 'eventCount', 1);
 
-    this.logger.log(`Event created successfully: ${savedEvent.slug}`);
-
     return this.findOne(savedEvent.id);
   }
 
@@ -122,10 +114,9 @@ export class EventsService {
     // Apply filters if provided
     if (filters) {
       if (filters.search) {
-        queryBuilder.andWhere(
-          '(event.title ILIKE :search OR event.description ILIKE :search)',
-          { search: `%${filters.search}%` },
-        );
+        queryBuilder.andWhere('(event.title ILIKE :search OR event.description ILIKE :search)', {
+          search: `%${filters.search}%`,
+        });
       }
       if (filters.category) {
         queryBuilder.andWhere('category.slug = :category', { category: filters.category });
@@ -189,18 +180,23 @@ export class EventsService {
       }
     }
 
-    // Handle date updates
+    // Handle date conversions - support both Date and string input
     if (updateEventDto.startDate) {
-      updateEventDto.startDate = new Date(updateEventDto.startDate) as any;
+      event.startDate =
+        updateEventDto.startDate instanceof Date
+          ? updateEventDto.startDate
+          : new Date(updateEventDto.startDate);
     }
     if (updateEventDto.endDate) {
-      updateEventDto.endDate = new Date(updateEventDto.endDate) as any;
+      event.endDate =
+        updateEventDto.endDate instanceof Date
+          ? updateEventDto.endDate
+          : new Date(updateEventDto.endDate);
     }
 
+    // Apply other updates
     Object.assign(event, updateEventDto);
     const updatedEvent = await this.eventRepository.save(event);
-
-    this.logger.log(`Event updated successfully: ${updatedEvent.slug}`);
 
     return this.findOne(updatedEvent.id);
   }
@@ -215,7 +211,10 @@ export class EventsService {
   }
 
   // Ticket Type methods
-  async addTicketType(eventId: string, createTicketTypeDto: CreateTicketTypeDto): Promise<TicketType> {
+  async addTicketType(
+    eventId: string,
+    createTicketTypeDto: CreateTicketTypeDto,
+  ): Promise<TicketType> {
     const event = await this.findOne(eventId);
 
     const ticketType = this.ticketTypeRepository.create({

@@ -1,6 +1,5 @@
-import { BaseEntity } from '../../../common/entities/base.entity';
 import { UserRole, UserStatus, BloodGroup, Gender, TShirtSize } from '../types';
-export declare class User extends BaseEntity {
+export declare class User {
     id: string;
     email: string;
     password: string;
@@ -23,5 +22,5 @@ export declare class User extends BaseEntity {
     updatedAt: string;
     deletedAt?: string;
     validatePassword(password: string): Promise<boolean>;
-    toJSON(): Omit<this, "password" | "setCreatedAt" | "setUpdatedAt" | "validatePassword" | "toJSON">;
+    toJSON(): Omit<this, "password" | "validatePassword" | "toJSON">;
 }

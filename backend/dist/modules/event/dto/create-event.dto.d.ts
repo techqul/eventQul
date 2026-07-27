@@ -10,18 +10,19 @@ export declare class CreateTicketTypeDto {
 }
 export declare class CreateEventDto {
     slug: string;
+    organizerSlug: string;
+    venueSlug: string;
+    categorySlug: string;
     title: string;
     description: string;
     longDescription?: string;
     coverImage?: string;
     gallery?: string[];
-    startDate: string;
-    endDate: string;
+    startDate: Date;
+    endDate: Date;
     timezone: string;
-    organizerSlug: string;
-    venueSlug: string;
-    categorySlug: string;
     capacity: number;
+    soldTickets?: number;
     status?: EventStatus;
     featured?: boolean;
     trending?: boolean;

@@ -8,7 +8,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var AuthService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
@@ -16,11 +15,10 @@ const jwt_1 = require("@nestjs/jwt");
 const config_1 = require("@nestjs/config");
 const users_service_1 = require("../users/users.service");
 const types_1 = require("../users/types");
-let AuthService = AuthService_1 = class AuthService {
+let AuthService = class AuthService {
     usersService;
     jwtService;
     configService;
-    logger = new common_1.Logger(AuthService_1.name);
     refreshTokens = new Map();
     constructor(usersService, jwtService, configService) {
         this.usersService = usersService;
@@ -90,7 +88,7 @@ let AuthService = AuthService_1 = class AuthService {
         this.refreshTokens.delete(refreshTokenDto.refreshToken);
         return tokens;
     }
-    async logout(refreshTokenDto) {
+    logout(refreshTokenDto) {
         this.refreshTokens.delete(refreshTokenDto.refreshToken);
     }
     async generateTokens(user) {
@@ -130,7 +128,7 @@ let AuthService = AuthService_1 = class AuthService {
     }
 };
 exports.AuthService = AuthService;
-exports.AuthService = AuthService = AuthService_1 = __decorate([
+exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [users_service_1.UsersService,
         jwt_1.JwtService,

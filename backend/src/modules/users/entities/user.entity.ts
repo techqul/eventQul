@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { dateTransformer } from '../../../common/utils/helper';
 import { UserRole, UserStatus, BloodGroup, Gender, TShirtSize } from '../types';
@@ -79,20 +86,23 @@ export class User {
   @Column({ name: 'avatar_url', nullable: true })
   avatarUrl?: string;
 
-  @Column({ name: 'last_login_at', type: 'timestamp', nullable: true, transformer: dateTransformer })
+  @Column({
+    name: 'last_login_at',
+    type: 'timestamp',
+    nullable: true,
+    transformer: dateTransformer,
+  })
   lastLoginAt?: string;
 
   @CreateDateColumn({
     name: 'created_at',
     type: 'timestamp',
-    transformer: dateTransformer,
   })
   declare createdAt: string;
 
   @UpdateDateColumn({
     name: 'updated_at',
     type: 'timestamp',
-    transformer: dateTransformer,
   })
   declare updatedAt: string;
 
@@ -100,7 +110,6 @@ export class User {
     name: 'deleted_at',
     type: 'timestamp',
     nullable: true,
-    transformer: dateTransformer,
   })
   declare deletedAt?: string;
 

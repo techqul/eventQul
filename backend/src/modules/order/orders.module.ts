@@ -10,10 +10,7 @@ import { User } from '../users/entities/user.entity';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Order, Ticket, TicketType, Event, User]),
-    AuthModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Order, Ticket, TicketType, Event, User]), AuthModule],
   controllers: [OrdersController, TicketsController],
   providers: [OrdersService],
   exports: [OrdersService],

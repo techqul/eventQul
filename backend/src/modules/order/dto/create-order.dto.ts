@@ -27,7 +27,7 @@ export class TicketItemDto {
 export class CreateOrderDto {
   @ApiProperty({
     type: [TicketItemDto],
-    description: 'Array of ticket types and quantities'
+    description: 'Array of ticket types and quantities',
   })
   @IsArray()
   @ValidateNested({ each: true })
@@ -46,7 +46,7 @@ export class CreateOrderDto {
 
   @ApiProperty({
     example: 'John Doe',
-    description: 'Attendee name for all tickets'
+    description: 'Attendee name for all tickets',
   })
   @IsString()
   @IsNotEmpty()
@@ -54,7 +54,7 @@ export class CreateOrderDto {
 
   @ApiProperty({
     example: 'john@example.com',
-    description: 'Attendee email for all tickets'
+    description: 'Attendee email for all tickets',
   })
   @IsEmail()
   @IsNotEmpty()
@@ -62,7 +62,7 @@ export class CreateOrderDto {
 
   @ApiProperty({
     example: '+8801234567890',
-    description: 'Attendee phone for all tickets'
+    description: 'Attendee phone for all tickets',
   })
   @IsString()
   @IsNotEmpty()

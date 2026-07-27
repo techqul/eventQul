@@ -84,7 +84,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({
         example: { lat: 23.7697, lng: 90.3685 },
-        description: 'GPS coordinates for the venue'
+        description: 'GPS coordinates for the venue',
     }),
     (0, class_validator_1.IsObject)(),
     (0, class_validator_1.IsOptional)(),

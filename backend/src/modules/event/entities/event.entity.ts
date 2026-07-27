@@ -1,10 +1,19 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from 'typeorm';
 import { Organizer } from '../../organizer/entities/organizer.entity';
 import { Venue } from '../../venue/entities/venue.entity';
 import { Category } from '../../category/entities/category.entity';
 import { TicketType } from './ticket-type.entity';
 import { EventStatus } from '../types/event-status.enum';
-import { dateTransformer } from '../../../common/utils/helper';
 
 @Entity('events')
 export class Event {
@@ -87,14 +96,12 @@ export class Event {
   @CreateDateColumn({
     name: 'created_at',
     type: 'timestamp',
-    transformer: dateTransformer,
   })
   declare createdAt: string;
 
   @UpdateDateColumn({
     name: 'updated_at',
     type: 'timestamp',
-    transformer: dateTransformer,
   })
   declare updatedAt: string;
 
@@ -102,7 +109,6 @@ export class Event {
     name: 'deleted_at',
     type: 'timestamp',
     nullable: true,
-    transformer: dateTransformer,
   })
   declare deletedAt?: string;
 }

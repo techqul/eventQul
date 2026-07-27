@@ -1,6 +1,14 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { dateTransformer } from '../../../common/utils/helper';
 
 @Entity('organizers')
 export class Organizer {
@@ -32,7 +40,7 @@ export class Organizer {
   @Column({ name: 'is_verified', default: false })
   isVerified!: boolean;
 
-  @Column({ type: 'decimal', precision: 3, scale: 2, default: 0.00 })
+  @Column({ type: 'decimal', precision: 3, scale: 2, default: 0.0 })
   rating!: number;
 
   @Column({ name: 'total_events', default: 0 })
@@ -41,7 +49,7 @@ export class Organizer {
   @Column({ default: 0 })
   followers!: number;
 
-  @Column({ name: 'commission_rate', type: 'decimal', precision: 5, scale: 2, default: 10.00 })
+  @Column({ name: 'commission_rate', type: 'decimal', precision: 5, scale: 2, default: 10.0 })
   commissionRate!: number;
 
   @Column({ type: 'jsonb', default: '{}' })
@@ -55,14 +63,12 @@ export class Organizer {
   @CreateDateColumn({
     name: 'created_at',
     type: 'timestamp',
-    transformer: dateTransformer,
   })
   declare createdAt: string;
 
   @UpdateDateColumn({
     name: 'updated_at',
     type: 'timestamp',
-    transformer: dateTransformer,
   })
   declare updatedAt: string;
 
@@ -70,7 +76,6 @@ export class Organizer {
     name: 'deleted_at',
     type: 'timestamp',
     nullable: true,
-    transformer: dateTransformer,
   })
   declare deletedAt?: string;
 }

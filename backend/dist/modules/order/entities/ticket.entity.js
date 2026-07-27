@@ -11,13 +11,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Ticket = void 0;
 const typeorm_1 = require("typeorm");
-const base_entity_1 = require("../../../common/entities/base.entity");
 const order_entity_1 = require("./order.entity");
 const event_entity_1 = require("../../event/entities/event.entity");
 const ticket_type_entity_1 = require("../../event/entities/ticket-type.entity");
 const order_status_enum_1 = require("../types/order-status.enum");
-const base_entity_2 = require("../../../common/entities/base.entity");
-let Ticket = class Ticket extends base_entity_1.BaseEntity {
+let Ticket = class Ticket {
     id;
     order;
     orderId;
@@ -96,7 +94,6 @@ __decorate([
     (0, typeorm_1.CreateDateColumn)({
         name: 'created_at',
         type: 'timestamp',
-        transformer: base_entity_2.dateTransformer,
     }),
     __metadata("design:type", String)
 ], Ticket.prototype, "createdAt", void 0);
@@ -104,7 +101,6 @@ __decorate([
     (0, typeorm_1.UpdateDateColumn)({
         name: 'updated_at',
         type: 'timestamp',
-        transformer: base_entity_2.dateTransformer,
     }),
     __metadata("design:type", String)
 ], Ticket.prototype, "updatedAt", void 0);
@@ -113,7 +109,6 @@ __decorate([
         name: 'deleted_at',
         type: 'timestamp',
         nullable: true,
-        transformer: base_entity_2.dateTransformer,
     }),
     __metadata("design:type", String)
 ], Ticket.prototype, "deletedAt", void 0);

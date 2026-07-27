@@ -11,16 +11,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var OrganizersService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrganizersService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const organizer_entity_1 = require("./entities/organizer.entity");
-let OrganizersService = OrganizersService_1 = class OrganizersService {
+let OrganizersService = class OrganizersService {
     organizerRepository;
-    logger = new common_1.Logger(OrganizersService_1.name);
     constructor(organizerRepository) {
         this.organizerRepository = organizerRepository;
     }
@@ -42,7 +40,6 @@ let OrganizersService = OrganizersService_1 = class OrganizersService {
             userId,
         });
         const savedOrganizer = await this.organizerRepository.save(organizer);
-        this.logger.log(`Organizer created successfully: ${savedOrganizer.slug}`);
         return savedOrganizer;
     }
     async findAll(page = 1, limit = 20) {
@@ -92,7 +89,6 @@ let OrganizersService = OrganizersService_1 = class OrganizersService {
         }
         Object.assign(organizer, updateOrganizerDto);
         const updatedOrganizer = await this.organizerRepository.save(organizer);
-        this.logger.log(`Organizer updated successfully: ${updatedOrganizer.slug}`);
         return updatedOrganizer;
     }
     async remove(id) {
@@ -101,13 +97,11 @@ let OrganizersService = OrganizersService_1 = class OrganizersService {
             throw new common_1.NotFoundException('Organizer not found');
         }
         await this.organizerRepository.delete(id);
-        this.logger.log(`Organizer deleted: ${id}`);
     }
     async verifyOrganizer(id) {
         const organizer = await this.findOne(id);
         organizer.isVerified = true;
         const updatedOrganizer = await this.organizerRepository.save(organizer);
-        this.logger.log(`Organizer verified: ${id}`);
         return updatedOrganizer;
     }
     async incrementEventCount(organizerId) {
@@ -118,7 +112,7 @@ let OrganizersService = OrganizersService_1 = class OrganizersService {
     }
 };
 exports.OrganizersService = OrganizersService;
-exports.OrganizersService = OrganizersService = OrganizersService_1 = __decorate([
+exports.OrganizersService = OrganizersService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(organizer_entity_1.Organizer)),
     __metadata("design:paramtypes", [typeorm_2.Repository])

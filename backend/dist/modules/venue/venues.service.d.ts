@@ -10,7 +10,6 @@ export interface PaginatedResult<T> {
 }
 export declare class VenuesService {
     private readonly venueRepository;
-    private readonly logger;
     constructor(venueRepository: Repository<Venue>);
     create(createVenueDto: CreateVenueDto): Promise<Venue>;
     findAll(page?: number, limit?: number): Promise<PaginatedResult<Venue>>;

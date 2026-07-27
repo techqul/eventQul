@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  ConflictException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
@@ -34,7 +29,6 @@ export interface AuthResponse {
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
   private readonly refreshTokens: Map<string, { userId: string; expiry: Date }> = new Map();
 
   constructor(
@@ -126,7 +120,7 @@ export class AuthService {
     return tokens;
   }
 
-  async logout(refreshTokenDto: RefreshTokenDto): Promise<void> {
+  logout(refreshTokenDto: RefreshTokenDto): void {
     this.refreshTokens.delete(refreshTokenDto.refreshToken);
   }
 
@@ -141,7 +135,8 @@ export class AuthService {
 
     const expiresIn = this.configService.get<string>('JWT_EXPIRES_IN') || '15m';
     const refreshExpiresIn = this.configService.get<string>('JWT_REFRESH_EXPIRES_IN') || '7d';
-    const refreshSecret = this.configService.get<string>('JWT_REFRESH_SECRET') || 'default-refresh-secret';
+    const refreshSecret =
+      this.configService.get<string>('JWT_REFRESH_SECRET') || 'default-refresh-secret';
 
     const accessToken = await this.jwtService.signAsync(payload);
 
@@ -151,7 +146,9 @@ export class AuthService {
     });
 
     const refreshExpiry = new Date();
-    refreshExpiry.setDate(refreshExpiry.getDate() + parseInt(refreshExpiresIn.replace(/\D/g, ''), 10));
+    refreshExpiry.setDate(
+      refreshExpiry.getDate() + parseInt(refreshExpiresIn.replace(/\D/g, ''), 10),
+    );
 
     this.refreshTokens.set(refreshToken, {
       userId: user.id,

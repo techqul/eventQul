@@ -10,10 +10,7 @@ import { Category } from '../category/entities/category.entity';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Event, TicketType, Organizer, Venue, Category]),
-    AuthModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Event, TicketType, Organizer, Venue, Category]), AuthModule],
   controllers: [EventsController, TicketTypesController],
   providers: [EventsService],
   exports: [EventsService],

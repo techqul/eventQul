@@ -11,10 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TicketType = void 0;
 const typeorm_1 = require("typeorm");
-const base_entity_1 = require("../../../common/entities/base.entity");
 const event_entity_1 = require("./event.entity");
-const base_entity_2 = require("../../../common/entities/base.entity");
-let TicketType = class TicketType extends base_entity_1.BaseEntity {
+let TicketType = class TicketType {
     id;
     event;
     eventId;
@@ -72,7 +70,6 @@ __decorate([
     (0, typeorm_1.CreateDateColumn)({
         name: 'created_at',
         type: 'timestamp',
-        transformer: base_entity_2.dateTransformer,
     }),
     __metadata("design:type", String)
 ], TicketType.prototype, "createdAt", void 0);
@@ -80,7 +77,6 @@ __decorate([
     (0, typeorm_1.UpdateDateColumn)({
         name: 'updated_at',
         type: 'timestamp',
-        transformer: base_entity_2.dateTransformer,
     }),
     __metadata("design:type", String)
 ], TicketType.prototype, "updatedAt", void 0);
@@ -89,7 +85,6 @@ __decorate([
         name: 'deleted_at',
         type: 'timestamp',
         nullable: true,
-        transformer: base_entity_2.dateTransformer,
     }),
     __metadata("design:type", String)
 ], TicketType.prototype, "deletedAt", void 0);

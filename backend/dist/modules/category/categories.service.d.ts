@@ -15,7 +15,7 @@ export declare class CategoriesService {
     create(createCategoryDto: CreateCategoryDto): Promise<Category>;
     findAll(page?: number, limit?: number): Promise<PaginatedResult<Category>>;
     findOne(id: string): Promise<Category>;
-    findBySlug(slug: string): Promise<Category | null>;
+    findBySlug(slug: string): Promise<Category>;
     update(id: string, updateCategoryDto: UpdateCategoryDto): Promise<Category>;
     remove(id: string): Promise<void>;
     incrementEventCount(categoryId: string): Promise<void>;

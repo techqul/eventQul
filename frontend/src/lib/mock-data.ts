@@ -134,12 +134,12 @@ export const ORGANIZERS: Organizer[] = [
   },
   {
     id: "o3",
-    name: "Bangladesh Concert Arena",
-    slug: "bd-concert-arena",
+    name: "HSC 95 Society",
+    slug: "hsc-95-society",
     logo: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&h=200&fit=crop",
     banner: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=1200&h=400&fit=crop",
     description:
-      "The largest concert organizer in Bangladesh. From local artists to international superstars, we bring the best music to you.",
+      "The largest reunion organizer in Bangladesh. We organize annual reunions, family gatherings, and social events for family and friends.",
     verified: true,
     rating: 4.9,
     totalEvents: 120,
@@ -285,16 +285,16 @@ export const EVENTS: Event[] = [
   // Concerts
   createEvent(
     "e1",
-    "30 Years Celebration of HSC '96 Society",
+    "30 Years Celebration of HSC '95 Society",
     "hsc96-society-30-years",
-    "এইচএসসি ৯৬ সোসাইটির ৩০ বছর পূর্তি উদযাপন।",
-    "এইচএসসি ৯৬ সোসাইটির ৩০ বছর পূর্তি উদযাপন উপলক্ষে আয়োজিত এই বিশেষ অনুষ্ঠানে প্রাক্তন শিক্ষার্থীদের এক মিলনমেলার আয়োজন করা হয়েছে। দীর্ঘ তিন দশকের পথচলায় গড়ে ওঠা বন্ধুত্ব, স্মৃতি ও অভিজ্ঞতাকে একত্রে উদযাপন করাই এই আয়োজনের মূল উদ্দেশ্য।",
+    "এইচএসসি ৯৫ সোসাইটির ৩০ বছর পূর্তি উদযাপন।",
+    "এইচএসসি ৯৫ সোসাইটির ৩০ বছর পূর্তি উদযাপন উপলক্ষে আয়োজিত এই বিশেষ অনুষ্ঠানে প্রাক্তন শিক্ষার্থীদের এক মিলনমেলার আয়োজন করা হয়েছে। দীর্ঘ তিন দশকের পথচলায় গড়ে ওঠা বন্ধুত্ব, স্মৃতি ও অভিজ্ঞতাকে একত্রে উদযাপন করাই এই আয়োজনের মূল উদ্দেশ্য।",
     "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=800&h=600&fit=crop",
     "o3",
     "v1",
     "1",
-    new Date("2026-09-20T16:00:00"),
-    new Date("2026-09-20T23:59:00"),
+    new Date("2026-10-30T16:00:00"),
+    new Date("2026-10-30T23:59:00"),
     [
       {
         id: "t5",

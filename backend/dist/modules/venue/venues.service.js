@@ -11,16 +11,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var VenuesService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VenuesService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const venue_entity_1 = require("./entities/venue.entity");
-let VenuesService = VenuesService_1 = class VenuesService {
+let VenuesService = class VenuesService {
     venueRepository;
-    logger = new common_1.Logger(VenuesService_1.name);
     constructor(venueRepository) {
         this.venueRepository = venueRepository;
     }
@@ -33,7 +31,6 @@ let VenuesService = VenuesService_1 = class VenuesService {
         }
         const venue = this.venueRepository.create(createVenueDto);
         const savedVenue = await this.venueRepository.save(venue);
-        this.logger.log(`Venue created successfully: ${savedVenue.slug}`);
         return savedVenue;
     }
     async findAll(page = 1, limit = 20) {
@@ -75,7 +72,6 @@ let VenuesService = VenuesService_1 = class VenuesService {
         }
         Object.assign(venue, updateVenueDto);
         const updatedVenue = await this.venueRepository.save(venue);
-        this.logger.log(`Venue updated successfully: ${updatedVenue.slug}`);
         return updatedVenue;
     }
     async remove(id) {
@@ -84,11 +80,10 @@ let VenuesService = VenuesService_1 = class VenuesService {
             throw new common_1.NotFoundException('Venue not found');
         }
         await this.venueRepository.delete(id);
-        this.logger.log(`Venue deleted: ${id}`);
     }
 };
 exports.VenuesService = VenuesService;
-exports.VenuesService = VenuesService = VenuesService_1 = __decorate([
+exports.VenuesService = VenuesService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(venue_entity_1.Venue)),
     __metadata("design:paramtypes", [typeorm_2.Repository])

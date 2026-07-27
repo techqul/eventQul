@@ -6,49 +6,51 @@ import {
   IsOptional,
   IsNumber,
   IsArray,
-  IsDateString,
+  IsDate,
   IsBoolean,
-  Matches,
-  Max,
+  ValidateNested,
   Min,
+  IsEnum,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { EventStatus } from '../types/event-status.enum';
 
 export class CreateTicketTypeDto {
-  @ApiProperty({ example: 'VIP' })
+  @ApiProperty({ example: 'General Admission' })
   @IsString()
   @IsNotEmpty()
+  @MinLength(2)
+  @MaxLength(100)
   name!: string;
 
-  @ApiPropertyOptional({ example: 'VIP access with front row seating' })
+  @ApiPropertyOptional({ example: 'Standard entry ticket' })
   @IsString()
   @IsOptional()
+  @MaxLength(500)
   description?: string;
 
-  @ApiProperty({ example: 500.00 })
+  @ApiProperty({ example: 500.0 })
   @IsNumber()
   @Min(0)
   price!: number;
 
-  @ApiProperty({ example: 'BDT' })
+  @ApiPropertyOptional({ example: 'BDT', default: 'BDT' })
   @IsString()
   @IsOptional()
   currency?: string;
 
   @ApiProperty({ example: 100 })
   @IsNumber()
-  @Min(0)
+  @Min(1)
   available!: number;
 
-  @ApiProperty({ example: 10 })
+  @ApiPropertyOptional({ example: 10, default: 10 })
   @IsNumber()
-  @Min(1)
-  @Max(100)
   @IsOptional()
   maxPerPurchase?: number;
 
-  @ApiPropertyOptional({ example: ['priority seating', 'complimentary drinks'] })
+  @ApiPropertyOptional({ example: ['Priority seating', 'Free drink'], type: [String] })
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
@@ -56,86 +58,89 @@ export class CreateTicketTypeDto {
 }
 
 export class CreateEventDto {
-  @ApiProperty({ example: 'tech-summit-2024' })
+  @ApiProperty({ example: 'tech-conference-2024' })
   @IsString()
   @IsNotEmpty()
   @MinLength(2)
-  @MaxLength(200)
-  @Matches(/^[a-z0-9-]+$/, {
-    message: 'Slug must contain only lowercase letters, numbers, and hyphens',
-  })
+  @MaxLength(100)
   slug!: string;
 
-  @ApiProperty({ example: 'Tech Summit 2024' })
+  @ApiProperty({ example: 'tech-organizer' })
+  @IsString()
+  @IsNotEmpty()
+  organizerSlug!: string;
+
+  @ApiProperty({ example: 'convention-center' })
+  @IsString()
+  @IsNotEmpty()
+  venueSlug!: string;
+
+  @ApiProperty({ example: 'technology' })
+  @IsString()
+  @IsNotEmpty()
+  categorySlug!: string;
+
+  @ApiProperty({ example: 'Tech Conference 2024' })
   @IsString()
   @IsNotEmpty()
   @MinLength(2)
   @MaxLength(200)
   title!: string;
 
-  @ApiProperty({ example: 'The biggest tech conference in Bangladesh' })
+  @ApiProperty({ example: 'Annual technology conference' })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(500)
   description!: string;
 
   @ApiPropertyOptional({
-    example: 'Join us for a day of networking and learning from industry leaders...',
-    description: 'Detailed event description'
+    example: 'Join us for the biggest tech event of the year',
   })
   @IsString()
   @IsOptional()
+  @MaxLength(2000)
   longDescription?: string;
 
-  @ApiPropertyOptional({ example: 'https://example.com/event-cover.jpg' })
+  @ApiPropertyOptional({ example: 'https://example.com/cover.jpg' })
   @IsString()
   @IsOptional()
   @MaxLength(500)
   coverImage?: string;
 
-  @ApiPropertyOptional({ example: ['image1.jpg', 'image2.jpg'] })
+  @ApiPropertyOptional({ example: ['img1.jpg', 'img2.jpg'], type: [String] })
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
   gallery?: string[];
 
-  @ApiProperty({ example: '2024-12-15T10:00:00Z' })
-  @IsDateString()
-  startDate!: string;
+  @ApiProperty({ example: '2024-12-01T09:00:00.000Z' })
+  @IsDate()
+  @Type(() => Date)
+  startDate!: Date;
 
-  @ApiProperty({ example: '2024-12-15T18:00:00Z' })
-  @IsDateString()
-  endDate!: string;
+  @ApiProperty({ example: '2024-12-01T17:00:00.000Z' })
+  @IsDate()
+  @Type(() => Date)
+  endDate!: Date;
 
   @ApiProperty({ example: 'Asia/Dhaka' })
   @IsString()
   @IsNotEmpty()
   timezone!: string;
 
-  @ApiProperty({ example: 'tech-summit-2024' })
-  @IsString()
-  @IsNotEmpty()
-  organizerSlug!: string;
-
-  @ApiProperty({ example: 'bangabandhu-international-conference-center' })
-  @IsString()
-  @IsNotEmpty()
-  venueSlug!: string;
-
-  @ApiProperty({ example: 'tech-conferences' })
-  @IsString()
-  @IsNotEmpty()
-  categorySlug!: string;
-
   @ApiProperty({ example: 500 })
   @IsNumber()
   @Min(1)
   capacity!: number;
 
-  @ApiPropertyOptional({
-    enum: EventStatus,
-    example: EventStatus.UPCOMING,
-  })
-  @IsString()
+  @ApiPropertyOptional({ example: 0 })
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  soldTickets?: number;
+
+  @ApiPropertyOptional({ enum: EventStatus, default: EventStatus.UPCOMING })
+  @IsEnum(EventStatus)
   @IsOptional()
   status?: EventStatus;
 
@@ -149,7 +154,7 @@ export class CreateEventDto {
   @IsOptional()
   trending?: boolean;
 
-  @ApiPropertyOptional({ example: ['tech', 'innovation', 'networking'] })
+  @ApiPropertyOptional({ example: ['tech', 'conference', 'innovation'], type: [String] })
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
@@ -157,6 +162,8 @@ export class CreateEventDto {
 
   @ApiPropertyOptional({ type: [CreateTicketTypeDto] })
   @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateTicketTypeDto)
   @IsOptional()
   ticketTypes?: CreateTicketTypeDto[];
 }

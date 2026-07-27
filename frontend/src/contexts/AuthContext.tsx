@@ -2,8 +2,10 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { authApi } from '@/lib/api/auth';
 import type { User, LoginCredentials } from '@/types/user';
+import { UserRole } from '@/types/user';
 
 interface AuthContextType {
   user: User | null;
@@ -46,6 +48,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const checkAuth = async () => {
       const token = getStorageItem('access_token');
+      const storedUser = getStorageItem('user');
+
+      // Try loading user from localStorage first for faster initial load
+      if (storedUser) {
+        try {
+          setUser(JSON.parse(storedUser) as User);
+        } catch (e) {
+          // Invalid JSON, clear it
+          localStorage.removeItem('user');
+        }
+      }
 
       if (!token) {
         setIsLoading(false);
@@ -55,7 +68,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const response = await authApi.getCurrentUser();
         if (response.success && response.data) {
-          setUser(response.data as User);
+          const userData = response.data as User;
+          setUser(userData);
+          // Update localStorage with fresh data from API
+          setStorageItem('user', JSON.stringify(userData));
         }
       } catch (error: any) {
         // Only clear tokens if it's a 401/403 authentication error
@@ -66,6 +82,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (isAuthError) {
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
+          localStorage.removeItem('user');
+          setUser(null);
         }
       } finally {
         setIsLoading(false);
@@ -73,7 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     checkAuth();
-  }, [getStorageItem]);
+  }, [getStorageItem, setStorageItem]);
 
   const login = useCallback(async (credentials: LoginCredentials) => {
     try {
@@ -86,11 +104,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setStorageItem('access_token', accessToken);
         setStorageItem('refresh_token', refreshToken);
 
-        // Store user data
+        // Store user data in localStorage
+        setStorageItem('user', JSON.stringify(userData));
+
+        // Store user data in state
         setUser(userData as User);
 
-        // Redirect to admin dashboard
-        router.push('/admin');
+        // Show success toast
+        toast.success(`Welcome back, ${userData.firstName}!`);
+
+        // Redirect based on user role
+        const redirectPath = (() => {
+          switch (userData.role) {
+            case UserRole.ADMIN:
+              return '/admin';
+            case UserRole.ORGANIZER:
+              return '/organizer';
+            case UserRole.USER:
+            default:
+              return '/dashboard';
+          }
+        })();
+
+        router.push(redirectPath);
       }
     } catch (error) {
       throw error;
@@ -108,7 +144,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Clear local storage regardless of API call result
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user');
       setUser(null);
+
+      // Show logout toast
+      toast.success('Logged out successfully');
+
       router.push('/login');
     }
   }, [router, getStorageItem]);
@@ -117,12 +158,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await authApi.getCurrentUser();
       if (response.success && response.data) {
-        setUser(response.data as User);
+        const userData = response.data as User;
+        setUser(userData);
+        // Update localStorage with fresh data
+        setStorageItem('user', JSON.stringify(userData));
       }
     } catch (error) {
       throw error;
     }
-  }, []);
+  }, [setStorageItem]);
 
   const value: AuthContextType = {
     user,

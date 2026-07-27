@@ -41,7 +41,7 @@ export function EventDetailContent({
   return (
     <div className="flex flex-col">
       {/* Cover Image */}
-      <div className="relative h-[50vh] md:h-[70vh] w-full">
+      <div className="relative h-[40vh] md:h-[50vh] w-full">
         <Image
           src={event.coverImage}
           alt={event.title}
@@ -96,12 +96,13 @@ export function EventDetailContent({
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="h-5 w-5" />
-                <span>{formatTime(event.startDate)}</span>
+                <span>9.00AM - 9.00PM</span>
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="h-5 w-5" />
                 <span>
-                  {event.venue.name}, {event.venue.city}
+                  TSC, Dhaka University
+                  {/* {event.venue.name}, {event.venue.city} */}
                 </span>
               </div>
             </div>

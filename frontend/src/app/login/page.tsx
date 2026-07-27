@@ -27,7 +27,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      await login(credentials);
+      const response = await login(credentials);
       // Login successful, redirect happens in login function
     } catch (err: any) {
       setError(err.message || "Login failed. Please check your credentials.");

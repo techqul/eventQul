@@ -1,5 +1,4 @@
-import { BaseEntity } from '../../../common/entities/base.entity';
-export declare class Category extends BaseEntity {
+export declare class Category {
     id: string;
     slug: string;
     name: string;

@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Organizer } from './entities/organizer.entity';
@@ -19,8 +14,6 @@ export interface PaginatedResult<T> {
 
 @Injectable()
 export class OrganizersService {
-  private readonly logger = new Logger(OrganizersService.name);
-
   constructor(
     @InjectRepository(Organizer)
     private readonly organizerRepository: Repository<Organizer>,
@@ -113,7 +106,7 @@ export class OrganizersService {
 
     Object.assign(organizer, updateOrganizerDto);
     const updatedOrganizer = await this.organizerRepository.save(organizer);
-    
+
     return updatedOrganizer;
   }
 
@@ -123,7 +116,6 @@ export class OrganizersService {
       throw new NotFoundException('Organizer not found');
     }
     await this.organizerRepository.delete(id);
-    this.logger.log(`Organizer deleted: ${id}`);
   }
 
   async verifyOrganizer(id: string): Promise<Organizer> {
@@ -131,8 +123,6 @@ export class OrganizersService {
 
     organizer.isVerified = true;
     const updatedOrganizer = await this.organizerRepository.save(organizer);
-
-    this.logger.log(`Organizer verified: ${id}`);
 
     return updatedOrganizer;
   }

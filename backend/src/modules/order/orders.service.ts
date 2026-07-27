@@ -331,12 +331,7 @@ export class OrdersService {
 
       // Decrement event sold tickets count
       for (const ticket of order.tickets) {
-        await queryRunner.manager.decrement(
-          Event,
-          { id: ticket.eventId },
-          'soldTickets',
-          1,
-        );
+        await queryRunner.manager.decrement(Event, { id: ticket.eventId }, 'soldTickets', 1);
       }
 
       await queryRunner.commitTransaction();

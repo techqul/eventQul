@@ -10,7 +10,6 @@ export interface PaginatedResult<T> {
 }
 export declare class OrganizersService {
     private readonly organizerRepository;
-    private readonly logger;
     constructor(organizerRepository: Repository<Organizer>);
     create(userId: string, createOrganizerDto: CreateOrganizerDto): Promise<Organizer>;
     findAll(page?: number, limit?: number): Promise<PaginatedResult<Organizer>>;

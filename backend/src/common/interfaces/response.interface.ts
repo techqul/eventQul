@@ -130,11 +130,7 @@ export function createValidationErrorResponse(errors: ValidationError[]): ApiErr
 /**
  * Calculate pagination metadata
  */
-export function calculatePaginationMeta(
-  page: number,
-  limit: number,
-  total: number,
-): ResponseMeta {
+export function calculatePaginationMeta(page: number, limit: number, total: number): ResponseMeta {
   const totalPages = Math.ceil(total / limit);
 
   return {

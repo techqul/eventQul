@@ -1,6 +1,5 @@
-import { BaseEntity } from '../../../common/entities/base.entity';
 import { User } from '../../users/entities/user.entity';
-export declare class Organizer extends BaseEntity {
+export declare class Organizer {
     id: string;
     user: User;
     userId: string;

@@ -48,12 +48,12 @@ let OrganizersController = class OrganizersController {
         }
         return this.organizersService.update(organizer.id, updateOrganizerDto);
     }
-    async remove(slug) {
-        const organizer = await this.organizersService.findBySlug(slug);
+    async remove(id) {
+        const organizer = await this.organizersService.findOne(id);
         if (!organizer) {
             throw new Error('Organizer not found');
         }
-        await this.organizersService.remove(organizer.id);
+        await this.organizersService.remove(id);
         return { success: true };
     }
     async verifyOrganizer(slug) {
@@ -122,7 +122,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], OrganizersController.prototype, "update", null);
 __decorate([
-    (0, common_1.Delete)(':slug'),
+    (0, common_1.Delete)(':id'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)(types_1.UserRole.ADMIN),
     (0, swagger_1.ApiBearerAuth)('JWT-auth'),
@@ -130,7 +130,7 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Delete organizer (Admin only)' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Organizer deleted successfully' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Organizer not found' }),
-    __param(0, (0, common_1.Param)('slug')),
+    __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)

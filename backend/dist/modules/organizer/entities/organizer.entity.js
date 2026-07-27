@@ -11,10 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Organizer = void 0;
 const typeorm_1 = require("typeorm");
-const base_entity_1 = require("../../../common/entities/base.entity");
 const user_entity_1 = require("../../users/entities/user.entity");
-const base_entity_2 = require("../../../common/entities/base.entity");
-let Organizer = class Organizer extends base_entity_1.BaseEntity {
+let Organizer = class Organizer {
     id;
     user;
     userId;
@@ -69,7 +67,7 @@ __decorate([
     __metadata("design:type", Boolean)
 ], Organizer.prototype, "isVerified", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'decimal', precision: 3, scale: 2, default: 0.00 }),
+    (0, typeorm_1.Column)({ type: 'decimal', precision: 3, scale: 2, default: 0.0 }),
     __metadata("design:type", Number)
 ], Organizer.prototype, "rating", void 0);
 __decorate([
@@ -81,7 +79,7 @@ __decorate([
     __metadata("design:type", Number)
 ], Organizer.prototype, "followers", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'commission_rate', type: 'decimal', precision: 5, scale: 2, default: 10.00 }),
+    (0, typeorm_1.Column)({ name: 'commission_rate', type: 'decimal', precision: 5, scale: 2, default: 10.0 }),
     __metadata("design:type", Number)
 ], Organizer.prototype, "commissionRate", void 0);
 __decorate([
@@ -92,7 +90,6 @@ __decorate([
     (0, typeorm_1.CreateDateColumn)({
         name: 'created_at',
         type: 'timestamp',
-        transformer: base_entity_2.dateTransformer,
     }),
     __metadata("design:type", String)
 ], Organizer.prototype, "createdAt", void 0);
@@ -100,7 +97,6 @@ __decorate([
     (0, typeorm_1.UpdateDateColumn)({
         name: 'updated_at',
         type: 'timestamp',
-        transformer: base_entity_2.dateTransformer,
     }),
     __metadata("design:type", String)
 ], Organizer.prototype, "updatedAt", void 0);
@@ -109,7 +105,6 @@ __decorate([
         name: 'deleted_at',
         type: 'timestamp',
         nullable: true,
-        transformer: base_entity_2.dateTransformer,
     }),
     __metadata("design:type", String)
 ], Organizer.prototype, "deletedAt", void 0);

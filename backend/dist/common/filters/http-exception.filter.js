@@ -31,18 +31,20 @@ let HttpExceptionFilter = HttpExceptionFilter_1 = class HttpExceptionFilter {
         const errorResponse = (0, response_interface_1.createErrorResponse)(message, status);
         if (exception instanceof common_1.HttpException) {
             const exceptionResponse = exception.getResponse();
-            if (typeof exceptionResponse === 'object' &&
-                exceptionResponse !== null &&
-                'message' in exceptionResponse) {
-                const messages = exceptionResponse.message;
-                if (Array.isArray(messages)) {
-                    errorResponse.errors = messages.map((msg) => {
+            if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+                if (Array.isArray(exceptionResponse.errors) && exceptionResponse.errors.length > 0) {
+                    errorResponse.errors = exceptionResponse.errors;
+                    errorResponse.message = exceptionResponse.errors[0].message;
+                }
+                else if (Array.isArray(exceptionResponse.message) && exceptionResponse.message.length > 0) {
+                    errorResponse.errors = exceptionResponse.message.map((msg) => {
                         const [field, ...messageParts] = msg.split(' ');
                         return {
                             field,
                             message: messageParts.join(' '),
                         };
                     });
+                    errorResponse.message = exceptionResponse.message[0];
                 }
             }
         }

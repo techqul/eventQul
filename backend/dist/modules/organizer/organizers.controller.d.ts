@@ -8,7 +8,7 @@ export declare class OrganizersController {
     findAll(page?: string, limit?: string): Promise<import("./organizers.service").PaginatedResult<import("./entities/organizer.entity").Organizer>>;
     findOne(slug: string): Promise<import("./entities/organizer.entity").Organizer | null>;
     update(slug: string, updateOrganizerDto: UpdateOrganizerDto): Promise<import("./entities/organizer.entity").Organizer>;
-    remove(slug: string): Promise<{
+    remove(id: string): Promise<{
         success: boolean;
     }>;
     verifyOrganizer(slug: string): Promise<import("./entities/organizer.entity").Organizer>;

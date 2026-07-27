@@ -32,7 +32,7 @@ export default async function OrganizerDetailPage({ params }: OrganizerPageProps
   return (
     <div className="flex flex-col">
       {/* Cover Image */}
-      <div className="relative h-[50vh] md:h-[60vh] w-full">
+      <div className="relative h-[40vh] md:h-[40vh] w-full">
         <Image
           src={organizer.banner}
           alt={organizer.name}

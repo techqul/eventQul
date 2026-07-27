@@ -225,7 +225,7 @@ export const organizers = [
                   "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=200&h=200&fit=crop",
               },
               {
-                name: "Bangladesh Concert Arena",
+                name: "HSC 96 Society",
                 events: 120,
                 image:
                   "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&h=200&fit=crop",

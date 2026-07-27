@@ -82,7 +82,6 @@ let EventsService = EventsService_1 = class EventsService {
         }
         await this.organizerRepository.increment({ id: organizer.id }, 'totalEvents', 1);
         await this.categoryRepository.increment({ id: category.id }, 'eventCount', 1);
-        this.logger.log(`Event created successfully: ${savedEvent.slug}`);
         return this.findOne(savedEvent.id);
     }
     async findAll(page = 1, limit = 20, filters) {
@@ -94,7 +93,9 @@ let EventsService = EventsService_1 = class EventsService {
             .leftJoinAndSelect('event.ticketTypes', 'ticketTypes');
         if (filters) {
             if (filters.search) {
-                queryBuilder.andWhere('(event.title ILIKE :search OR event.description ILIKE :search)', { search: `%${filters.search}%` });
+                queryBuilder.andWhere('(event.title ILIKE :search OR event.description ILIKE :search)', {
+                    search: `%${filters.search}%`,
+                });
             }
             if (filters.category) {
                 queryBuilder.andWhere('category.slug = :category', { category: filters.category });
@@ -148,14 +149,19 @@ let EventsService = EventsService_1 = class EventsService {
             }
         }
         if (updateEventDto.startDate) {
-            updateEventDto.startDate = new Date(updateEventDto.startDate);
+            event.startDate =
+                updateEventDto.startDate instanceof Date
+                    ? updateEventDto.startDate
+                    : new Date(updateEventDto.startDate);
         }
         if (updateEventDto.endDate) {
-            updateEventDto.endDate = new Date(updateEventDto.endDate);
+            event.endDate =
+                updateEventDto.endDate instanceof Date
+                    ? updateEventDto.endDate
+                    : new Date(updateEventDto.endDate);
         }
         Object.assign(event, updateEventDto);
         const updatedEvent = await this.eventRepository.save(event);
-        this.logger.log(`Event updated successfully: ${updatedEvent.slug}`);
         return this.findOne(updatedEvent.id);
     }
     async remove(id) {

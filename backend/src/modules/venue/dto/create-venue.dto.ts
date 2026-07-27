@@ -64,7 +64,7 @@ export class CreateVenueDto {
 
   @ApiPropertyOptional({
     example: { lat: 23.7697, lng: 90.3685 },
-    description: 'GPS coordinates for the venue'
+    description: 'GPS coordinates for the venue',
   })
   @IsObject()
   @IsOptional()

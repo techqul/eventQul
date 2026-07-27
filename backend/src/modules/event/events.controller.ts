@@ -11,7 +11,13 @@ import {
   ParseIntPipe,
   DefaultValuePipe,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
@@ -119,7 +125,10 @@ export class EventsController {
   @ResponseMessage('Ticket type added successfully')
   @ApiOperation({ summary: 'Add ticket type to event (Owner/Admin only)' })
   @ApiResponse({ status: 201, description: 'Ticket type added successfully' })
-  async addTicketType(@Param('slug') slug: string, @Body() createTicketTypeDto: CreateTicketTypeDto) {
+  async addTicketType(
+    @Param('slug') slug: string,
+    @Body() createTicketTypeDto: CreateTicketTypeDto,
+  ) {
     const event = await this.eventsService.findBySlug(slug);
     if (!event) {
       throw new Error('Event not found');

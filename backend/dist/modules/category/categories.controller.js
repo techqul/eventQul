@@ -40,6 +40,9 @@ let CategoriesController = class CategoriesController {
     async findOne(id) {
         return this.categoriesService.findOne(id);
     }
+    async findBySlug(slug) {
+        return this.categoriesService.findBySlug(slug);
+    }
     async update(id, updateCategoryDto) {
         return this.categoriesService.update(id, updateCategoryDto);
     }
@@ -89,6 +92,18 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Get)('slug/:slug'),
+    (0, skip_auth_decorator_1.Public)(),
+    (0, response_message_decorator_1.ResponseMessage)('Category retrieved successfully'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get category by slug (Public)' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Category retrieved successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Category not found' }),
+    __param(0, (0, common_1.Param)('slug')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], CategoriesController.prototype, "findBySlug", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),

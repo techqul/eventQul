@@ -25,15 +25,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface NavbarClientProps {
   variant?: "default" | "transparent" | "glass";
 }
 
 export function NavbarClient({ variant = "default" }: NavbarClientProps) {
+  const { user, isAuthenticated, logout, isLoading } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isDark, setIsDark] = useState(true);
 
   // Initialize theme from localStorage/system on mount
@@ -43,6 +44,28 @@ export function NavbarClient({ variant = "default" }: NavbarClientProps) {
     const darkMode = theme === "dark" || (!theme && systemDark);
     setIsDark(darkMode);
   }, []);
+
+  // Get user initials for avatar fallback
+  const getUserInitials = () => {
+    if (!user) return "U";
+    const firstName = user.firstName?.[0] || "";
+    const lastName = user.lastName?.[0] || "";
+    return (firstName + lastName).toUpperCase() || "U";
+  };
+
+  const getFullName = () => {
+    if (!user) return "User";
+    return `${user.firstName} ${user.lastName}`;
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setIsMenuOpen(false);
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   const toggleTheme = () => {
     const newDarkMode = !isDark;
@@ -84,24 +107,22 @@ export function NavbarClient({ variant = "default" }: NavbarClientProps) {
           )}
         </Button>
 
-        {isLoggedIn ? (
+        {!isLoading && isAuthenticated ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9">
                 <Avatar className="h-7 w-7 sm:h-8 sm:w-8">
-                  <AvatarImage
-                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop"
-                  />
-                  <AvatarFallback className="text-xs">AH</AvatarFallback>
+                  <AvatarImage src={user?.avatarUrl} />
+                  <AvatarFallback className="text-xs">{getUserInitials()}</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52 sm:w-56">
               <DropdownMenuLabel>
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium">Ahmed Rahman</p>
+                  <p className="text-sm font-medium">{getFullName()}</p>
                   <p className="text-xs text-muted-foreground truncate">
-                    ahmed@example.com
+                    {user?.email}
                   </p>
                 </div>
               </DropdownMenuLabel>
@@ -126,7 +147,7 @@ export function NavbarClient({ variant = "default" }: NavbarClientProps) {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                onClick={() => setIsLoggedIn(false)}
+                onClick={handleLogout}
                 className="cursor-pointer text-destructive"
               >
                 <LogOut className="mr-2 h-4 w-4" />
@@ -135,14 +156,16 @@ export function NavbarClient({ variant = "default" }: NavbarClientProps) {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <>
-            <Button variant="ghost" asChild className="text-sm">
-              <Link href="/login">Log in</Link>
-            </Button>
-            <Button variant="gradient" asChild className="text-sm">
-              <Link href="/signup">Sign up</Link>
-            </Button>
-          </>
+          !isLoading && (
+            <>
+              <Button variant="ghost" asChild className="text-sm">
+                <Link href="/login">Log in</Link>
+              </Button>
+              <Button variant="gradient" asChild className="text-sm">
+                <Link href="/signup">Sign up</Link>
+              </Button>
+            </>
+          )
         )}
       </div>
 
@@ -246,8 +269,12 @@ export function NavbarClient({ variant = "default" }: NavbarClientProps) {
               </Button>
 
               <div className="pt-2 sm:pt-4 space-y-2">
-                {isLoggedIn ? (
+                {!isLoading && isAuthenticated ? (
                   <>
+                    <div className="pb-2 border-b">
+                      <p className="text-sm font-medium">{getFullName()}</p>
+                      <p className="text-xs text-muted-foreground">{user?.email}</p>
+                    </div>
                     <Link
                       href="/dashboard"
                       className="block py-2 text-sm font-medium"
@@ -266,8 +293,7 @@ export function NavbarClient({ variant = "default" }: NavbarClientProps) {
                       variant="ghost"
                       className="w-full justify-start text-destructive"
                       onClick={() => {
-                        setIsLoggedIn(false);
-                        setIsMenuOpen(false);
+                        handleLogout();
                       }}
                     >
                       <LogOut className="mr-2 h-4 w-4" />
@@ -275,24 +301,26 @@ export function NavbarClient({ variant = "default" }: NavbarClientProps) {
                     </Button>
                   </>
                 ) : (
-                  <>
-                    <Button
-                      variant="ghost"
-                      className="w-full"
-                      asChild
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Link href="/login">Log in</Link>
-                    </Button>
-                    <Button
-                      variant="gradient"
-                      className="w-full"
-                      asChild
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Link href="/signup">Sign up</Link>
-                    </Button>
-                  </>
+                  !isLoading && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        className="w-full"
+                        asChild
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <Link href="/login">Log in</Link>
+                      </Button>
+                      <Button
+                        variant="gradient"
+                        className="w-full"
+                        asChild
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <Link href="/signup">Sign up</Link>
+                      </Button>
+                    </>
+                  )
                 )}
               </div>
             </div>

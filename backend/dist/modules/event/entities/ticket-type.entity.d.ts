@@ -1,6 +1,5 @@
-import { BaseEntity } from '../../../common/entities/base.entity';
 import { Event } from './event.entity';
-export declare class TicketType extends BaseEntity {
+export declare class TicketType {
     id: string;
     event: Event;
     eventId: string;

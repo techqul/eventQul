@@ -11,14 +11,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Event = void 0;
 const typeorm_1 = require("typeorm");
-const base_entity_1 = require("../../../common/entities/base.entity");
 const organizer_entity_1 = require("../../organizer/entities/organizer.entity");
 const venue_entity_1 = require("../../venue/entities/venue.entity");
 const category_entity_1 = require("../../category/entities/category.entity");
 const ticket_type_entity_1 = require("./ticket-type.entity");
 const event_status_enum_1 = require("../types/event-status.enum");
-const base_entity_2 = require("../../../common/entities/base.entity");
-let Event = class Event extends base_entity_1.BaseEntity {
+let Event = class Event {
     id;
     organizer;
     organizerId;
@@ -147,7 +145,6 @@ __decorate([
     (0, typeorm_1.CreateDateColumn)({
         name: 'created_at',
         type: 'timestamp',
-        transformer: base_entity_2.dateTransformer,
     }),
     __metadata("design:type", String)
 ], Event.prototype, "createdAt", void 0);
@@ -155,7 +152,6 @@ __decorate([
     (0, typeorm_1.UpdateDateColumn)({
         name: 'updated_at',
         type: 'timestamp',
-        transformer: base_entity_2.dateTransformer,
     }),
     __metadata("design:type", String)
 ], Event.prototype, "updatedAt", void 0);
@@ -164,7 +160,6 @@ __decorate([
         name: 'deleted_at',
         type: 'timestamp',
         nullable: true,
-        transformer: base_entity_2.dateTransformer,
     }),
     __metadata("design:type", String)
 ], Event.prototype, "deletedAt", void 0);

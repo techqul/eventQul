@@ -33,7 +33,6 @@ let CategoriesService = CategoriesService_1 = class CategoriesService {
         }
         const category = this.categoryRepository.create(createCategoryDto);
         const savedCategory = await this.categoryRepository.save(category);
-        this.logger.log(`Category created successfully: ${savedCategory.slug}`);
         return savedCategory;
     }
     async findAll(page = 1, limit = 20) {
@@ -59,9 +58,13 @@ let CategoriesService = CategoriesService_1 = class CategoriesService {
         return category;
     }
     async findBySlug(slug) {
-        return this.categoryRepository.findOne({
+        const category = await this.categoryRepository.findOne({
             where: { slug },
         });
+        if (!category) {
+            throw new common_1.NotFoundException('Category not found');
+        }
+        return category;
     }
     async update(id, updateCategoryDto) {
         const category = await this.findOne(id);
@@ -75,7 +78,6 @@ let CategoriesService = CategoriesService_1 = class CategoriesService {
         }
         Object.assign(category, updateCategoryDto);
         const updatedCategory = await this.categoryRepository.save(category);
-        this.logger.log(`Category updated successfully: ${updatedCategory.slug}`);
         return updatedCategory;
     }
     async remove(id) {
@@ -84,7 +86,6 @@ let CategoriesService = CategoriesService_1 = class CategoriesService {
             throw new common_1.NotFoundException('Category not found');
         }
         await this.categoryRepository.delete(id);
-        this.logger.log(`Category deleted: ${id}`);
     }
     async incrementEventCount(categoryId) {
         await this.categoryRepository.increment({ id: categoryId }, 'eventCount', 1);

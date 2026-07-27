@@ -73,12 +73,7 @@ export default function OrganizerLayout({
       {/* Main Content */}
       <main
         className={cn(
-          "flex-1 min-h-screen transition-all duration-200",
-          // Mobile: full width, top padding for header
-          "pt-16 md:pt-0 px-4 md:px-6",
-          // Desktop: margin for sidebar
-          "md:ml-64",
-          isSidebarCollapsed && "md:ml-20"
+          "flex-1 min-h-screen transition-all duration-200 px-4 md:px-6"
         )}
       >
         <div className="py-6">

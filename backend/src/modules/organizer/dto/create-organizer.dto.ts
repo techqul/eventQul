@@ -43,15 +43,18 @@ export class CreateOrganizerDto {
 
   @ApiPropertyOptional({
     example: 'Leading tech event organizer in Bangladesh',
-    description: 'Organization description'
+    description: 'Organization description',
   })
   @IsString()
   @IsOptional()
   description?: string;
 
   @ApiPropertyOptional({
-    example: { facebook: 'https://fb.com/techevents', instagram: 'https://instagram.com/techevents' },
-    description: 'Social media links'
+    example: {
+      facebook: 'https://fb.com/techevents',
+      instagram: 'https://instagram.com/techevents',
+    },
+    description: 'Social media links',
   })
   @IsObject()
   @IsOptional()

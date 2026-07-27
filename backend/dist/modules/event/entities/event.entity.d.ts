@@ -1,10 +1,9 @@
-import { BaseEntity } from '../../../common/entities/base.entity';
 import { Organizer } from '../../organizer/entities/organizer.entity';
 import { Venue } from '../../venue/entities/venue.entity';
 import { Category } from '../../category/entities/category.entity';
 import { TicketType } from './ticket-type.entity';
 import { EventStatus } from '../types/event-status.enum';
-export declare class Event extends BaseEntity {
+export declare class Event {
     id: string;
     organizer: Organizer;
     organizerId: string;

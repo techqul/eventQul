@@ -42,7 +42,7 @@ exports.CreateOrderDto = CreateOrderDto;
 __decorate([
     (0, swagger_1.ApiProperty)({
         type: [TicketItemDto],
-        description: 'Array of ticket types and quantities'
+        description: 'Array of ticket types and quantities',
     }),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.ValidateNested)({ each: true }),
@@ -64,7 +64,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)({
         example: 'John Doe',
-        description: 'Attendee name for all tickets'
+        description: 'Attendee name for all tickets',
     }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
@@ -73,7 +73,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)({
         example: 'john@example.com',
-        description: 'Attendee email for all tickets'
+        description: 'Attendee email for all tickets',
     }),
     (0, class_validator_1.IsEmail)(),
     (0, class_validator_1.IsNotEmpty)(),
@@ -82,7 +82,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)({
         example: '+8801234567890',
-        description: 'Attendee phone for all tickets'
+        description: 'Attendee phone for all tickets',
     }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
