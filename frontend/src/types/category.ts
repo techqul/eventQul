@@ -1,3 +1,5 @@
+import { ServiceResponse } from "./user";
+
 export interface Category {
   id: string;
   name: string;
@@ -18,3 +20,18 @@ export type CategorySlug =
   | "startup-networking"
   | "workshops";
 
+  export interface CreateCategoryDto {
+  id: string;
+  name: string;
+  nameBengali?: string;
+  slug: string;
+  icon: string;
+  color: string;
+  eventCount: number;
+  }
+
+
+  export interface CategoryListResponse extends ServiceResponse<Category[]> {}
+  export interface UpdateCategoryDto extends CreateCategoryDto {}
+  
+  export interface CategoryResponse extends ServiceResponse<Category> {}

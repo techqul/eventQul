@@ -1,4 +1,4 @@
-import { Event, Organizer, Venue, User, Ticket, Category } from "@/types";
+import { Event, Organizer, Venue, Ticket } from "@/types";
 import { CATEGORIES } from "./constants";
 
 // Venues
@@ -403,14 +403,16 @@ export const EVENTS: Event[] = [
   ),
 ];
 
-// Users
+// Users - commented out due to type mismatch with new User interface
+// TODO: Update to match new User type structure with firstName, lastName, etc.
+/*
 export const USERS: User[] = [
   {
     id: "u1",
     name: "Ahmed Rahman",
     email: "ahmed@example.com",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop",
-    role: "user",
+    role: UserRole.USER,
     joinedDate: new Date("2024-01-15"),
     phone: "+880171234567",
     location: "Dhaka",
@@ -421,13 +423,14 @@ export const USERS: User[] = [
     name: "Fatima Akter",
     email: "fatima@example.com",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop",
-    role: "user",
+    role: UserRole.USER,
     joinedDate: new Date("2024-03-20"),
     phone: "+880181234567",
     location: "Chittagong",
     bio: "Music lover and concert goer",
   },
 ];
+*/
 
 // Mock Tickets (purchased)
 export const TICKETS: Ticket[] = [

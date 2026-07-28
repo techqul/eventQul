@@ -1,33 +1,83 @@
-
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { getEventsByOrganizer, ORGANIZERS } from "@/lib/mock-data";
-import { Calendar, MapPin, Users, Facebook, X, Instagram, Mail, Phone, Globe, Check } from "lucide-react";
+import { Calendar, Users, Facebook, X, Instagram, Mail, Phone, Globe, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EventGrid } from "@/components/event/EventGrid";
 import { formatPrice } from "@/lib/utils";
+import { organizersApi } from '@/lib/api/organizers';
+import { Organizer } from '@/types';
 
 interface OrganizerPageProps {
   params: Promise<{ slug: string }>;
 }
 
+// Transform API data to match frontend Organizer type
+function transformOrganizer(apiOrganizer: any): Organizer {
+  // Convert Google Drive file URLs to direct image URLs
+  const convertGoogleDriveUrl = (url: string): string => {
+    if (!url) return '';
+
+    // Pattern: https://drive.google.com/file/d/[FILE_ID]/view?usp=drive_link
+    const googleDriveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (googleDriveMatch) {
+      const fileId = googleDriveMatch[1];
+      return `https://lh3.googleusercontent.com/d/${fileId}`;
+    }
+
+    return url;
+  };
+
+  return {
+    id: apiOrganizer.id,
+    name: apiOrganizer.name,
+    slug: apiOrganizer.slug,
+    logo: convertGoogleDriveUrl(apiOrganizer.logo),
+    banner: convertGoogleDriveUrl(apiOrganizer.banner),
+    description: apiOrganizer.description || '',
+    verified: apiOrganizer.isVerified || false,
+    rating: parseFloat(apiOrganizer.rating) || 0,
+    totalEvents: apiOrganizer.totalEvents || 0,
+    followers: apiOrganizer.followers || 0,
+    socialLinks: apiOrganizer.socialLinks || {
+      facebook: '',
+      instagram: '',
+      twitter: '',
+      website: '',
+    },
+  };
+}
+
 export default async function OrganizerDetailPage({ params }: OrganizerPageProps) {
   const { slug } = await params;
-  const organizer = ORGANIZERS.find((o: any) => o.slug === slug);
+
+  // Fetch organizer by slug from API
+  let organizer: Organizer | null = null;
+  let error: string | null = null;
+
+  try {
+    const response = await organizersApi.getBySlug(slug);
+    if (response.success && response.data) {
+      organizer = transformOrganizer(response.data);
+    } else {
+      error = response.message || 'Organizer not found';
+    }
+  } catch (err) {
+    error = err instanceof Error ? err.message : 'An error occurred while fetching organizer';
+    console.error('Error fetching organizer:', err);
+  }
 
   if (!organizer) {
     notFound();
   }
 
-  const events = getEventsByOrganizer(organizer.id);
-  const totalRevenue = events.reduce((sum, e) => {
-    const lowestPrice = Math.min(...e.ticketTypes.map((t) => t.price));
-    return sum + (lowestPrice * e.soldTickets);
-  }, 0);
+  // TODO: Fetch events by organizer ID from API when endpoint is available
+  // For now, use empty array
+  const events: any[] = [];
+  const totalRevenue = 0;
 
   return (
     <div className="flex flex-col">
@@ -234,8 +284,42 @@ export default async function OrganizerDetailPage({ params }: OrganizerPageProps
   );
 }
 
+// SEO metadata
+export async function generateMetadata({ params }: OrganizerPageProps) {
+  const { slug } = await params;
+
+  try {
+    const response = await organizersApi.getBySlug(slug);
+    if (response.success && response.data) {
+      const organizer = response.data;
+      return {
+        title: `${organizer.name} - Event Organizer`,
+        description: organizer.description,
+        keywords: `${organizer.name}, event organizer, events, Bangladesh`,
+      };
+    }
+  } catch (err) {
+    console.error('Error generating metadata:', err);
+  }
+
+  return {
+    title: 'Event Organizer',
+    description: 'Discover amazing events from this organizer',
+  };
+}
+
+// Generate static params for known organizer slugs
 export async function generateStaticParams() {
-  return ORGANIZERS.map((organizer) => ({
-    slug: organizer.slug,
-  }));
+  try {
+    const response = await organizersApi.getAll();
+    if (response.success && response.data) {
+      return response.data.slice(0, 5).map((organizer: any) => ({
+        slug: organizer.slug,
+      }));
+    }
+  } catch (err) {
+    console.error('Error generating static params:', err);
+  }
+
+  return [];
 }
