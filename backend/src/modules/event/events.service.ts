@@ -159,6 +159,13 @@ export class EventsService {
     return event;
   }
 
+  async findById(id: string): Promise<Event | null> {
+    return this.eventRepository.findOne({
+      where: { id },
+      relations: { organizer: true, venue: true, category: true, ticketTypes: true },
+    });
+  }  
+
   async findBySlug(slug: string): Promise<Event | null> {
     return this.eventRepository.findOne({
       where: { slug },

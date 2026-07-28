@@ -132,6 +132,12 @@ let EventsService = EventsService_1 = class EventsService {
         }
         return event;
     }
+    async findById(id) {
+        return this.eventRepository.findOne({
+            where: { id },
+            relations: { organizer: true, venue: true, category: true, ticketTypes: true },
+        });
+    }
     async findBySlug(slug) {
         return this.eventRepository.findOne({
             where: { slug },

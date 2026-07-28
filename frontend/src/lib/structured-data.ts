@@ -1,7 +1,7 @@
 import { Event } from '@/types';
 
 export function generateEventStructuredData(event: Event) {
-  const lowestPrice = Math.min(...event.ticketTypes.map((t) => t.price));
+  const lowestPrice = Math.min(...event.ticketTypes.map((t) => parseFloat(t.price)));
 
   return {
     '@context': 'https://schema.org',

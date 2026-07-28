@@ -74,6 +74,16 @@ export class EventsController {
     return this.eventsService.findAll(page, limit, filters);
   }
 
+    @Get(':id')
+  @Public()
+  @ResponseMessage('Event retrieved successfully')
+  @ApiOperation({ summary: 'Get event by slug (Public)' })
+  @ApiResponse({ status: 200, description: 'Event retrieved successfully' })
+  @ApiResponse({ status: 404, description: 'Event not found' })
+  async findById(@Param('id') id: string) {
+    return this.eventsService.findById(id);
+  }
+
   @Get(':slug')
   @Public()
   @ResponseMessage('Event retrieved successfully')

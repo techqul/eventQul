@@ -9,6 +9,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn, formatPrice, formatRelativeTime, formatDateTime } from "@/lib/utils";
+import { getGoogleDriveImageUrl } from "@/lib/utils/image";
 
 interface EventCardProps {
   event: Event;
@@ -23,10 +24,12 @@ export function EventCard({
   showOrganizer = true,
   className,
 }: EventCardProps) {
-  const lowestPrice = Math.min(...event.ticketTypes.map((t) => t.price));
+  const lowestPrice = Math.min(...event.ticketTypes.map((t) => parseFloat(t.price)));
   const isSoldOut = event.soldTickets >= event.capacity;
   const isTrending = event.trending;
   const isFeatured = event.featured;
+
+  console.log("event", event);
 
   if (variant === "compact") {
     return (
@@ -103,7 +106,7 @@ export function EventCard({
         >
           <div className="relative h-48 md:h-64 overflow-hidden">
             <Image
-              src={event.coverImage}
+               src={getGoogleDriveImageUrl(event.coverImage)}
               alt={event.title}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -192,7 +195,7 @@ export function EventCard({
                 <span className="text-sm text-muted-foreground">
                   {event.organizer.name}
                 </span>
-                {event.organizer.verified && (
+                {event.organizer.isVerified && (
                   <Badge variant="outline" className="text-xs">
                     ✓ Verified
                   </Badge>

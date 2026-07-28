@@ -25,6 +25,7 @@ import { formatPrice, formatDateTime, formatDate, formatTime } from "@/lib/utils
 import { EventGrid } from "@/components/event/EventGrid";
 import { Event } from "@/types";
 import { cn } from "@/lib/utils";
+import { getGoogleDriveImageUrl } from "@/lib/utils/image";
 
 interface EventDetailContentProps {
   event: Event;
@@ -35,7 +36,7 @@ export function EventDetailContent({
   event,
   relatedEvents,
 }: EventDetailContentProps) {
-  const lowestPrice = Math.min(...event.ticketTypes.map((t) => t.price));
+  const lowestPrice = Math.min(...event.ticketTypes.map((t) => parseFloat(t.price)));
   const isSoldOut = event.soldTickets >= event.capacity;
 
   return (
@@ -46,7 +47,7 @@ export function EventDetailContent({
           src={event.coverImage}
           alt={event.title}
           fill
-          className="object-cover"
+          className="object-fit cener"
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
@@ -101,8 +102,8 @@ export function EventDetailContent({
               <div className="flex items-center gap-2">
                 <MapPin className="h-5 w-5" />
                 <span>
-                  TSC, Dhaka University
-                  {/* {event.venue.name}, {event.venue.city} */}
+                
+                  {event.venue.name}, {event.venue.address}
                 </span>
               </div>
             </div>
@@ -220,7 +221,7 @@ export function EventDetailContent({
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
                     <Avatar className="h-16 w-16">
-                      <AvatarImage src={event.organizer.logo} />
+                      <AvatarImage src={getGoogleDriveImageUrl(event.organizer.logo)}/>
                       <AvatarFallback>
                         {event.organizer.name[0]}
                       </AvatarFallback>
@@ -230,7 +231,7 @@ export function EventDetailContent({
                         <h3 className="font-semibold text-lg">
                           {event.organizer.name}
                         </h3>
-                        {event.organizer.verified && (
+                        {event.organizer.isVerified && (
                           <Badge variant="outline" className="text-xs">
                             ✓ Verified
                           </Badge>
@@ -340,7 +341,7 @@ export function EventDetailContent({
                             </p>
                           </div>
                           <p className="font-bold text-primary">
-                            {formatPrice(ticket.price)}
+                            {formatPrice(Number(ticket.price))}
                           </p>
                         </div>
                         <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">

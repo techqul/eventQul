@@ -138,7 +138,7 @@ export default function OrganizerEventsPage() {
                     <p className="text-lg font-bold">
                       {formatPrice(
                         event.soldTickets *
-                          Math.min(...event.ticketTypes.map((t) => t.price))
+                          Math.min(...event.ticketTypes.map((t) => parseFloat(t.price)))
                       )}
                     </p>
                     <p className="text-xs text-muted-foreground">Revenue</p>

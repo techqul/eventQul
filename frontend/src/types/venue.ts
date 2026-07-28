@@ -12,4 +12,6 @@ export interface Venue {
     lat: number;
     lng: number;
   };
+  createdAt: string;
+  updatedAt: string;
 }

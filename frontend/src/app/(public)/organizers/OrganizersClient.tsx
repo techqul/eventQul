@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import { Organizer } from '@/types';
+import { getGoogleDriveImageUrl } from '@/lib/utils/image';
 
 interface OrganizersClientProps {
   organizers: Organizer[];
@@ -49,7 +50,7 @@ export default function OrganizersClient({ organizers, totalOrganizers, totalEve
       >
         {[
           { label: "Total Organizers", value: totalOrganizers },
-          { label: "Verified", value: organizers.filter((o) => o.verified).length },
+          { label: "Verified", value: organizers.filter((o) => o.isVerified).length },
           { label: "Events Hosted", value: totalEvents },
           { label: "Total Followers", value: totalFollowers > 1000 ? `${(totalFollowers / 1000).toFixed(0)}K` : totalFollowers },
         ].map((stat, index) => (
@@ -91,7 +92,7 @@ export default function OrganizersClient({ organizers, totalOrganizers, totalEve
                   {/* Banner */}
                   <div className="h-32 relative overflow-hidden">
                     <Image
-                      src={organizer.banner}
+                      src={getGoogleDriveImageUrl(organizer.banner)}
                       alt={organizer.name}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -101,7 +102,7 @@ export default function OrganizersClient({ organizers, totalOrganizers, totalEve
 
                   <CardContent className="p-6 -mt-12 relative">
                     <Avatar className="h-20 w-20 border-4 border-background shadow-lg">
-                      <AvatarImage src={organizer.logo} />
+                      <AvatarImage src={getGoogleDriveImageUrl(organizer.logo)} />
                       <AvatarFallback>{organizer.name[0]}</AvatarFallback>
                     </Avatar>
 
@@ -110,7 +111,7 @@ export default function OrganizersClient({ organizers, totalOrganizers, totalEve
                         <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
                           {organizer.name}
                         </h3>
-                        {organizer.verified && (
+                        {organizer.isVerified && (
                           <Badge variant="outline" className="text-xs">
                             <Check className="h-3 w-3 mr-1" />
                             Verified

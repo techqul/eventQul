@@ -1,54 +1,18 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Calendar, Users, Facebook, X, Instagram, Mail, Phone, Globe, Check } from "lucide-react";
+import { Calendar, Users, Facebook, X, Instagram, Globe, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EventGrid } from "@/components/event/EventGrid";
-import { formatPrice } from "@/lib/utils";
 import { organizersApi } from '@/lib/api/organizers';
 import { Organizer } from '@/types';
+import { getGoogleDriveImageUrl } from '@/lib/utils/image';
 
 interface OrganizerPageProps {
   params: Promise<{ slug: string }>;
-}
-
-// Transform API data to match frontend Organizer type
-function transformOrganizer(apiOrganizer: any): Organizer {
-  // Convert Google Drive file URLs to direct image URLs
-  const convertGoogleDriveUrl = (url: string): string => {
-    if (!url) return '';
-
-    // Pattern: https://drive.google.com/file/d/[FILE_ID]/view?usp=drive_link
-    const googleDriveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-    if (googleDriveMatch) {
-      const fileId = googleDriveMatch[1];
-      return `https://lh3.googleusercontent.com/d/${fileId}`;
-    }
-
-    return url;
-  };
-
-  return {
-    id: apiOrganizer.id,
-    name: apiOrganizer.name,
-    slug: apiOrganizer.slug,
-    logo: convertGoogleDriveUrl(apiOrganizer.logo),
-    banner: convertGoogleDriveUrl(apiOrganizer.banner),
-    description: apiOrganizer.description || '',
-    verified: apiOrganizer.isVerified || false,
-    rating: parseFloat(apiOrganizer.rating) || 0,
-    totalEvents: apiOrganizer.totalEvents || 0,
-    followers: apiOrganizer.followers || 0,
-    socialLinks: apiOrganizer.socialLinks || {
-      facebook: '',
-      instagram: '',
-      twitter: '',
-      website: '',
-    },
-  };
 }
 
 export default async function OrganizerDetailPage({ params }: OrganizerPageProps) {
@@ -61,7 +25,7 @@ export default async function OrganizerDetailPage({ params }: OrganizerPageProps
   try {
     const response = await organizersApi.getBySlug(slug);
     if (response.success && response.data) {
-      organizer = transformOrganizer(response.data);
+      organizer = response.data;
     } else {
       error = response.message || 'Organizer not found';
     }
@@ -84,7 +48,7 @@ export default async function OrganizerDetailPage({ params }: OrganizerPageProps
       {/* Cover Image */}
       <div className="relative h-[40vh] md:h-[40vh] w-full">
         <Image
-          src={organizer.banner}
+          src={getGoogleDriveImageUrl(organizer.banner)}
           alt={organizer.name}
           fill
           className="object-cover"
@@ -107,13 +71,13 @@ export default async function OrganizerDetailPage({ params }: OrganizerPageProps
         <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12">
           <div className="container mx-auto flex items-end gap-6">
             <Avatar className="h-32 w-32 border-4 border-background shadow-xl">
-              <AvatarImage src={organizer.logo} />
+              <AvatarImage src={getGoogleDriveImageUrl(organizer.logo)} />
               <AvatarFallback className="text-4xl">{organizer.name[0]}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
                 <h1 className="text-4xl md:text-5xl font-bold">{organizer.name}</h1>
-                {organizer.verified && (
+                {organizer.isVerified && (
                   <Badge variant="outline" className="text-sm">
                     <Check className="h-4 w-4 mr-1" />
                     Verified
@@ -172,9 +136,7 @@ export default async function OrganizerDetailPage({ params }: OrganizerPageProps
               </Card>
               <Card>
                 <CardContent className="p-6 text-center">
-                  <p className="text-3xl font-bold text-primary">
-                    {formatPrice(totalRevenue)}
-                  </p>
+                  <p className="text-3xl font-bold text-primary">{totalRevenue}</p>
                   <p className="text-sm text-muted-foreground">Total Revenue</p>
                 </CardContent>
               </Card>
@@ -184,7 +146,7 @@ export default async function OrganizerDetailPage({ params }: OrganizerPageProps
             <div>
               <h2 className="text-2xl font-bold mb-4">Events by {organizer.name}</h2>
               {events.length > 0 ? (
-                <EventGrid events={events} />
+                <EventGrid events={events}  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6"/>
               ) : (
                 <Card>
                   <CardContent className="p-12 text-center">
@@ -313,7 +275,7 @@ export async function generateStaticParams() {
   try {
     const response = await organizersApi.getAll();
     if (response.success && response.data) {
-      return response.data.slice(0, 5).map((organizer: any) => ({
+      return response.data.slice(0, 5).map((organizer: Organizer) => ({
         slug: organizer.slug,
       }));
     }

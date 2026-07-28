@@ -38,6 +38,9 @@ let EventsController = class EventsController {
         const filters = { search, category, status, featured, trending };
         return this.eventsService.findAll(page, limit, filters);
     }
+    async findById(id) {
+        return this.eventsService.findById(id);
+    }
     async findOne(slug) {
         return this.eventsService.findBySlug(slug);
     }
@@ -111,6 +114,18 @@ __decorate([
     __metadata("design:paramtypes", [Number, Number, String, String, String, String, String]),
     __metadata("design:returntype", Promise)
 ], EventsController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, skip_auth_decorator_1.Public)(),
+    (0, response_message_decorator_1.ResponseMessage)('Event retrieved successfully'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get event by slug (Public)' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Event retrieved successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Event not found' }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], EventsController.prototype, "findById", null);
 __decorate([
     (0, common_1.Get)(':slug'),
     (0, skip_auth_decorator_1.Public)(),

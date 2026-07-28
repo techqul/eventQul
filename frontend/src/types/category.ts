@@ -1,5 +1,6 @@
 import { ServiceResponse } from "./user";
 
+// Backend API response structure
 export interface Category {
   id: string;
   name: string;
@@ -8,6 +9,8 @@ export interface Category {
   icon: string;
   color: string;
   eventCount: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type CategorySlug =
@@ -20,18 +23,23 @@ export type CategorySlug =
   | "startup-networking"
   | "workshops";
 
-  export interface CreateCategoryDto {
-  id: string;
+export interface CreateCategoryDto {
   name: string;
   nameBengali?: string;
   slug: string;
   icon: string;
   color: string;
-  eventCount: number;
-  }
+}
 
+export interface UpdateCategoryDto extends Partial<CreateCategoryDto> {}
 
-  export interface CategoryListResponse extends ServiceResponse<Category[]> {}
-  export interface UpdateCategoryDto extends CreateCategoryDto {}
-  
-  export interface CategoryResponse extends ServiceResponse<Category> {}
+export interface CategoryListResponse extends ServiceResponse<Category[]> {
+  meta?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface CategoryResponse extends ServiceResponse<Category> {}

@@ -27,22 +27,29 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { CATEGORIES } from "@/lib/constants";
-import { Event, EventFilter } from "@/types";
+import { Event, EventFilter, Category } from "@/types";
 
 const CITIES = ["Dhaka", "Chittagong", "Sylhet", "Rajshahi", "Khulna"];
 
 interface EventsPageContentProps {
   initialEvents: Event[];
   totalEvents: number;
+  categories?: Category[];
+  error?: string | null;
 }
 
 export function EventsPageContent({
   initialEvents,
   totalEvents,
+  categories = [],
+  error,
 }: EventsPageContentProps) {
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<EventFilter>({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  // Use API categories if available, otherwise fall back to constants
+  const displayCategories = categories.length > 0 ? categories : CATEGORIES;
 
   const filteredEvents = useMemo(() => {
     let filtered = [...initialEvents];
@@ -71,11 +78,11 @@ export function EventsPageContent({
     // Price filter
     if (filters.price === "free") {
       filtered = filtered.filter((e) =>
-        e.ticketTypes.some((t) => t.price === 0)
+        e.ticketTypes.some((t) => parseFloat(t.price) === 0)
       );
     } else if (filters.price === "paid") {
       filtered = filtered.filter((e) =>
-        e.ticketTypes.some((t) => t.price > 0)
+        e.ticketTypes.some((t) => parseFloat(t.price) > 0)
       );
     }
 
@@ -88,14 +95,14 @@ export function EventsPageContent({
     } else if (filters.sort === "price_low") {
       filtered.sort(
         (a, b) =>
-          Math.min(...a.ticketTypes.map((t) => t.price)) -
-          Math.min(...b.ticketTypes.map((t) => t.price))
+          Math.min(...a.ticketTypes.map((t) => parseFloat(t.price))) -
+          Math.min(...b.ticketTypes.map((t) => parseFloat(t.price)))
       );
     } else if (filters.sort === "price_high") {
       filtered.sort(
         (a, b) =>
-          Math.min(...b.ticketTypes.map((t) => t.price)) -
-          Math.min(...a.ticketTypes.map((t) => t.price))
+          Math.min(...b.ticketTypes.map((t) => parseFloat(t.price))) -
+          Math.min(...a.ticketTypes.map((t) => parseFloat(t.price)))
       );
     } else if (filters.sort === "popular") {
       filtered.sort((a, b) => b.soldTickets - a.soldTickets);
@@ -121,7 +128,7 @@ export function EventsPageContent({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
+        className="mb-6"
       >
         <h1 className="text-4xl font-bold mb-2">Discover Events</h1>
         <p className="text-muted-foreground">
@@ -156,7 +163,7 @@ export function EventsPageContent({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                {CATEGORIES.map((cat) => (
+                {displayCategories.map((cat) => (
                   <SelectItem key={cat.id} value={cat.slug}>
                     {cat.name}
                   </SelectItem>
@@ -238,7 +245,7 @@ export function EventsPageContent({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Categories</SelectItem>
-                      {CATEGORIES.map((cat) => (
+                      {displayCategories.map((cat) => (
                         <SelectItem key={cat.id} value={cat.slug}>
                           {cat.name}
                         </SelectItem>
@@ -371,6 +378,21 @@ export function EventsPageContent({
           </div>
         )}
       </div>
+
+      {/* Error State */}
+      {error && (
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-6 mb-6">
+          <p className="text-destructive font-medium mb-2">Failed to load events</p>
+          <p className="text-sm text-muted-foreground mb-4">{error}</p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => window.location.reload()}
+          >
+            Retry
+          </Button>
+        </div>
+      )}
 
       {/* Results */}
       <div className="mb-4">

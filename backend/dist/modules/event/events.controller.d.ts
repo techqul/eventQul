@@ -7,6 +7,7 @@ export declare class EventsController {
     constructor(eventsService: EventsService);
     create(user: any, createEventDto: CreateEventDto): Promise<import("./entities/event.entity").Event>;
     findAll(page?: number, limit?: number, search?: string, category?: string, status?: string, featured?: string, trending?: string): Promise<import("./events.service").PaginatedResult<import("./entities/event.entity").Event>>;
+    findById(id: string): Promise<import("./entities/event.entity").Event | null>;
     findOne(slug: string): Promise<import("./entities/event.entity").Event | null>;
     update(slug: string, updateEventDto: UpdateEventDto): Promise<import("./entities/event.entity").Event>;
     remove(slug: string): Promise<{

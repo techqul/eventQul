@@ -7,8 +7,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
-  Calendar,
-  MapPin,
   CreditCard,
   Smartphone,
   Phone,
@@ -19,14 +17,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getEventById } from "@/lib/mock-data";
 import { formatPrice, formatDateTime } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
+import { eventsApi } from "@/lib/api/events";
+import { Event, TicketType } from "@/types";
+import { getGoogleDriveImageUrl } from "@/lib/utils/image";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -38,24 +36,38 @@ export default function CheckoutPage() {
   const [discount, setDiscount] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("card");
+  const [event, setEvent] = useState<Event | null>(null);
+  const [ticketType, setTicketType] = useState<TicketType | null>(null);
 
-  const eventId = searchParams.get("event");
-  const ticketId = searchParams.get("ticket");
+  const eventId = searchParams.get("event") as string;
+  const ticketId = searchParams.get("ticket") as string;
 
-  const event = eventId ? getEventById(eventId) : null;
-  const ticketType = event?.ticketTypes.find((t) => t.id === ticketId);
+  console.log("id", eventId, ticketId);
+
+  //single event api call
 
   useEffect(() => {
-    if (!event || !ticketType) {
+    if (!eventId) {
       router.push("/events");
     }
-  }, [event, ticketType, router]);
+    const fetchEvent = async () => {
+      try {
+        const response = await eventsApi.getById(eventId);
+        console.log("response", response);
+        if (response.success && response.data) {
+          const data: any = response.data;
+          setEvent(data);
+          setTicketType(data?.ticketTypes?.find((t: any) => t.id === ticketId));
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
-  if (!event || !ticketType) {
-    return null;
-  }
+    fetchEvent();
+  }, [eventId]);
 
-  const subtotal = ticketType.price * quantity;
+  const subtotal = Number(ticketType?.price) * quantity;
   const convenienceFee = Math.max(50, subtotal * 0.05);
   const total = subtotal + convenienceFee - discount;
 
@@ -91,7 +103,7 @@ export default function CheckoutPage() {
   return (
     <div className="container mx-auto p-4">
       <Link
-        href={`/events/${event.slug}`}
+        href={`/events/${event?.slug}`}
         className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4"
       >
         <ArrowLeft className="h-4 w-4 mr-2" />
@@ -101,15 +113,7 @@ export default function CheckoutPage() {
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Form Section */}
         <div className="lg:col-span-2 space-y-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <h1 className="text-2xl font-bold mb-1">Checkout</h1>
-            <p className="text-muted-foreground">
-              Complete your purchase to secure your tickets
-            </p>
-          </motion.div>
+ 
 
           {/* Attendee Information */}
           <motion.div
@@ -119,9 +123,13 @@ export default function CheckoutPage() {
           >
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <User className="h-5 w-5" />
-                  Attendee Information
+                <CardTitle className="">
+                  {/* <User className="h-5 w-5" />
+                  Attendee Information */}
+                   <h1 className="text-2xl font-bold mb-1">Checkout</h1>
+            <p className="text-muted-foreground text-sm">
+              Complete your purchase to secure your tickets
+            </p>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -173,10 +181,7 @@ export default function CheckoutPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Tabs
-                  value={paymentMethod}
-                  onValueChange={setPaymentMethod}
-                >
+                <Tabs value={paymentMethod} onValueChange={setPaymentMethod}>
                   <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="card">
                       <CreditCard className="h-4 w-4 mr-2" />
@@ -214,26 +219,17 @@ export default function CheckoutPage() {
 
                   <TabsContent value="mobile" className="space-y-4 mt-4">
                     <div className="grid grid-cols-3 gap-3">
-                      <Button
-                        variant="outline"
-                        className="h-20 flex-col gap-1"
-                      >
+                      <Button variant="outline" className="h-20 flex-col gap-1">
                         <span className="text-lg font-bold text-pink-500">
                           bKash
                         </span>
                       </Button>
-                      <Button
-                        variant="outline"
-                        className="h-20 flex-col gap-1"
-                      >
+                      <Button variant="outline" className="h-20 flex-col gap-1">
                         <span className="text-lg font-bold text-orange-500">
                           Nagad
                         </span>
                       </Button>
-                      <Button
-                        variant="outline"
-                        className="h-20 flex-col gap-1"
-                      >
+                      <Button variant="outline" className="h-20 flex-col gap-1">
                         <span className="text-lg font-bold text-purple-500">
                           Rocket
                         </span>
@@ -241,10 +237,7 @@ export default function CheckoutPage() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="mobileNumber">Mobile Number</Label>
-                      <Input
-                        id="mobileNumber"
-                        placeholder="+880 1XXX-XXXXXX"
-                      />
+                      <Input id="mobileNumber" placeholder="+880 1XXX-XXXXXX" />
                     </div>
                   </TabsContent>
 
@@ -276,21 +269,21 @@ export default function CheckoutPage() {
                 <div className="flex gap-3">
                   <div className="relative h-20 w-20 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src={event.coverImage}
-                      alt={event.title}
+                      src={getGoogleDriveImageUrl(event?.coverImage as string)}
+                      alt={event?.title as string}
                       fill
                       className="object-cover"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="font-semibold line-clamp-2">
-                      {event.title}
+                      {event?.title}
                     </h4>
                     <p className="text-sm text-muted-foreground line-clamp-1">
-                      {ticketType.name}
+                      {ticketType?.name}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {formatDateTime(event.startDate)}
+                      {formatDateTime(event?.startDate)}
                     </p>
                   </div>
                 </div>
@@ -305,9 +298,7 @@ export default function CheckoutPage() {
                       variant="outline"
                       size="icon"
                       className="h-8 w-8"
-                      onClick={() =>
-                        setQuantity(Math.max(1, quantity - 1))
-                      }
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     >
                       -
                     </Button>
@@ -317,7 +308,12 @@ export default function CheckoutPage() {
                       size="icon"
                       className="h-8 w-8"
                       onClick={() =>
-                        setQuantity(Math.min(ticketType.maxPerPurchase, quantity + 1))
+                        setQuantity(
+                          Math.min(
+                            Number(ticketType?.maxPerPurchase),
+                            quantity + 1,
+                          ),
+                        )
                       }
                     >
                       +
@@ -331,7 +327,8 @@ export default function CheckoutPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">
-                      Subtotal ({quantity} × {formatPrice(ticketType.price)})
+                      Subtotal ({quantity} ×{" "}
+                      {formatPrice(Number(ticketType?.price))})
                     </span>
                     <span>{formatPrice(subtotal)}</span>
                   </div>

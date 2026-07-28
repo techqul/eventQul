@@ -9,6 +9,8 @@ export const CATEGORIES: Category[] = [
     icon: "Music",
     color: "from-pink-500 to-rose-500",
     eventCount: 156,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
   {
     id: "2",
@@ -18,6 +20,8 @@ export const CATEGORIES: Category[] = [
     icon: "Laptop",
     color: "from-blue-500 to-cyan-500",
     eventCount: 89,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
   {
     id: "3",
@@ -27,6 +31,8 @@ export const CATEGORIES: Category[] = [
     icon: "Briefcase",
     color: "from-purple-500 to-indigo-500",
     eventCount: 124,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
   {
     id: "4",
@@ -36,6 +42,8 @@ export const CATEGORIES: Category[] = [
     icon: "Trophy",
     color: "from-green-500 to-emerald-500",
     eventCount: 67,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
   {
     id: "5",
@@ -45,6 +53,8 @@ export const CATEGORIES: Category[] = [
     icon: "Palette",
     color: "from-orange-500 to-amber-500",
     eventCount: 93,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
   {
     id: "6",
@@ -54,6 +64,8 @@ export const CATEGORIES: Category[] = [
     icon: "Utensils",
     color: "from-red-500 to-pink-500",
     eventCount: 78,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
   {
     id: "7",
@@ -63,6 +75,8 @@ export const CATEGORIES: Category[] = [
     icon: "Rocket",
     color: "from-violet-500 to-purple-500",
     eventCount: 112,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
   {
     id: "8",
@@ -72,6 +86,8 @@ export const CATEGORIES: Category[] = [
     icon: "GraduationCap",
     color: "from-teal-500 to-cyan-500",
     eventCount: 145,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
 ];
 

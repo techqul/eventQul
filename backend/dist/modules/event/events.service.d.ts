@@ -23,6 +23,7 @@ export declare class EventsService {
     create(createEventDto: CreateEventDto, organizerId: string): Promise<Event>;
     findAll(page?: number, limit?: number, filters?: any): Promise<PaginatedResult<Event>>;
     findOne(id: string): Promise<Event>;
+    findById(id: string): Promise<Event | null>;
     findBySlug(slug: string): Promise<Event | null>;
     update(id: string, updateEventDto: UpdateEventDto): Promise<Event>;
     remove(id: string): Promise<void>;
