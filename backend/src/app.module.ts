@@ -19,6 +19,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { OtpModule } from './modules/otp/otp.module';
 
 /**
  * Global Configuration Module
@@ -68,6 +69,7 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     OrganizersModule,
     EventsModule,
     OrdersModule,
+    OtpModule
   ],
   controllers: [AppController],
   providers: [

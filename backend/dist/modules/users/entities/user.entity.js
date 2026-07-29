@@ -57,10 +57,14 @@ let User = class User {
     phoneNumber;
     instituteName;
     district;
+    thana;
+    ocupation;
     dob;
     bloodGroup;
     gender;
     tshirtSize;
+    facebookId;
+    linkedinId;
     role;
     status;
     emailVerified;
@@ -112,6 +116,14 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "district", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ name: 'thana', nullable: true }),
+    __metadata("design:type", String)
+], User.prototype, "thana", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'ocupation', nullable: true }),
+    __metadata("design:type", String)
+], User.prototype, "ocupation", void 0);
+__decorate([
     (0, typeorm_1.Column)({ name: 'dob', type: 'varchar', length: '50', nullable: true }),
     __metadata("design:type", String)
 ], User.prototype, "dob", void 0);
@@ -142,6 +154,14 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], User.prototype, "tshirtSize", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'facebook_id', nullable: true }),
+    __metadata("design:type", String)
+], User.prototype, "facebookId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'linkedin_id', nullable: true }),
+    __metadata("design:type", String)
+], User.prototype, "linkedinId", void 0);
 __decorate([
     (0, typeorm_1.Column)({
         type: 'enum',

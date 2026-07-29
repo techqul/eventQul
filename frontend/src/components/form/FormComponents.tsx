@@ -45,7 +45,7 @@ export const FormInput = ({
   disabled = false,
   required = false,
   description,
-  className = "",
+  className = "space-y-2",
 }: FormInputProps) => {
   const { control } = useFormContext();
   return (

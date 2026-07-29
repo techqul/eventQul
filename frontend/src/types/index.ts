@@ -4,3 +4,4 @@ export * from "./organizer";
 export * from "./ticket";
 export * from "./user";
 export * from "./event";
+export * from "./order";

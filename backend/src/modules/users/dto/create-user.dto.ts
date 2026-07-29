@@ -46,7 +46,6 @@ export class CreateUserDto {
   @ApiPropertyOptional({ example: 'Johnny' })
   @IsString()
   @IsOptional()
-  @MinLength(2)
   @MaxLength(30)
   nickName?: string;
 
@@ -67,6 +66,18 @@ export class CreateUserDto {
   @MaxLength(50)
   district?: string;
 
+  @ApiPropertyOptional({ example: 'Rampura' })
+  @IsString()
+  @IsOptional()
+  @MaxLength(50)
+  thana?: string;
+
+  @ApiPropertyOptional({ example: 'Software Engineer' })
+  @IsString()
+  @IsOptional()
+  @MaxLength(100)
+  ocupation?: string;
+
   @ApiPropertyOptional({ example: '2000-07-02' })
   @IsString()
   @IsOptional()
@@ -86,6 +97,18 @@ export class CreateUserDto {
   @IsEnum(TShirtSize)
   @IsOptional()
   tshirtSize?: TShirtSize;
+
+  @ApiPropertyOptional({ example: 'https://facebook.com/johndoe' })
+  @IsString()
+  @IsOptional()
+  @MaxLength(255)
+  facebookId?: string;
+
+  @ApiPropertyOptional({ example: 'https://linkedin.com/in/johndoe' })
+  @IsString()
+  @IsOptional()
+  @MaxLength(255)
+  linkedinId?: string;
 }
 
 export class RegisterDto extends CreateUserDto {

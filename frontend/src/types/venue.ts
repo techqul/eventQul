@@ -6,7 +6,7 @@ export interface Venue {
   city: string;
   area: string;
   capacity: number;
-  mapImage: string;
+  mapImage: string; // Full iframe embed code from Google Maps
   facilities: string[];
   coordinates?: {
     lat: number;

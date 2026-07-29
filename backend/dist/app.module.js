@@ -61,6 +61,7 @@ const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const auth_module_1 = require("./modules/auth/auth.module");
 const response_interceptor_1 = require("./common/interceptors/response.interceptor");
+const otp_module_1 = require("./modules/otp/otp.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -100,6 +101,7 @@ exports.AppModule = AppModule = __decorate([
             organizers_module_1.OrganizersModule,
             events_module_1.EventsModule,
             orders_module_1.OrdersModule,
+            otp_module_1.OtpModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [

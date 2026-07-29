@@ -4,7 +4,7 @@ import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 export declare class OrdersController {
     private readonly ordersService;
     constructor(ordersService: OrdersService);
-    create(user: any, createOrderDto: CreateOrderDto): Promise<import("./entities/order.entity").Order>;
+    create(user: any, createOrderDto: CreateOrderDto): Promise<import("./orders.service").SerializedOrder>;
     findAll(user: any, page?: number, limit?: number): Promise<import("./orders.service").PaginatedResult<import("./entities/order.entity").Order>>;
     getMyTickets(user: any): Promise<import("./entities/ticket.entity").Ticket[]>;
     findOne(orderNumber: string, user: any): Promise<import("./entities/order.entity").Order>;

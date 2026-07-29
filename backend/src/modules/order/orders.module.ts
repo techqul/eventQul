@@ -8,9 +8,14 @@ import { TicketType } from '../event/entities/ticket-type.entity';
 import { Event } from '../event/entities/event.entity';
 import { User } from '../users/entities/user.entity';
 import { AuthModule } from '../auth/auth.module';
+import { OtpModule } from '../otp/otp.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Order, Ticket, TicketType, Event, User]), AuthModule],
+  imports: [
+    TypeOrmModule.forFeature([Order, Ticket, TicketType, Event, User]),
+    AuthModule,
+    OtpModule,
+  ],
   controllers: [OrdersController, TicketsController],
   providers: [OrdersService],
   exports: [OrdersService],

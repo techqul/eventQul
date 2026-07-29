@@ -9,10 +9,14 @@ export declare class User {
     phoneNumber?: string;
     instituteName?: string;
     district?: string;
+    thana?: string;
+    ocupation?: string;
     dob?: string;
     bloodGroup?: BloodGroup;
     gender?: Gender;
     tshirtSize?: TShirtSize;
+    facebookId?: string;
+    linkedinId?: string;
     role: UserRole;
     status: UserStatus;
     emailVerified: boolean;

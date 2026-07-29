@@ -17,12 +17,17 @@ const ticket_type_entity_1 = require("../event/entities/ticket-type.entity");
 const event_entity_1 = require("../event/entities/event.entity");
 const user_entity_1 = require("../users/entities/user.entity");
 const auth_module_1 = require("../auth/auth.module");
+const otp_module_1 = require("../otp/otp.module");
 let OrdersModule = class OrdersModule {
 };
 exports.OrdersModule = OrdersModule;
 exports.OrdersModule = OrdersModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([order_entity_1.Order, ticket_entity_1.Ticket, ticket_type_entity_1.TicketType, event_entity_1.Event, user_entity_1.User]), auth_module_1.AuthModule],
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([order_entity_1.Order, ticket_entity_1.Ticket, ticket_type_entity_1.TicketType, event_entity_1.Event, user_entity_1.User]),
+            auth_module_1.AuthModule,
+            otp_module_1.OtpModule,
+        ],
         controllers: [orders_controller_1.OrdersController, orders_controller_1.TicketsController],
         providers: [orders_service_1.OrdersService],
         exports: [orders_service_1.OrdersService],

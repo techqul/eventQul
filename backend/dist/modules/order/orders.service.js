@@ -22,19 +22,22 @@ const ticket_entity_1 = require("./entities/ticket.entity");
 const ticket_type_entity_1 = require("../event/entities/ticket-type.entity");
 const event_entity_1 = require("../event/entities/event.entity");
 const order_status_enum_1 = require("./types/order-status.enum");
+const otp_service_1 = require("../otp/otp.service");
 let OrdersService = OrdersService_1 = class OrdersService {
     orderRepository;
     ticketRepository;
     ticketTypeRepository;
     eventRepository;
     dataSource;
+    otpService;
     logger = new common_1.Logger(OrdersService_1.name);
-    constructor(orderRepository, ticketRepository, ticketTypeRepository, eventRepository, dataSource) {
+    constructor(orderRepository, ticketRepository, ticketTypeRepository, eventRepository, dataSource, otpService) {
         this.orderRepository = orderRepository;
         this.ticketRepository = ticketRepository;
         this.ticketTypeRepository = ticketTypeRepository;
         this.eventRepository = eventRepository;
         this.dataSource = dataSource;
+        this.otpService = otpService;
     }
     async create(userId, createOrderDto) {
         const queryRunner = this.dataSource.createQueryRunner();
@@ -67,8 +70,8 @@ let OrdersService = OrdersService_1 = class OrdersService {
             }
             const discount = 0;
             const total = subtotal - discount;
-            const orderNumber = await this.generateOrderNumber();
-            const order = queryRunner.manager.create(order_entity_1.Order, {
+            const orderNumber = this.generateOrderNumber();
+            const orderCreate = queryRunner.manager.create(order_entity_1.Order, {
                 userId,
                 orderNumber,
                 subtotal,
@@ -79,11 +82,11 @@ let OrdersService = OrdersService_1 = class OrdersService {
                 paymentMethod: createOrderDto.paymentMethod,
                 paymentStatus: 'pending',
             });
-            const savedOrder = await queryRunner.manager.save(order);
+            const savedOrder = await queryRunner.manager.save(orderCreate);
             const tickets = [];
             for (const item of ticketItems) {
                 for (let i = 0; i < item.quantity; i++) {
-                    const qrCode = await this.generateQRCode();
+                    const qrCode = this.generateQRCode();
                     const ticket = queryRunner.manager.create(ticket_entity_1.Ticket, {
                         orderId: savedOrder.id,
                         eventId: item.ticketType.eventId,
@@ -104,7 +107,18 @@ let OrdersService = OrdersService_1 = class OrdersService {
             }
             await queryRunner.commitTransaction();
             this.logger.log(`Order created successfully: ${orderNumber}`);
-            return this.findOne(savedOrder.id);
+            try {
+                const eventName = ticketItems[0]?.ticketType?.event?.title || 'Event';
+                const totalTickets = createOrderDto.tickets.reduce((sum, t) => sum + t.quantity, 0);
+                const confirmationMessage = `EventQul: Your order ${orderNumber} for ${eventName} has been confirmed! Total tickets: ${totalTickets}. Amount: ৳${total}. Thank you for your purchase.`;
+                await this.otpService.sendOtp({ mobileNo: createOrderDto.attendeePhone }, confirmationMessage);
+                this.logger.log(`Order confirmation SMS sent to ${createOrderDto.attendeePhone}`);
+            }
+            catch (smsError) {
+                console.log("error", smsError);
+            }
+            const order = await this.findOne(savedOrder.id);
+            return this.toOrderResponse(order);
         }
         catch (error) {
             await queryRunner.rollbackTransaction();
@@ -205,13 +219,13 @@ let OrdersService = OrdersService_1 = class OrdersService {
         }
         return tickets;
     }
-    async generateOrderNumber() {
+    generateOrderNumber() {
         const prefix = 'EQ';
         const timestamp = Date.now().toString(36);
         const random = Math.random().toString(36).substring(2, 8);
         return `${prefix}-${timestamp}-${random}`.toUpperCase();
     }
-    async generateQRCode() {
+    generateQRCode() {
         const timestamp = Date.now().toString(36);
         const random = Math.random().toString(36).substring(2, 15);
         const random2 = Math.random().toString(36).substring(2, 15);
@@ -250,6 +264,44 @@ let OrdersService = OrdersService_1 = class OrdersService {
             await queryRunner.release();
         }
     }
+    toOrderResponse(order) {
+        return {
+            id: order.id,
+            userId: order.userId,
+            orderNumber: order.orderNumber,
+            subtotal: Number(order.subtotal),
+            discount: Number(order.discount),
+            total: Number(order.total),
+            status: order.status,
+            couponCode: order.couponCode || null,
+            paymentMethod: order.paymentMethod || null,
+            paymentStatus: order.paymentStatus,
+            paidAt: order.paidAt ? order.paidAt.toISOString() : null,
+            tickets: order.tickets?.map((ticket) => this.toTicketResponse(ticket)) || [],
+            createdAt: order.createdAt || '',
+            updatedAt: order.updatedAt || '',
+        };
+    }
+    toTicketResponse(ticket) {
+        return {
+            id: ticket.id,
+            orderId: ticket.orderId,
+            eventId: ticket.eventId,
+            eventTitle: ticket.event?.title || null,
+            eventDate: ticket.event?.startDate ? ticket.event.startDate.toISOString() : null,
+            eventCoverImage: ticket.event?.coverImage || null,
+            ticketTypeId: ticket.ticketTypeId,
+            ticketTypeName: ticket.ticketType?.name || null,
+            ticketPrice: String(ticket.ticketType?.price || '0'),
+            qrCode: ticket.qrCode,
+            attendeeName: ticket.attendeeName,
+            attendeeEmail: ticket.attendeeEmail,
+            attendeePhone: ticket.attendeePhone,
+            status: ticket.status,
+            checkedInAt: ticket.checkedInAt ? ticket.checkedInAt.toISOString() : null,
+            createdAt: ticket.createdAt || '',
+        };
+    }
 };
 exports.OrdersService = OrdersService;
 exports.OrdersService = OrdersService = OrdersService_1 = __decorate([
@@ -262,6 +314,7 @@ exports.OrdersService = OrdersService = OrdersService_1 = __decorate([
         typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository,
-        typeorm_2.DataSource])
+        typeorm_2.DataSource,
+        otp_service_1.OtpService])
 ], OrdersService);
 //# sourceMappingURL=orders.service.js.map

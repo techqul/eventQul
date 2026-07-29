@@ -13,12 +13,50 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { TicketType } from '../event/entities/ticket-type.entity';
 import { Event } from '../event/entities/event.entity';
 import { OrderStatus, TicketStatus } from './types/order-status.enum';
+import { OtpService } from '../otp/otp.service';
 
 export interface PaginatedResult<T> {
   data: T[];
   page: number;
   size: number;
   total: number;
+}
+
+// Clean response interfaces
+export interface SerializedTicket {
+  id: string;
+  orderId: string;
+  eventId: string;
+  eventTitle: string | null;
+  eventDate: string | null;
+  eventCoverImage: string | null;
+  ticketTypeId: string;
+  ticketTypeName: string | null;
+  ticketPrice: string;
+  qrCode: string;
+  attendeeName: string;
+  attendeeEmail: string;
+  attendeePhone: string;
+  status: string;
+  checkedInAt: string | null;
+  createdAt: string;
+}
+
+export interface SerializedOrder {
+  id: string;
+  userId: string;
+  orderNumber: string;
+  subtotal: number;
+  discount: number;
+  total: number;
+  status: string;
+  couponCode: string | null;
+  paymentMethod: string | null;
+  paymentStatus: string;
+  paidAt: string | null;
+  tickets: SerializedTicket[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 @Injectable()
@@ -35,9 +73,10 @@ export class OrdersService {
     @InjectRepository(Event)
     private readonly eventRepository: Repository<Event>,
     private dataSource: DataSource,
+    private readonly otpService: OtpService,
   ) {}
 
-  async create(userId: string, createOrderDto: CreateOrderDto): Promise<Order> {
+  async create(userId: string, createOrderDto: CreateOrderDto): Promise<SerializedOrder> {
     // Start a transaction
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -87,10 +126,10 @@ export class OrdersService {
       const total = subtotal - discount;
 
       // Generate unique order number
-      const orderNumber = await this.generateOrderNumber();
+      const orderNumber = this.generateOrderNumber();
 
       // Create order
-      const order = queryRunner.manager.create(Order, {
+      const orderCreate = queryRunner.manager.create(Order, {
         userId,
         orderNumber,
         subtotal,
@@ -102,13 +141,13 @@ export class OrdersService {
         paymentStatus: 'pending',
       });
 
-      const savedOrder = await queryRunner.manager.save(order);
+      const savedOrder = await queryRunner.manager.save(orderCreate);
 
       // Create tickets
       const tickets: Ticket[] = [];
       for (const item of ticketItems) {
         for (let i = 0; i < item.quantity; i++) {
-          const qrCode = await this.generateQRCode();
+          const qrCode = this.generateQRCode();
           const ticket = queryRunner.manager.create(Ticket, {
             orderId: savedOrder.id,
             eventId: item.ticketType.eventId,
@@ -148,7 +187,23 @@ export class OrdersService {
 
       this.logger.log(`Order created successfully: ${orderNumber}`);
 
-      return this.findOne(savedOrder.id);
+      // Send order confirmation SMS
+      try {
+        const eventName = ticketItems[0]?.ticketType?.event?.title || 'Event';
+        const totalTickets = createOrderDto.tickets.reduce((sum, t) => sum + t.quantity, 0);
+        const confirmationMessage = `EventQul: Your order ${orderNumber} for ${eventName} has been confirmed! Total tickets: ${totalTickets}. Amount: ৳${total}. Thank you for your purchase.`;
+        await this.otpService.sendOtp(
+          { mobileNo: createOrderDto.attendeePhone },
+          confirmationMessage,
+        );
+        this.logger.log(`Order confirmation SMS sent to ${createOrderDto.attendeePhone}`);
+      } catch (smsError) {
+        console.log("error", smsError);
+      }
+
+      // Return clean response
+      const order = await this.findOne(savedOrder.id);
+      return this.toOrderResponse(order);
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -276,14 +331,14 @@ export class OrdersService {
     return tickets;
   }
 
-  private async generateOrderNumber(): Promise<string> {
+  private generateOrderNumber(): string {
     const prefix = 'EQ';
     const timestamp = Date.now().toString(36);
     const random = Math.random().toString(36).substring(2, 8);
     return `${prefix}-${timestamp}-${random}`.toUpperCase();
   }
 
-  private async generateQRCode(): Promise<string> {
+  private generateQRCode(): string {
     // Generate a unique QR code
     const timestamp = Date.now().toString(36);
     const random = Math.random().toString(36).substring(2, 15);
@@ -345,5 +400,51 @@ export class OrdersService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  /**
+   * Transform order entity to clean response format
+   */
+  private toOrderResponse(order: Order): SerializedOrder {
+    return {
+      id: order.id,
+      userId: order.userId,
+      orderNumber: order.orderNumber,
+      subtotal: Number(order.subtotal),
+      discount: Number(order.discount),
+      total: Number(order.total),
+      status: order.status,
+      couponCode: order.couponCode || null,
+      paymentMethod: order.paymentMethod || null,
+      paymentStatus: order.paymentStatus,
+      paidAt: order.paidAt ? order.paidAt.toISOString() : null,
+      tickets: order.tickets?.map((ticket) => this.toTicketResponse(ticket)) || [],
+      createdAt: order.createdAt || '',
+      updatedAt: order.updatedAt || '',
+    };
+  }
+
+  /**
+   * Transform ticket entity to clean response format
+   */
+  private toTicketResponse(ticket: Ticket): SerializedTicket {
+    return {
+      id: ticket.id,
+      orderId: ticket.orderId,
+      eventId: ticket.eventId,
+      eventTitle: ticket.event?.title || null,
+      eventDate: ticket.event?.startDate ? ticket.event.startDate.toISOString() : null,
+      eventCoverImage: ticket.event?.coverImage || null,
+      ticketTypeId: ticket.ticketTypeId,
+      ticketTypeName: ticket.ticketType?.name || null,
+      ticketPrice: String(ticket.ticketType?.price || '0'),
+      qrCode: ticket.qrCode,
+      attendeeName: ticket.attendeeName,
+      attendeeEmail: ticket.attendeeEmail,
+      attendeePhone: ticket.attendeePhone,
+      status: ticket.status,
+      checkedInAt: ticket.checkedInAt ? ticket.checkedInAt.toISOString() : null,
+      createdAt: ticket.createdAt || '',
+    };
   }
 }

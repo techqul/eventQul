@@ -26,6 +26,7 @@ import { EventGrid } from "@/components/event/EventGrid";
 import { Event } from "@/types";
 import { cn } from "@/lib/utils";
 import { getGoogleDriveImageUrl } from "@/lib/utils/image";
+import { VenueMap } from "./VenueMap";
 
 interface EventDetailContentProps {
   event: Event;
@@ -134,7 +135,7 @@ export function EventDetailContent({
             >
               <Card>
                 <CardHeader>
-                  <CardTitle>Event Details</CardTitle>
+                  <CardTitle className="text-2xl">Event Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-start gap-3">
@@ -188,28 +189,7 @@ export function EventDetailContent({
               </Card>
             </motion.div>
 
-            {/* Venue Map Placeholder */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle>Venue Location</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                    <div className="text-center">
-                      <MapPin className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
-                      <p className="text-muted-foreground">
-                        Interactive map coming soon
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+        
 
             {/* Organizer */}
             <motion.div
@@ -313,6 +293,18 @@ export function EventDetailContent({
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 space-y-6">
+                  {/* Venue Map */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <VenueMap
+                embedCode={event.venue.mapImage}
+              
+              />
+            </motion.div>
+
               {/* Ticket Card */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
@@ -331,7 +323,7 @@ export function EventDetailContent({
                     {event.ticketTypes.map((ticket) => (
                       <div
                         key={ticket.id}
-                        className="border rounded-lg p-4 hover:border-primary/50 transition-colors cursor-pointer"
+                        className="border rounded-lg p-4 hover:border-primary/50 transition-colors"
                       >
                         <div className="flex justify-between items-start mb-2">
                           <div>
@@ -351,11 +343,7 @@ export function EventDetailContent({
                         <Button
                           className="w-full"
                           disabled={ticket.available === 0 || isSoldOut}
-                          asChild={
-                            ticket.available > 0 && !isSoldOut
-                              ? undefined
-                              : undefined
-                          }
+                          asChild={ticket.available > 0 && !isSoldOut}
                         >
                           {ticket.available === 0 || isSoldOut ? (
                             <span>Sold Out</span>

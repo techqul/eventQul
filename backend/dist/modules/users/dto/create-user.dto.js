@@ -22,10 +22,14 @@ class CreateUserDto {
     phoneNumber;
     instituteName;
     district;
+    thana;
+    ocupation;
     dob;
     bloodGroup;
     gender;
     tshirtSize;
+    facebookId;
+    linkedinId;
 }
 exports.CreateUserDto = CreateUserDto;
 __decorate([
@@ -65,7 +69,6 @@ __decorate([
     (0, swagger_1.ApiPropertyOptional)({ example: 'Johnny' }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.MinLength)(2),
     (0, class_validator_1.MaxLength)(30),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "nickName", void 0);
@@ -90,6 +93,20 @@ __decorate([
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "district", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Rampura' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.MaxLength)(50),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "thana", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Software Engineer' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.MaxLength)(100),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "ocupation", void 0);
+__decorate([
     (0, swagger_1.ApiPropertyOptional)({ example: '2000-07-02' }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
@@ -113,6 +130,20 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "tshirtSize", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'https://facebook.com/johndoe' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.MaxLength)(255),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "facebookId", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'https://linkedin.com/in/johndoe' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.MaxLength)(255),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "linkedinId", void 0);
 class RegisterDto extends CreateUserDto {
     role;
 }

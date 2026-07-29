@@ -39,6 +39,12 @@ export class User {
   @Column({ name: 'district', nullable: true })
   district?: string;
 
+  @Column({ name: 'thana', nullable: true })
+  thana?: string;
+
+  @Column({ name: 'ocupation', nullable: true })
+  ocupation?: string;
+
   @Column({ name: 'dob', type: 'varchar', length: '50', nullable: true })
   dob?: string;
 
@@ -65,6 +71,12 @@ export class User {
     nullable: true,
   })
   tshirtSize?: TShirtSize;
+
+  @Column({ name: 'facebook_id', nullable: true })
+  facebookId?: string;
+
+  @Column({ name: 'linkedin_id', nullable: true })
+  linkedinId?: string;
 
   @Column({
     type: 'enum',

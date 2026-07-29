@@ -8,10 +8,14 @@ export declare class CreateUserDto {
     phoneNumber?: string;
     instituteName?: string;
     district?: string;
+    thana?: string;
+    ocupation?: string;
     dob?: string;
     bloodGroup?: BloodGroup;
     gender?: Gender;
     tshirtSize?: TShirtSize;
+    facebookId?: string;
+    linkedinId?: string;
 }
 export declare class RegisterDto extends CreateUserDto {
     role?: UserRole;
