@@ -20,6 +20,7 @@ exports.OtpModule = OtpModule = __decorate([
         controllers: [otp_controller_1.OtpController],
         providers: [otp_service_1.OtpService],
         imports: [typeorm_1.TypeOrmModule.forFeature([otp_entity_1.Otp])],
+        exports: [otp_service_1.OtpService],
     })
 ], OtpModule);
 //# sourceMappingURL=otp.module.js.map

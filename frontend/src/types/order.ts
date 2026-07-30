@@ -70,3 +70,48 @@ export interface OrdersResponse {
     totalPages: number;
   };
 }
+
+// Detailed order response from SQL function
+export interface OrderDetailResponse {
+  success: boolean;
+  message: string;
+  data: OrderDetail;
+}
+
+export interface OrderDetail {
+  id: string;
+  qrCode: string;
+  attendeeName: string;
+  attendeeEmail: string;
+  attendeePhone: string;
+  status: string;
+  tshirtSize: string;
+  bloodGroup: string;
+  dob: string;
+  avatarUrl: string | null;
+  eventTitle: string;
+  venuName: string;
+  eventStartDate: string;
+  eventEndDate: string;
+  eventTime: string;
+  orderNumber: string;
+  subtotal: string;
+  discount: string;
+  total: string;
+  platformCharge: number;
+  couponCode: string | null;
+  paymentMethod: string;
+  paymentStatus: string;
+  paidAt: string | null;
+  tickets: OrderDetailTicket[];
+}
+
+export interface OrderDetailTicket {
+  id: string;
+  name: string;
+  description: string;
+  price: string;
+  currency: string;
+  isFree: boolean;
+  benefits: string[];
+}

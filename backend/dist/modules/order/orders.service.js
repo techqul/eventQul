@@ -106,13 +106,11 @@ let OrdersService = OrdersService_1 = class OrdersService {
                 await queryRunner.manager.increment(event_entity_1.Event, { id: item.ticketType.eventId }, 'soldTickets', item.quantity);
             }
             await queryRunner.commitTransaction();
-            this.logger.log(`Order created successfully: ${orderNumber}`);
             try {
                 const eventName = ticketItems[0]?.ticketType?.event?.title || 'Event';
                 const totalTickets = createOrderDto.tickets.reduce((sum, t) => sum + t.quantity, 0);
                 const confirmationMessage = `EventQul: Your order ${orderNumber} for ${eventName} has been confirmed! Total tickets: ${totalTickets}. Amount: ৳${total}. Thank you for your purchase.`;
                 await this.otpService.sendOtp({ mobileNo: createOrderDto.attendeePhone }, confirmationMessage);
-                this.logger.log(`Order confirmation SMS sent to ${createOrderDto.attendeePhone}`);
             }
             catch (smsError) {
                 console.log("error", smsError);
@@ -168,10 +166,12 @@ let OrdersService = OrdersService_1 = class OrdersService {
         return order;
     }
     async findByOrderNumber(orderNumber) {
-        return this.orderRepository.findOne({
-            where: { orderNumber },
-            relations: { user: true, tickets: { event: true, ticketType: true } },
-        });
+        const query = `
+      SELECT *
+      FROM get_order_details($1) AS data;
+    `;
+        const result = await this.dataSource.query(query, [orderNumber]);
+        return result[0].data;
     }
     async updateStatus(id, status) {
         const order = await this.findOne(id);

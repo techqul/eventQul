@@ -7,7 +7,7 @@ export declare class OrdersController {
     create(user: any, createOrderDto: CreateOrderDto): Promise<import("./orders.service").SerializedOrder>;
     findAll(user: any, page?: number, limit?: number): Promise<import("./orders.service").PaginatedResult<import("./entities/order.entity").Order>>;
     getMyTickets(user: any): Promise<import("./entities/ticket.entity").Ticket[]>;
-    findOne(orderNumber: string, user: any): Promise<import("./entities/order.entity").Order>;
+    findOne(orderNumber: string): Promise<import("./entities/order.entity").Order | null>;
     updateStatus(orderNumber: string, updateOrderStatusDto: UpdateOrderStatusDto): Promise<import("./entities/order.entity").Order>;
     cancelOrder(orderNumber: string, user: any): Promise<import("./entities/order.entity").Order>;
 }

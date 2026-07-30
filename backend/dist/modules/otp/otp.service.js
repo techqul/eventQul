@@ -54,7 +54,6 @@ let OtpService = class OtpService {
             const response = await axios_1.default.post(smsApiUrl, data, {
                 headers: { 'Content-Type': 'application/json' },
             });
-            console.log('response', response);
             if (response.data[0].statusCode === '1000') {
                 if (!customMessage) {
                     const res = await this.otpRepository.save(createOtpDto);

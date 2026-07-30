@@ -4,6 +4,7 @@ import type {
   Order,
   OrderResponse,
   OrdersResponse,
+  OrderDetailResponse,
 } from '@/types/order';
 
 export const ordersApi = {
@@ -24,8 +25,8 @@ export const ordersApi = {
   /**
    * Get order by order number
    */
-  async getByOrderNumber(orderNumber: string): Promise<OrderResponse> {
-    return apiClient.get<OrderResponse>(`/orders/${orderNumber}`);
+  async getByOrderNumber(orderNumber: string): Promise<OrderDetailResponse> {
+    return apiClient.get<OrderDetailResponse>(`/orders/${orderNumber}`);
   },
 
   /**

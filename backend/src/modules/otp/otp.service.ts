@@ -48,8 +48,6 @@ export class OtpService {
         headers: { 'Content-Type': 'application/json' },
       });
 
-      console.log('response', response);
-
       if (response.data[0].statusCode === '1000') {
         // Only save OTP record if it's an actual OTP message
         if (!customMessage) {
@@ -70,7 +68,7 @@ export class OtpService {
           success: false,
         };
       }
-    } catch (error) {
+    } catch (error:any) {
       throw new BadRequestException(error.message);
     }
   }
@@ -103,7 +101,7 @@ export class OtpService {
           statusCode: 200,
         };
       }
-    } catch (error) {
+    } catch (error:any) {
       throw new BadRequestException(error.message);
     }
   }
@@ -117,7 +115,7 @@ export class OtpService {
           statusCode: 200,
         };
       }
-    } catch (error) {
+    } catch (error:any) {
       throw new BadRequestException(error.message);
     }
   }

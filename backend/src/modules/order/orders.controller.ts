@@ -79,16 +79,8 @@ export class OrdersController {
   @ApiOperation({ summary: 'Get order by order number' })
   @ApiResponse({ status: 200, description: 'Order retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Order not found' })
-  async findOne(@Param('orderNumber') orderNumber: string, @CurrentUser() user: any) {
-    const order = await this.ordersService.findByOrderNumber(orderNumber);
-    if (!order) {
-      throw new Error('Order not found');
-    }
-    // Check if user owns this order or is admin
-    if (order.userId !== user.id && user.role !== UserRole.ADMIN) {
-      throw new Error('Access denied');
-    }
-    return order;
+  async findOne(@Param('orderNumber') orderNumber: string) {
+    return await this.ordersService.findByOrderNumber(orderNumber);
   }
 
   @Patch(':orderNumber/status')

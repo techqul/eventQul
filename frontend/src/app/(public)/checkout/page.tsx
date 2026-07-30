@@ -73,7 +73,7 @@ export default function CheckoutPage() {
   }, [eventId]);
 
   const subtotal = Number(ticketType?.price) * quantity;
-  const convenienceFee = Math.max(50, subtotal * 0.05);
+  const convenienceFee = quantity * 10;
   const total = subtotal + convenienceFee - discount;
 
   const handleApplyCoupon = () => {
@@ -217,7 +217,7 @@ export default function CheckoutPage() {
             subtotal={subtotal}
             convenienceFee={convenienceFee}
             discount={discount}
-            total={total}
+            total={total }
             couponCode={couponCode}
             onQuantityIncrease={handleIncreaseQuantity}
             onQuantityDecrease={handleDecreaseQuantity}

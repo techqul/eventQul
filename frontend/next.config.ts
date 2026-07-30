@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  server: {
+    port: 3000,
+  },
   images: {
     domains: ['images.unsplash.com', 'plus.unsplash.com', 'example.com'],
     remotePatterns: [

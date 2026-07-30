@@ -38,15 +38,8 @@ let OrdersController = class OrdersController {
     async getMyTickets(user) {
         return this.ordersService.getUserTickets(user.id);
     }
-    async findOne(orderNumber, user) {
-        const order = await this.ordersService.findByOrderNumber(orderNumber);
-        if (!order) {
-            throw new Error('Order not found');
-        }
-        if (order.userId !== user.id && user.role !== types_1.UserRole.ADMIN) {
-            throw new Error('Access denied');
-        }
-        return order;
+    async findOne(orderNumber) {
+        return await this.ordersService.findByOrderNumber(orderNumber);
     }
     async updateStatus(orderNumber, updateOrderStatusDto) {
         const order = await this.ordersService.findByOrderNumber(orderNumber);
@@ -118,9 +111,8 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Order retrieved successfully' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Order not found' }),
     __param(0, (0, common_1.Param)('orderNumber')),
-    __param(1, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "findOne", null);
 __decorate([

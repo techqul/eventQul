@@ -185,8 +185,6 @@ export class OrdersService {
       // Commit transaction
       await queryRunner.commitTransaction();
 
-      this.logger.log(`Order created successfully: ${orderNumber}`);
-
       // Send order confirmation SMS
       try {
         const eventName = ticketItems[0]?.ticketType?.event?.title || 'Event';
@@ -196,7 +194,6 @@ export class OrdersService {
           { mobileNo: createOrderDto.attendeePhone },
           confirmationMessage,
         );
-        this.logger.log(`Order confirmation SMS sent to ${createOrderDto.attendeePhone}`);
       } catch (smsError) {
         console.log("error", smsError);
       }
@@ -259,10 +256,15 @@ export class OrdersService {
   }
 
   async findByOrderNumber(orderNumber: string): Promise<Order | null> {
-    return this.orderRepository.findOne({
-      where: { orderNumber },
-      relations: { user: true, tickets: { event: true, ticketType: true } },
-    });
+      const query = `
+      SELECT *
+      FROM get_order_details($1) AS data;
+    `;
+
+    const result = await this.dataSource.query(query, [orderNumber]);
+
+    return result[0].data;
+
   }
 
   async updateStatus(id: string, status: OrderStatus): Promise<Order> {
