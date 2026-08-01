@@ -26,7 +26,7 @@ import { AddUserDialog } from "@/components/users/AddUserDialog";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { usersApi } from "@/lib/api/users";
 import type { User } from "@/types/user";
-import type { UserFormData } from "@/lib/validations/user.schema";
+import type { UserCreateFormData } from "@/lib/validations/user.schema";
 import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -94,7 +94,7 @@ export default function AdminUsersPage() {
     }
   };
 
-  const handleCreateUser = async (data: UserFormData) => {
+  const handleCreateUser = async (data: UserCreateFormData) => {
     console.log("data", data);
     setIsCreating(true);
     try {

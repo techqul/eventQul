@@ -1,6 +1,0 @@
-export declare enum EventStatus {
-    UPCOMING = "upcoming",
-    ONGOING = "ongoing",
-    PAST = "past",
-    CANCELLED = "cancelled"
-}

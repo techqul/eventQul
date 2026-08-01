@@ -29,13 +29,4 @@ export interface Ticket {
   };
 }
 
-export interface Order {
-  id: string;
-  tickets: Ticket[];
-  subtotal: number;
-  discount: number;
-  total: number;
-  status: "pending" | "confirmed" | "cancelled";
-  createdAt: Date;
-  couponCode?: string;
-}
+// Order interface has been moved to order.ts to avoid duplicate exports

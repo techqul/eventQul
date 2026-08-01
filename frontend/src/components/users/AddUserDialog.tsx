@@ -4,8 +4,8 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  userFormSchema,
-  type UserFormData,
+  userCreateSchema,
+  type UserCreateFormData,
 } from "@/lib/validations/user.schema";
 import { UserRole } from "@/types/user";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,7 @@ import { toast } from "sonner";
 interface AddUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: UserFormData) => Promise<any>;
+  onSubmit: (data: UserCreateFormData) => Promise<any>;
   isLoading?: boolean;
 }
 
@@ -38,8 +38,8 @@ export function AddUserDialog({
   onSubmit,
   isLoading = false,
 }: AddUserDialogProps) {
-  const form = useForm<UserFormData>({
-    resolver: zodResolver(userFormSchema),
+  const form = useForm<UserCreateFormData>({
+    resolver: zodResolver(userCreateSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -58,7 +58,7 @@ export function AddUserDialog({
     mode: "onBlur",
   });
 
-  const handleSubmit = async (data: UserFormData) => {
+  const handleSubmit = async (data: UserCreateFormData) => {
     try {
       const res = await onSubmit(data);
       console.log("res", res);

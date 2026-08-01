@@ -81,6 +81,22 @@ export const userFormSchema = z.object({
 export type UserFormData = z.infer<typeof userFormSchema>;
 
 /**
+ * Schema for creating new user (password required)
+ */
+export const userCreateSchema = userFormSchema.extend({
+  password: z
+    .string()
+    .min(1, 'Password is required')
+    .min(8, 'Password must be at least 8 characters')
+    .regex(
+      passwordRegex,
+      'Password must contain uppercase, lowercase, number, and special character',
+    ),
+});
+
+export type UserCreateFormData = z.infer<typeof userCreateSchema>;
+
+/**
  * Schema for editing user (password optional)
  */
 export const userEditSchema = userFormSchema
