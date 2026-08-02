@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { EventGrid } from "@/components/event/EventGrid";
 import { CategoryCard } from "@/components/category/CategoryCard";
-import { TESTIMONIALS, FAQ_ITEMS, organizers } from "@/lib/constants";
+import { TESTIMONIALS, FAQ_ITEMS } from "@/lib/constants";
 import {
   Card,
   CardContent,
@@ -25,20 +25,24 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Event, Category } from "@/types";
+import { Event, Category, Organizer } from "@/types";
 
 interface HomePageContentProps {
   featuredEvents: Event[];
   trendingEvents: Event[];
   upcomingEvents: Event[];
+  pastEvents: Event[];
   categories: Category[];
+  organizers: Organizer[];
 }
 
 export function HomePageContent({
   featuredEvents,
   trendingEvents,
   upcomingEvents,
+  pastEvents,
   categories,
+  organizers,
 }: HomePageContentProps) {
   return (
     <div className="flex flex-col">
@@ -166,7 +170,7 @@ export function HomePageContent({
             </Button>
           </motion.div>
 
-          <EventGrid events={featuredEvents} />
+          <EventGrid events={featuredEvents} gridClassName="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6" />
         </div>
       </section>
 
@@ -197,8 +201,7 @@ export function HomePageContent({
               </Link>
             </Button>
           </motion.div>
-
-          <EventGrid events={trendingEvents} />
+            <EventGrid events={trendingEvents} gridClassName="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6" />
         </div>
       </section>
 
@@ -227,9 +230,40 @@ export function HomePageContent({
             </Button>
           </motion.div>
 
-          <EventGrid events={upcomingEvents} />
+              <EventGrid events={upcomingEvents} gridClassName="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6" />
         </div>
       </section>
+
+      {/* Past Events */}
+      {pastEvents.length > 0 && (
+        <section className="py-20 bg-background/50">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="flex justify-between items-center mb-12"
+            >
+              <div>
+                <h2 className="text-3xl md:text-4xl font-bold mb-2">
+                  Past Events
+                </h2>
+                <p className="text-muted-foreground">
+                  Events that have already concluded
+                </p>
+              </div>
+              <Button variant="outline" asChild className="hidden md:flex">
+                <Link href="/events?status=past">
+                  View All
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </motion.div>
+
+            <EventGrid events={pastEvents} gridClassName="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6" />
+          </div>
+        </section>
+      )}
 
       {/* How It Works */}
       <section className="py-20 bg-gradient-to-b from-background/50 to-background">
@@ -315,23 +349,26 @@ export function HomePageContent({
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {organizers.map((org, index) => (
               <motion.div
-                key={org.name}
+                key={org.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Link href="/organizers">
+                <Link href={`/organizers/${org.slug}`}>
                   <Card className="text-center hover:shadow-lg transition-all cursor-pointer border-border/50">
                     <CardContent className="p-6">
                       <Avatar className="h-20 w-20 mx-auto mb-4">
-                        <AvatarImage src={org.image} />
-                        <AvatarFallback>{org.name[0]}</AvatarFallback>
+                        <AvatarImage src={org.logo} alt={org.name} />
+                        <AvatarFallback>{org.name.charAt(0)}</AvatarFallback>
                       </Avatar>
                       <h3 className="font-semibold mb-1">{org.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {org.events} events
-                      </p>
+                      <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
+                        {org.isVerified && (
+                          <Badge variant="secondary" className="text-xs">Verified</Badge>
+                        )}
+                        <span>{org.totalEvents || 0} events</span>
+                      </div>
                     </CardContent>
                   </Card>
                 </Link>

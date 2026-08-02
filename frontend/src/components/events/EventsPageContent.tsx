@@ -401,7 +401,7 @@ export function EventsPageContent({
         </p>
       </div>
 
-      <EventGrid events={filteredEvents} />
+             <EventGrid events={filteredEvents} gridClassName="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6" />
 
       {filteredEvents.length === 0 && (
         <div className="text-center py-20">
