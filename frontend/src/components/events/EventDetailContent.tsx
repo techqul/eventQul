@@ -20,13 +20,24 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { formatPrice, formatDateTime, formatDate, formatTime } from "@/lib/utils";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  formatPrice,
+  formatDateTime,
+  formatDate,
+  formatTime,
+} from "@/lib/utils";
 import { EventGrid } from "@/components/event/EventGrid";
 import { Event } from "@/types";
 import { cn } from "@/lib/utils";
 import { getGoogleDriveImageUrl } from "@/lib/utils/image";
 import { VenueMap } from "./VenueMap";
+import { time } from "console";
 
 interface EventDetailContentProps {
   event: Event;
@@ -37,7 +48,9 @@ export function EventDetailContent({
   event,
   relatedEvents,
 }: EventDetailContentProps) {
-  const lowestPrice = Math.min(...event.ticketTypes.map((t) => parseFloat(t.price)));
+  const lowestPrice = Math.min(
+    ...event.ticketTypes.map((t) => parseFloat(t.price)),
+  );
   const isSoldOut = event.soldTickets >= event.capacity;
 
   return (
@@ -103,7 +116,6 @@ export function EventDetailContent({
               <div className="flex items-center gap-2">
                 <MapPin className="h-5 w-5" />
                 <span>
-                
                   {event.venue.name}, {event.venue.address}
                 </span>
               </div>
@@ -142,15 +154,12 @@ export function EventDetailContent({
                     <Calendar className="h-5 w-5 text-primary mt-1" />
                     <div>
                       <p className="font-medium">Date & Time</p>
-                      <p className="text-muted-foreground">
-                        {formatDateTime(event.startDate)}
-                      </p>
-                      {event.endDate &&
-                        new Date(event.endDate) > new Date(event.startDate) && (
-                          <p className="text-muted-foreground">
-                            to {formatDateTime(event.endDate)}
-                          </p>
-                        )}
+                      <div className="flex justify-start">
+                        <p className="text-muted-foreground">
+                          {formatDate(event.startDate)} to {formatDate(event.endDate)}, {event.time}
+                        </p>
+
+                      </div>
                     </div>
                   </div>
 
@@ -160,8 +169,12 @@ export function EventDetailContent({
                     <MapPin className="h-5 w-5 text-primary mt-1" />
                     <div className="flex-1">
                       <p className="font-medium">Location</p>
-                      <p className="text-muted-foreground">{event.venue.name}</p>
-                      <p className="text-muted-foreground">{event.venue.address}</p>
+                      <p className="text-muted-foreground">
+                        {event.venue.name}
+                      </p>
+                      <p className="text-muted-foreground">
+                        {event.venue.address}
+                      </p>
                       <p className="text-muted-foreground">
                         {event.venue.city}, {event.venue.area}
                       </p>
@@ -189,8 +202,6 @@ export function EventDetailContent({
               </Card>
             </motion.div>
 
-        
-
             {/* Organizer */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -201,10 +212,10 @@ export function EventDetailContent({
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
                     <Avatar className="h-16 w-16">
-                      <AvatarImage src={getGoogleDriveImageUrl(event.organizer.logo)}/>
-                      <AvatarFallback>
-                        {event.organizer.name[0]}
-                      </AvatarFallback>
+                      <AvatarImage
+                        src={getGoogleDriveImageUrl(event.organizer.logo)}
+                      />
+                      <AvatarFallback>{event.organizer.name[0]}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
@@ -223,7 +234,10 @@ export function EventDetailContent({
                       <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-4">
                         <span>⭐ {event.organizer.rating} rating</span>
                         <span>🎪 {event.organizer.totalEvents} events</span>
-                        <span>👥 {event.organizer.followers.toLocaleString()} followers</span>
+                        <span>
+                          👥 {event.organizer.followers.toLocaleString()}{" "}
+                          followers
+                        </span>
                       </div>
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" asChild>
@@ -250,16 +264,16 @@ export function EventDetailContent({
               <h2 className="text-2xl font-bold mb-4">FAQ</h2>
               <Accordion type="single" collapsible>
                 <AccordionItem value="item-1">
-                  <AccordionTrigger>What is the refund policy?</AccordionTrigger>
+                  <AccordionTrigger>
+                    What is the refund policy?
+                  </AccordionTrigger>
                   <AccordionContent>
                     Tickets can be refunded up to 48 hours before the event.
                     Contact our support team for assistance.
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="item-2">
-                  <AccordionTrigger>
-                    Are tickets transferable?
-                  </AccordionTrigger>
+                  <AccordionTrigger>Are tickets transferable?</AccordionTrigger>
                   <AccordionContent>
                     Yes, tickets can be transferred to another person up to 24
                     hours before the event through your dashboard.
@@ -293,17 +307,40 @@ export function EventDetailContent({
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 space-y-6">
-                  {/* Venue Map */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <VenueMap
-                embedCode={event.venue.mapImage}
-              
-              />
-            </motion.div>
+              {/* Venue Map */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <VenueMap embedCode={event.venue.mapImage} />
+              </motion.div>
+
+               {/* Venue Facilities */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <Card>
+                  <CardHeader>
+                    <CardTitle >Venue Facilities</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-2">
+                      {event.venue.facilities.map((facility) => (
+                        <div
+                          key={facility}
+                          className="flex items-center gap-2 text-sm"
+                        >
+                          <Check className="h-4 w-4 text-primary" />
+                          <span>{facility}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
 
               {/* Ticket Card */}
               <motion.div
@@ -314,9 +351,6 @@ export function EventDetailContent({
                   <CardHeader>
                     <div className="flex items-baseline justify-between">
                       <CardTitle>Tickets</CardTitle>
-                      <span className="text-sm text-muted-foreground">
-                        From {formatPrice(lowestPrice)}
-                      </span>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
@@ -359,7 +393,10 @@ export function EventDetailContent({
                     ))}
 
                     {isSoldOut && (
-                      <Badge variant="destructive" className="w-full justify-center py-2">
+                      <Badge
+                        variant="destructive"
+                        className="w-full justify-center py-2"
+                      >
                         Event Sold Out
                       </Badge>
                     )}
@@ -396,31 +433,7 @@ export function EventDetailContent({
                 </Card>
               </motion.div>
 
-              {/* Venue Facilities */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Venue Facilities</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-2">
-                      {event.venue.facilities.map((facility) => (
-                        <div
-                          key={facility}
-                          className="flex items-center gap-2 text-sm"
-                        >
-                          <Check className="h-4 w-4 text-primary" />
-                          <span>{facility}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+             
             </div>
           </div>
         </div>

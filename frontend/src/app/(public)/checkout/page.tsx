@@ -73,7 +73,7 @@ export default function CheckoutPage() {
   }, [eventId]);
 
   const subtotal = Number(ticketType?.price) * quantity;
-  const convenienceFee = quantity * 10;
+  const convenienceFee = quantity * 0;
   const total = subtotal + convenienceFee - discount;
 
   const handleApplyCoupon = () => {

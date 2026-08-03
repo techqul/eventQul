@@ -29,7 +29,8 @@ export interface CreateOrganizerDto {
   name: string;
   slug: string;
   logo: string;
-  banner: string;
+  banner?: string;
+  isVerified?: boolean;
   description: string;
   socialLinks?: {
     facebook?: string;

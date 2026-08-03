@@ -22,6 +22,8 @@ export class CreateOrganizerDto {
   })
   slug!: string;
 
+  
+
   @ApiProperty({ example: 'Tech Events Bangladesh' })
   @IsString()
   @IsNotEmpty()

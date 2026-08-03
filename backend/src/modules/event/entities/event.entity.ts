@@ -72,6 +72,9 @@ export class Event {
   timezone!: string;
 
   @Column()
+  time!: string;
+
+  @Column()
   capacity!: number;
 
   @Column({ name: 'sold_tickets', default: 0 })

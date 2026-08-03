@@ -45,7 +45,7 @@ export const FormInput = ({
   disabled = false,
   required = false,
   description,
-  className = "space-y-2",
+  className = "",
 }: FormInputProps) => {
   const { control } = useFormContext();
   return (
@@ -55,11 +55,11 @@ export const FormInput = ({
       render={({ field, fieldState }) => (
         <FormItem className={className}>
           {label && (
-            <FormLabel className="mb-1">
+            <FormLabel >
               {label} {required && <span className="text-destructive">*</span>}
             </FormLabel>
           )}
-          <FormControl>
+          <FormControl className="mt-1">
             <Input
               type={type}
               placeholder={placeholder}
@@ -122,7 +122,7 @@ export const FormSelect = ({
             value={field.value as string}
             disabled={disabled}
           >
-            <FormControl>
+            <FormControl  className="mt-1">
               <SelectTrigger>
                 <SelectValue placeholder={placeholder} />
               </SelectTrigger>
@@ -200,7 +200,7 @@ export const FormDatePicker = ({
                 {label} {required && <span className="text-destructive">*</span>}
               </FormLabel>
             )}
-            <FormControl className="w-full">
+            <FormControl className="w-full mt-1">
               <DatePicker
                 disableFuture={disableFuture}
                 id={id}
@@ -254,7 +254,7 @@ export const FormTextarea = ({
               {label} {required && <span className="text-destructive">*</span>}
             </FormLabel>
           )}
-          <FormControl>
+          <FormControl className="mt-1">
             <textarea
               placeholder={placeholder}
               disabled={disabled}
@@ -302,7 +302,7 @@ export const FormCheckbox = ({
             className,
           )}
         >
-          <FormControl>
+          <FormControl className="mt-1">
             <input
               type="checkbox"
               checked={field.value as boolean}
@@ -321,3 +321,9 @@ export const FormCheckbox = ({
     />
   );
 };
+
+// Alias for FormTextarea with capital A (FormTextArea)
+export { FormTextarea as FormTextArea };
+
+// Export rich text editor components
+export { FormRichTextEditor, FormRichTextEditorMini } from "./FormRichTextEditor";
