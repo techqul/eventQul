@@ -189,13 +189,11 @@ export class OrdersService {
       try {
         const eventName = ticketItems[0]?.ticketType?.event?.title || 'Event';
         const totalTickets = createOrderDto.tickets.reduce((sum, t) => sum + t.quantity, 0);
-        const confirmationMessage = `EventQul: Your order ${orderNumber} for ${eventName} has been confirmed! Total tickets: ${totalTickets}. Amount: ৳${total}. Thank you for your purchase.`;
-        await this.otpService.sendOtp(
-          { mobileNo: createOrderDto.attendeePhone },
-          confirmationMessage,
-        );
+        const confirmationMessage = `Your ticket ${orderNumber} for ${eventName} has been confirmed! Total tickets: ${totalTickets}. Amount: ৳${total}. Thank you for your purchase.`;
+        const message = `এইচএসসি '৯৫ ব্যাচের ৩০ বছর পূর্তি অনুষ্ঠানে সফলভাবে রেজিষ্ট্রেশন করার জন্য তোমাকে ধন্যবাদ।`;
+        await this.otpService.sendOtp({ mobileNo: createOrderDto.attendeePhone }, message);
       } catch (smsError) {
-        console.log("error", smsError);
+        console.log('error', smsError);
       }
 
       // Return clean response
@@ -256,7 +254,7 @@ export class OrdersService {
   }
 
   async findByOrderNumber(orderNumber: string): Promise<Order | null> {
-      const query = `
+    const query = `
       SELECT *
       FROM get_order_details($1) AS data;
     `;
@@ -264,7 +262,6 @@ export class OrdersService {
     const result = await this.dataSource.query(query, [orderNumber]);
 
     return result[0].data;
-
   }
 
   async updateStatus(id: string, status: OrderStatus): Promise<Order> {

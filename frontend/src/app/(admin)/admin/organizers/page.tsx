@@ -119,16 +119,27 @@ export default function AdminOrganizersPage() {
     }
   };
 
-  const handleToggleVerification = async (
-    organizerId: string,
-    currentStatus: boolean,
-  ) => {
+  const handleUpdate = async (organizerId: string, obj: any) => {
     try {
-      await organizersApi.update(organizerId, { isVerified: !currentStatus });
-      toast.success(
-        `Organizer ${!currentStatus ? "verified" : "unverified"} successfully`,
-      );
-      await fetchOrganizers();
+    const res =  await organizersApi.update(organizerId, obj);
+      if(res.success) {
+        toast.success(res.message || "Organizer updated successfully");
+         await fetchOrganizers();
+      }
+     
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update organizer verification");
+    }
+  };
+
+  const handleToggleVerification = async (organizerId: string) => {
+    console.log("id", organizerId);
+    try {
+      const res = await organizersApi.verifyOrganizer(organizerId);
+      if (res.success) {
+        toast.success(res.message || "Organizer verified successfully");
+        await fetchOrganizers();
+      }
     } catch (err: any) {
       toast.error(err.message || "Failed to update organizer verification");
     }
@@ -152,10 +163,15 @@ export default function AdminOrganizersPage() {
         className="mb-4 sm:mb-6"
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <h1 className="text-xl sm:text-2xl font-bold">Organizer Management</h1>
+          <h1 className="text-xl sm:text-2xl font-bold">
+            Organizer Management
+          </h1>
 
           <Breadcrumb
-            items={[{ label: "Admin", href: "/admin" }, { label: "Organizers" }]}
+            items={[
+              { label: "Admin", href: "/admin" },
+              { label: "Organizers" },
+            ]}
           />
         </div>
       </motion.div>
@@ -174,13 +190,16 @@ export default function AdminOrganizersPage() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search organizers..."
-                  className="pl-10 h-10 sm:h-auto"
+                  className="pl-8 h-10 sm:h-auto"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
             </div>
-            <Button onClick={() => setIsAddDialogOpen(true)} className="w-full sm:w-auto">
+            <Button
+              onClick={() => setIsAddDialogOpen(true)}
+              className="w-full sm:w-auto"
+            >
               <Building2 className="h-4 w-4 mr-1 sm:mr-2" />
               <span>Add Organizer</span>
             </Button>
@@ -215,7 +234,11 @@ export default function AdminOrganizersPage() {
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="flex-shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="flex-shrink-0"
+                      >
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -226,15 +249,13 @@ export default function AdminOrganizersPage() {
                           View Profile
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="cursor-pointer">
+                      <DropdownMenuItem className="cursor-pointer"  onClick={() => handleUpdate(organizer.id, organizer)}>
                         <Edit className="h-4 w-4 mr-2" />
                         Edit Organizer
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="cursor-pointer"
-                        onClick={() =>
-                          handleToggleVerification(organizer.id, organizer.isVerified)
-                        }
+                        onClick={() => handleToggleVerification(organizer.id)}
                       >
                         <Shield className="h-4 w-4 mr-2" />
                         {organizer.isVerified ? "Unverify" : "Verify"}
@@ -329,14 +350,16 @@ export default function AdminOrganizersPage() {
                               View Profile
                             </Link>
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="cursor-pointer">
+                          <DropdownMenuItem className="cursor-pointer"  onClick={() =>
+                              handleUpdate(organizer.id, organizer)
+                            }>
                             <Edit className="h-4 w-4 mr-2" />
                             Edit Organizer
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="cursor-pointer"
                             onClick={() =>
-                              handleToggleVerification(organizer.id, organizer.isVerified)
+                              handleToggleVerification(organizer.id)
                             }
                           >
                             <Shield className="h-4 w-4 mr-2" />
@@ -367,7 +390,8 @@ export default function AdminOrganizersPage() {
           {pagination.totalPages > 1 && (
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4 sm:mt-6 pt-4 border-t">
               <p className="text-xs sm:text-sm text-muted-foreground text-center sm:text-left">
-                Page {page} of {pagination.totalPages} ({pagination.total} organizers)
+                Page {page} of {pagination.totalPages} ({pagination.total}{" "}
+                organizers)
               </p>
               <div className="flex gap-2 justify-center sm:justify-end">
                 <Button

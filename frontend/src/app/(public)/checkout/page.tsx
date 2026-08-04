@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { eventsApi } from "@/lib/api/events";
 import { ordersApi } from "@/lib/api/orders";
 import { authApi } from "@/lib/api/auth";
@@ -20,7 +20,6 @@ import { OrderSummaryCard } from "@/components/checkout/OrderSummaryCard";
 export default function CheckoutPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { toast } = useToast();
 
   const [quantity, setQuantity] = useState(1);
   const [couponCode, setCouponCode] = useState("");
@@ -79,22 +78,12 @@ export default function CheckoutPage() {
   const handleApplyCoupon = () => {
     if (couponCode.toLowerCase() === "eventqul10") {
       setDiscount(subtotal * 0.1);
-      toast({
-        title: "Coupon applied!",
-        description: "10% discount has been applied to your order.",
-      });
+      toast.success("Coupon applied! 10% discount has been applied to your order.");
     } else if (couponCode.toLowerCase() === "free") {
       setDiscount(subtotal);
-      toast({
-        title: "Wow! Free ticket!",
-        description: "Your ticket is now completely free!",
-      });
+      toast.success("Wow! Your ticket is now completely free!");
     } else {
-      toast({
-        title: "Invalid coupon",
-        description: "Please enter a valid coupon code.",
-        variant: "destructive",
-      });
+      toast.error("Invalid coupon. Please enter a valid coupon code.");
     }
   };
 
@@ -102,20 +91,12 @@ export default function CheckoutPage() {
     // Validate form
     const isValid = await form.trigger();
     if (!isValid) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields correctly.",
-        variant: "destructive",
-      });
+      toast.error("Please fill in all required fields correctly.");
       return;
     }
 
     if (!ticketType?.id || !eventId) {
-      toast({
-        title: "Missing Information",
-        description: "Unable to process order. Missing ticket or event information.",
-        variant: "destructive",
-      });
+      toast.error("Unable to process order. Missing ticket or event information.");
       return;
     }
 
@@ -144,15 +125,6 @@ export default function CheckoutPage() {
 
       const authResponse = await authApi.register(registerData);
 
-      // STEP 2: Store JWT tokens for API call
-      if (authResponse?.data?.accessToken) {
-        if (typeof window !== "undefined") {
-          localStorage.setItem("access_token", authResponse.data.accessToken);
-          if (authResponse.data.refreshToken) {
-            localStorage.setItem("refresh_token", authResponse.data.refreshToken);
-          }
-        }
-      }
 
       // STEP 3: Create order
       const orderData: CreateOrderInput = {
@@ -168,17 +140,14 @@ export default function CheckoutPage() {
 
       // STEP 4: Show success
       if (response.success && response.data) {
+        toast.success("Your ticket has been confirmed successfully.");
         router.push(`/checkout/success?order=${response.data.orderNumber}`);
       } else {
         throw new Error("Failed to create order");
       }
     } catch (error: any) {
       console.error("Checkout error:", error);
-      toast({
-        title: "Order Failed",
-        description: error.message || "Unable to place your order. Please try again.",
-        variant: "destructive",
-      });
+      toast.error(error.message || "Unable to place your order. Please try again.");
     } finally {
       setIsProcessing(false);
     }

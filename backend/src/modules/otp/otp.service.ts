@@ -32,16 +32,17 @@ export class OtpService {
       createOtpDto.otp = otp;
       createOtpDto.mobileNo = mobileNo;
 
-      const smsApiUrl = `https://netsmsbd.com/v1.1/sms`;
+      const smsApiUrl = `http://bulksmsbd.net/api/smsapi`;
+      // const smsApiUrl = `https://netsmsbd.com/v1.1/sms`;
 
       // Use custom message if provided, otherwise use default OTP message
       const msgBody = customMessage || (defaultMessage + ': ' + otp);
 
       const data = {
-        apiKey: apiKey,
-        senderId: senderApiKey,
-        mobileNo: mobileNo,
-        msgBody: msgBody,
+        api_key: apiKey,
+        senderid: senderApiKey,
+        number: mobileNo,
+        message: msgBody,
       };
 
       const response = await axios.post(smsApiUrl, data, {

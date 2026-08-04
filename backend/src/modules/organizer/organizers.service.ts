@@ -20,14 +20,6 @@ export class OrganizersService {
   ) {}
 
   async create(userId: string, createOrganizerDto: CreateOrganizerDto): Promise<Organizer> {
-    // Check if user already has an organizer profile
-    const existingOrganizer = await this.organizerRepository.findOne({
-      where: { userId },
-    });
-
-    if (existingOrganizer) {
-      throw new ConflictException('User already has an organizer profile');
-    }
 
     // Check if slug is already taken
     const slugExists = await this.organizerRepository.findOne({
@@ -52,7 +44,7 @@ export class OrganizersService {
     const [organizers, total] = await this.organizerRepository.findAndCount({
       skip: (page - 1) * limit,
       take: limit,
-      order: { name: 'ASC' },
+      order: { name: 'DESC' },
       relations: { user: true },
     });
 
@@ -120,6 +112,7 @@ export class OrganizersService {
 
   async verifyOrganizer(id: string): Promise<Organizer> {
     const organizer = await this.findOne(id);
+
 
     organizer.isVerified = true;
     const updatedOrganizer = await this.organizerRepository.save(organizer);
