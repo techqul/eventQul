@@ -35,11 +35,47 @@ import { OrderStatus } from './types/order-status.enum';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  @Post('pending')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ResponseMessage('Pending order created successfully')
+  @ApiOperation({ summary: 'Create a pending order (for payment flow)' })
+  @ApiResponse({ status: 201, description: 'Pending order created successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request - invalid input or not enough tickets' })
+  async createPendingOrder(@CurrentUser() user: any, @Body() createOrderDto: CreateOrderDto) {
+    return this.ordersService.createPendingOrder(user.id, createOrderDto);
+  }
+
+  @Post(':orderId/confirm')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ResponseMessage('Order confirmed successfully')
+  @ApiOperation({ summary: 'Confirm order after successful payment' })
+  @ApiResponse({ status: 200, description: 'Order confirmed successfully' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  async confirmOrder(@Param('orderId') orderId: string) {
+    return this.ordersService.confirmOrder(orderId);
+  }
+
+  @Post(':orderId/fail')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ResponseMessage('Order failed')
+  @ApiOperation({ summary: 'Mark order as failed after payment failure' })
+  @ApiResponse({ status: 200, description: 'Order marked as failed' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  async failOrder(
+    @Param('orderId') orderId: string,
+    @Body() body: { reason?: string },
+  ) {
+    return this.ordersService.failOrder(orderId, body.reason);
+  }
+
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ResponseMessage('Order created successfully')
-  @ApiOperation({ summary: 'Create a new order' })
+  @ApiOperation({ summary: 'Create a new order (legacy - creates tickets immediately)' })
   @ApiResponse({ status: 201, description: 'Order created successfully' })
   @ApiResponse({ status: 400, description: 'Bad request - invalid input or not enough tickets' })
   async create(@CurrentUser() user: any, @Body() createOrderDto: CreateOrderDto) {

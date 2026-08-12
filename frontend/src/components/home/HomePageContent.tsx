@@ -170,7 +170,7 @@ export function HomePageContent({
             </Button>
           </motion.div>
 
-          <EventGrid events={featuredEvents} gridClassName="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6" />
+          <EventGrid events={featuredEvents} gridClassName="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6" />
         </div>
       </section>
 
@@ -201,7 +201,7 @@ export function HomePageContent({
               </Link>
             </Button>
           </motion.div>
-            <EventGrid events={trendingEvents} gridClassName="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6" />
+            <EventGrid events={trendingEvents} gridClassName="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6" />
         </div>
       </section>
 
@@ -230,7 +230,7 @@ export function HomePageContent({
             </Button>
           </motion.div>
 
-              <EventGrid events={upcomingEvents} gridClassName="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6" />
+              <EventGrid events={upcomingEvents} gridClassName="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6" />
         </div>
       </section>
 

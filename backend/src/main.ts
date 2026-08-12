@@ -10,6 +10,7 @@ import { QueryExceptionFilter } from './common/filters/query-exception.filter';
 import { validationPipeOptions } from './common/pipes/validation.pipe';
 import { swaggerConfig } from './config/swagger.config';
 import { appConfig } from './config/app.config';
+import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 
 /**
  * Bootstrap the NestJS application
@@ -43,15 +44,25 @@ async function bootstrap() {
   // Compression - Compress response bodies
   app.use(compression());
 
-  // CORS - Enable cross-origin resource sharing
-  app.enableCors({
-    origin:
-      configService.get('CORS_ENABLED') === 'true' ? configService.get('CORS_ORIGIN', '*') : '*',
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-  });
+    // Enable CORS with options
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'http://localhost:1001',
+    'https://eventqul.shafiq.info.bd',
+  ];
 
+  const corsOptions: CorsOptions = {
+    origin: function (origin:any, callback) {
+      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+  };
+  app.enableCors(corsOptions);
   // ============================================================================
   // API Configuration
   // ============================================================================

@@ -14,6 +14,8 @@ import { TicketType } from '../event/entities/ticket-type.entity';
 import { Event } from '../event/entities/event.entity';
 import { OrderStatus, TicketStatus } from './types/order-status.enum';
 import { OtpService } from '../otp/otp.service';
+import { PaymentService } from '../payment/services/payment.service';
+import { PaymentProvider, PaymentStatus } from '../payment/types/payment-provider.enum';
 
 export interface PaginatedResult<T> {
   data: T[];
@@ -74,6 +76,7 @@ export class OrdersService {
     private readonly eventRepository: Repository<Event>,
     private dataSource: DataSource,
     private readonly otpService: OtpService,
+    private readonly paymentService: PaymentService,
   ) {}
 
   async create(userId: string, createOrderDto: CreateOrderDto): Promise<SerializedOrder> {
@@ -445,5 +448,247 @@ export class OrdersService {
       checkedInAt: ticket.checkedInAt ? ticket.checkedInAt.toISOString() : null,
       createdAt: ticket.createdAt || '',
     };
+  }
+
+  /**
+   * Create a pending order (without tickets) - for payment flow
+   * This creates an order but doesn't create tickets until payment is confirmed
+   */
+  async createPendingOrder(
+    userId: string,
+    createOrderDto: CreateOrderDto,
+  ): Promise<{ orderId: string; orderNumber: string; amount: number; ticketItems: any[] }> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // Validate ticket types and calculate total
+      let subtotal = 0;
+      const ticketItems: any[] = [];
+
+      for (const item of createOrderDto.tickets) {
+        const ticketType = await queryRunner.manager.findOne(TicketType, {
+          where: { id: item.ticketTypeId },
+          relations: { event: true },
+        });
+
+        if (!ticketType) {
+          throw new NotFoundException(`Ticket type ${item.ticketTypeId} not found`);
+        }
+
+        // Check availability
+        if (ticketType.available < item.quantity) {
+          throw new ConflictException(
+            `Not enough tickets available. Only ${ticketType.available} left.`,
+          );
+        }
+
+        // Check max per purchase
+        if (item.quantity > ticketType.maxPerPurchase) {
+          throw new BadRequestException(
+            `Maximum ${ticketType.maxPerPurchase} tickets allowed per purchase for this ticket type.`,
+          );
+        }
+
+        const itemTotal = Number(ticketType.price) * item.quantity;
+        subtotal += itemTotal;
+
+        ticketItems.push({
+          ticketTypeId: item.ticketTypeId,
+          eventId: ticketType.eventId,
+          quantity: item.quantity,
+          unitPrice: Number(ticketType.price),
+          itemTotal,
+        });
+      }
+
+      // Apply coupon discount (placeholder)
+      const discount = 0;
+      const total = subtotal - discount;
+
+      // Generate unique order number
+      const orderNumber = this.generateOrderNumber();
+
+      // Create pending order (without tickets)
+      // Store ticket items in metadata for later ticket creation
+      const orderCreate = queryRunner.manager.create(Order, {
+        userId,
+        orderNumber,
+        subtotal,
+        discount,
+        total,
+        status: OrderStatus.PENDING,
+        couponCode: createOrderDto.couponCode,
+        paymentMethod: createOrderDto.paymentMethod,
+        paymentStatus: 'pending',
+      }) as Order & { metadata?: Record<string, any> };
+
+      // Store ticket items and attendee info in metadata
+      orderCreate.metadata = {
+        ticketItems,
+        attendeeInfo: {
+          name: createOrderDto.attendeeName,
+          email: createOrderDto.attendeeEmail,
+          phone: createOrderDto.attendeePhone,
+        },
+      };
+
+      const savedOrder = await queryRunner.manager.save(orderCreate);
+
+      await queryRunner.commitTransaction();
+
+      console.log(`Pending order created: ${savedOrder.id}, orderNumber: ${orderNumber}`);
+
+      return {
+        orderId: savedOrder.id,
+        orderNumber: savedOrder.orderNumber,
+        amount: total,
+        ticketItems,
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  /**
+   * Confirm order after successful payment
+   * This creates the tickets and updates availability
+   */
+  async confirmOrder(orderId: string): Promise<Order> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const order = await queryRunner.manager.findOne(Order, {
+        where: { id: orderId },
+      });
+
+      if (!order) {
+        throw new NotFoundException('Order not found');
+      }
+
+      if (order.status === OrderStatus.CONFIRMED) {
+        // Already confirmed, return existing order
+        await queryRunner.rollbackTransaction();
+        return this.findOne(orderId);
+      }
+
+      // Get ticket items from metadata
+      const ticketItems = (order.metadata as any)?.ticketItems || [];
+      const attendeeInfo = (order.metadata as any)?.attendeeInfo || {};
+
+      if (!ticketItems.length) {
+        throw new BadRequestException('No ticket items found in order');
+      }
+
+      // Create tickets for each item
+      const tickets: Ticket[] = [];
+      for (const item of ticketItems) {
+        // Get ticket type to check availability and get event info
+        const ticketType = await queryRunner.manager.findOne(TicketType, {
+          where: { id: item.ticketTypeId },
+          relations: { event: true },
+        });
+
+        if (!ticketType) {
+          throw new NotFoundException(`Ticket type ${item.ticketTypeId} not found`);
+        }
+
+        // Check availability again
+        if (ticketType.available < item.quantity) {
+          throw new ConflictException(
+            `Not enough tickets available. Only ${ticketType.available} left.`,
+          );
+        }
+
+        // Create tickets
+        for (let i = 0; i < item.quantity; i++) {
+          const qrCode = this.generateQRCode();
+          const ticket = queryRunner.manager.create(Ticket, {
+            orderId: order.id,
+            eventId: item.eventId,
+            ticketTypeId: item.ticketTypeId,
+            qrCode,
+            attendeeName: attendeeInfo.name || 'N/A',
+            attendeeEmail: attendeeInfo.email || '',
+            attendeePhone: attendeeInfo.phone || '',
+            status: TicketStatus.CONFIRMED,
+          });
+          tickets.push(ticket);
+        }
+
+        // Update ticket type availability
+        await queryRunner.manager.decrement(
+          TicketType,
+          { id: item.ticketTypeId },
+          'available',
+          item.quantity,
+        );
+
+        // Update event sold tickets count
+        await queryRunner.manager.increment(
+          Event,
+          { id: item.eventId },
+          'soldTickets',
+          item.quantity,
+        );
+      }
+
+      await queryRunner.manager.save(tickets);
+
+      // Update order status
+      order.status = OrderStatus.CONFIRMED;
+      order.paymentStatus = 'completed';
+      order.paidAt = new Date();
+
+      await queryRunner.manager.save(order);
+
+      await queryRunner.commitTransaction();
+
+      console.log(`Order confirmed: ${orderId}, ${tickets.length} tickets created`);
+
+      // Send order confirmation SMS
+      try {
+        const eventName = ticketItems[0]?.eventId || 'Event';
+        const totalTickets = ticketItems.reduce((sum: number, t: any) => sum + t.quantity, 0);
+        const message = `Your ticket ${order.orderNumber} has been confirmed! Total tickets: ${totalTickets}. Amount: ৳${order.total}. Thank you for your purchase.`;
+        await this.otpService.sendOtp({ mobileNo: attendeeInfo.phone || '' }, message);
+      } catch (smsError) {
+        console.log('SMS error:', smsError);
+      }
+
+      return this.findOne(orderId);
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  /**
+   * Handle failed payment
+   * Cancels the order and marks payment as failed
+   */
+  async failOrder(orderId: string, reason?: string): Promise<Order> {
+    const order = await this.findOne(orderId);
+
+    if (order.status === OrderStatus.CANCELLED) {
+      return order;
+    }
+
+    order.status = OrderStatus.CANCELLED;
+    order.paymentStatus = 'failed';
+
+    const updatedOrder = await this.orderRepository.save(order);
+
+    console.log(`Order failed: ${orderId}, reason: ${reason || 'Payment failed'}`);
+
+    return this.findOne(orderId);
   }
 }

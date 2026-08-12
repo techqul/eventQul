@@ -12,7 +12,7 @@ import { Organizer } from '../organizer/entities/organizer.entity';
     TypeOrmModule.forFeature([User, Organizer]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET') || 'default-secret',
       }),
       inject: [ConfigService],

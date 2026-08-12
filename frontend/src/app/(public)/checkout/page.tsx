@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { eventsApi } from "@/lib/api/events";
-import { ordersApi } from "@/lib/api/orders";
+import { paymentApi } from "@/lib/api/payment";
 import { authApi } from "@/lib/api/auth";
-import { Event, TicketType, UserRole, CreateOrderInput } from "@/types";
+import { usersApi } from "@/lib/api/users";
+import { Event, TicketType, UserRole } from "@/types";
 import { UserFormData, userFormSchema } from "@/lib/validations/user.schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,7 +26,7 @@ export default function CheckoutPage() {
   const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [paymentMethod, setPaymentMethod] = useState("bkash"); // Default to bKash
   const [event, setEvent] = useState<Event | null>(null);
   const [ticketType, setTicketType] = useState<TicketType | null>(null);
 
@@ -106,48 +107,56 @@ export default function CheckoutPage() {
       const formValues = form.getValues();
       const DEFAULT_PASSWORD = "Admin@1234!";
 
-      // STEP 1: Register user
-      const registerData = {
-        email: formValues.email,
-        password: DEFAULT_PASSWORD,
-        firstName: formValues.firstName,
-        lastName: formValues.lastName,
-        nickName: formValues.nickName,
-        phoneNumber: formValues.phoneNumber,
-        instituteName: formValues.instituteName,
-        district: formValues.district,
-        dob: formValues.dob,
-        bloodGroup: formValues.bloodGroup,
-        gender: formValues.gender,
-        tshirtSize: formValues.tshirtSize,
-        role: UserRole.USER,
+      // STEP 1: Check if user exists by email, if not then register
+      let existingUser = null;
+      try {
+        existingUser = await usersApi.getByEmail(formValues.email);
+      } catch (error) {
+        // User doesn't exist, will register
+      }
+
+      console.log("existingUser", existingUser);
+
+      if (!existingUser?.data) {
+        const registerData = {
+          email: formValues.email,
+          password: DEFAULT_PASSWORD,
+          firstName: formValues.firstName,
+          lastName: formValues.lastName,
+          nickName: formValues.nickName,
+          phoneNumber: formValues.phoneNumber,
+          instituteName: formValues.instituteName,
+          district: formValues.district,
+          dob: formValues.dob,
+          bloodGroup: formValues.bloodGroup,
+          gender: formValues.gender,
+          tshirtSize: formValues.tshirtSize,
+          role: UserRole.USER,
+        };
+
+        await authApi.register(registerData);
+      }
+
+      // STEP 2: Complete checkout with payment
+      const checkoutData = {
+        provider: 'bkash', // 'bkash' or 'sslcommerz'
+        paymentMethod: "mobile_banking",
+        callbackUrl: `${window.location.origin}/payment/bkash/callback`,
+        payerReference: formValues.phoneNumber || "",
+        amount: total,
       };
 
-      const authResponse = await authApi.register(registerData);
+      const response = await paymentApi.checkout(checkoutData);
 
+   console.log("Checkout response:", response);
 
-      // STEP 3: Create order
-      const orderData: CreateOrderInput = {
-        tickets: [{ ticketTypeId: ticketType.id, quantity }],
-        couponCode: couponCode || undefined,
-        paymentMethod: paymentMethod || "card",
-        attendeeName: `${formValues.firstName} ${formValues.lastName}`.trim(),
-        attendeeEmail: formValues.email,
-        attendeePhone: formValues.phoneNumber || "",
-      };
-
-      const response = await ordersApi.create(orderData);
-
-      // STEP 4: Show success
-      if (response.success && response.data) {
-        toast.success("Your ticket has been confirmed successfully.");
-        router.push(`/checkout/success?order=${response.data.orderNumber}`);
-      } else {
-        throw new Error("Failed to create order");
+      // Redirect to bKash payment page if redirectUrl is provided
+      if (response?.data?.redirectUrl) {
+        window.location.href = response.data.redirectUrl;
       }
     } catch (error: any) {
       console.error("Checkout error:", error);
-      toast.error(error.message || "Unable to place your order. Please try again.");
+      toast.error(error.message || "Unable to initiate payment. Please try again.");
     } finally {
       setIsProcessing(false);
     }
