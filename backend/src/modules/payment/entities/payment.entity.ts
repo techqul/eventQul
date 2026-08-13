@@ -17,19 +17,19 @@ export class Payment {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @ManyToOne(() => Order, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Order, { onDelete: 'CASCADE', nullable: true })
   @JoinColumn({ name: 'order_id' })
-  order!: Order;
+  order?: Order;
 
-  @Column({ name: 'order_id' })
-  orderId!: string;
+  @Column({ name: 'order_id', nullable: true })
+  orderId?: string;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, { onDelete: 'CASCADE', nullable: true })
   @JoinColumn({ name: 'user_id' })
-  user!: User;
+  user?: User;
 
-  @Column({ name: 'user_id' })
-  userId!: string;
+  @Column({ name: 'user_id', nullable: true })
+  userId?: string;
 
   @Column({
     type: 'enum',

@@ -18,6 +18,7 @@ export interface CreatePaymentRequest {
 export interface CreatePaymentResponse {
   success: boolean;
   paymentId: string;
+  orderId?: string;
   redirectUrl?: string;
   providerTransactionId?: string;
   amount?: number;

@@ -1,31 +1,19 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import axios, { AxiosInstance } from 'axios';
+
 import {
-  IPaymentProvider,
   CreatePaymentRequest,
   CreatePaymentResponse,
-  ExecutePaymentRequest,
-  ExecutePaymentResponse,
-  QueryPaymentRequest,
-  QueryPaymentResponse,
-  RefundPaymentRequest,
-  RefundPaymentResponse,
 } from '../interfaces/payment-provider.interface';
-import { PaymentProvider, PaymentStatus } from '../types/payment-provider.enum';
+
 import { PaymentConfigService, PaymentGatewayConfig } from './payment-config.service';
 
-/**
- * bKash Grant Token Response
- */
 interface BkashTokenResponse {
   id_token: string;
   token_type: string;
   expires_in: number;
 }
 
-/**
- * bKash Create Payment Response
- */
 interface BkashCreateResponse {
   paymentID: string;
   createTime: string;
@@ -38,104 +26,88 @@ interface BkashCreateResponse {
   bkashURL: string;
   status?: string;
   statusCode?: string;
+  statusMessage?: string;
 }
 
-/**
- * bKash Execute Payment Response
- */
 interface BkashExecuteResponse {
   paymentID: string;
-  transactionStatus: string;
-  amount: string;
-  currency: string;
-  trxID: string;
-  merchantInvoiceNumber: string;
-  status?: string;
+  trxID?: string;
+  transactionStatus?: string;
+  amount?: string;
+  currency?: string;
+  intent?: string;
+  merchantInvoiceNumber?: string;
+  paymentExecuteTime?: string;
   statusCode?: string;
   statusMessage?: string;
-  completedTime?: string;
+  status?: string;
 }
 
-/**
- * bKash Query Payment Response
- */
 interface BkashQueryResponse {
   paymentID: string;
-  transactionStatus: string;
-  amount: string;
-  currency: string;
-  trxID: string;
-  merchantInvoiceNumber: string;
-  completedTime?: string;
-  status?: string;
+  trxID?: string;
+  transactionStatus?: string;
+  amount?: string;
+  currency?: string;
+  intent?: string;
+  merchantInvoiceNumber?: string;
+  paymentExecuteTime?: string;
   statusCode?: string;
-}
-
-/**
- * bKash Refund Response
- */
-interface BkashRefundResponse {
-  transactionStatus: string;
-  transactionId: string;
-  completedTime: string;
-  amount: string;
-  currency: string;
+  statusMessage?: string;
   status?: string;
-  statusCode?: string;
 }
 
 @Injectable()
-export class BkashService implements IPaymentProvider {
+export class BkashService {
   private readonly axiosClient: AxiosInstance;
   private readonly config: PaymentGatewayConfig;
+
   private grantToken: string | null = null;
-  private tokenExpiresAt: Date | null = null;
+  private tokenExpiresAt: number | null = null;
 
   constructor(private readonly paymentConfigService: PaymentConfigService) {
-    // Get config once and cache it
     this.config = this.paymentConfigService.getBkashConfig();
 
-    // Verify credentials on initialization
-    if (!this.paymentConfigService.verifyProviderConfig(PaymentProvider.BKASH)) {
-      console.warn('bKash credentials not configured. Please check environment variables.');
-    }
-
-    // Initialize axios client with config
     this.axiosClient = axios.create({
       baseURL: this.config.baseURL,
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
     });
   }
 
   /**
-   * Get provider name
-   */
-  getProvider(): PaymentProvider {
-    return PaymentProvider.BKASH;
-  }
-
-  /**
-   * Get bKash configuration (cached)
+   * Validate bKash configuration
    */
   private getConfig(): PaymentGatewayConfig {
-    // Verify credentials before returning config
-    if (!this.config.username || !this.config.password ||
-        !this.config.appKey || !this.config.appSecret) {
-      throw new BadRequestException('bKash credentials not configured. Please check environment variables.');
+    if (
+      !this.config.username ||
+      !this.config.password ||
+      !this.config.appKey ||
+      !this.config.appSecret ||
+      !this.config.baseURL
+    ) {
+      throw new BadRequestException(
+        'bKash credentials/configuration not configured. Please check environment variables.',
+      );
     }
+
     return this.config;
   }
 
   /**
-   * Get grant token (access token) from bKash
-   * Token expires in 50 minutes, cache it until expiration
+   * Get bKash Grant Token
+   *
+   * Token is cached until expiration.
    */
-   async getGrantToken(): Promise<string> {
-
+  async getGrantToken(): Promise<string> {
     const config = this.getConfig();
+
+    // Return cached token if still valid
+    if (this.grantToken && this.tokenExpiresAt && Date.now() < this.tokenExpiresAt) {
+      return this.grantToken;
+    }
 
     try {
       const response = await this.axiosClient.post<BkashTokenResponse>(
@@ -152,41 +124,52 @@ export class BkashService implements IPaymentProvider {
         },
       );
 
-      console.log("response", response)
-
       const token = response.data.id_token;
-      const expiresIn = response.data.expires_in || 3000; // Default 50 minutes
 
-      // Cache the token
+      if (!token) {
+        throw new Error('bKash token not received');
+      }
+
+      const expiresIn = response.data.expires_in || 3000;
+
       this.grantToken = token;
-      this.tokenExpiresAt = new Date(Date.now() + expiresIn * 1000 - 60000); // 1 min buffer
+
+      // Keep 1 minute safety buffer
+      this.tokenExpiresAt = Date.now() + expiresIn * 1000 - 60_000;
 
       return token;
     } catch (error: any) {
       console.error('bKash grant token error:', error.response?.data || error.message);
-      throw new BadRequestException('Failed to get bKash grant token');
+
+      throw new BadRequestException(
+        error.response?.data?.statusMessage || 'Failed to get bKash grant token',
+      );
     }
   }
 
   /**
-   * Create payment with bKash
+   * Create bKash Payment
    */
   async createPayment(request: CreatePaymentRequest): Promise<CreatePaymentResponse> {
-    const token = await this.getGrantToken();
     const config = this.getConfig();
+    const token = await this.getGrantToken();
 
     try {
       const payload = {
         mode: '0000',
-        payerReference: config.merchantNumber,
-        callbackURL: request.callbackUrl,
-        amount: request.amount.toString(),
-        currency: 'BDT',
-        intent: 'sale'
-      };
 
-      console.log("payload", payload)
-      console.log("token", token)
+        payerReference: config.merchantNumber || '01619777283',
+
+        callbackURL: `${process.env.APP_URL}/api/v1/payment/bkash/callback`,
+
+        amount: Number(request.amount).toFixed(2),
+
+        currency: 'BDT',
+
+        intent: 'sale',
+
+        merchantInvoiceNumber:`EVENTQUL-${Date.now()}`,
+      };
 
       const response = await this.axiosClient.post<BkashCreateResponse>(
         '/tokenized/checkout/create',
@@ -194,34 +177,39 @@ export class BkashService implements IPaymentProvider {
         {
           headers: {
             Authorization: token,
-            'x-app-key': config.appKey,
+            'X-App-Key': config.appKey,
           },
         },
       );
-      console.log("response", response)
+
       const data = response.data;
 
+      console.log('bKash create payment response:', data);
 
-      console.log("data", data)
-
-      if (data.statusCode === '0000' || data.paymentID) {
+      if (data.statusCode === '0000' && data.paymentID && data.bkashURL) {
         return {
           success: true,
+
           paymentId: data.paymentID,
+
           redirectUrl: data.bkashURL,
+
           providerTransactionId: data.paymentID,
-          amount: parseFloat(data.amount),
-          expiresAt: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes
-        };
-      } else {
-        return {
-          success: false,
-          paymentId: '',
-          message: data.status || 'Failed to create bKash payment',
+
+          amount: Number(data.amount || request.amount),
+
+          expiresAt: new Date(Date.now() + 30 * 60 * 1000),
         };
       }
+
+      return {
+        success: false,
+        paymentId: '',
+        message: data.statusMessage || data.status || 'Failed to create bKash payment',
+      };
     } catch (error: any) {
       console.error('bKash create payment error:', error.response?.data || error.message);
+
       return {
         success: false,
         paymentId: '',
@@ -231,192 +219,81 @@ export class BkashService implements IPaymentProvider {
   }
 
   /**
-   * Execute payment after user completes payment on bKash
+   * Execute bKash Payment
+   *
+   * Called after customer completes payment
+   * and bKash redirects/calls the callback URL.
    */
-  async executePayment(request: ExecutePaymentRequest): Promise<ExecutePaymentResponse> {
-    const token = await this.getGrantToken();
+  async executePayment(paymentID: string): Promise<BkashExecuteResponse> {
+    if (!paymentID) {
+      throw new BadRequestException('bKash paymentID is required');
+    }
+
     const config = this.getConfig();
+    const token = await this.getGrantToken();
 
     try {
       const response = await this.axiosClient.post<BkashExecuteResponse>(
         '/tokenized/checkout/execute',
         {
-          paymentID: request.providerTransactionId,
+          paymentID,
         },
         {
           headers: {
             Authorization: token,
-            'x-app-key': config.appKey,
+            'X-App-Key': config.appKey,
           },
         },
       );
 
-      const data = response.data;
+      console.log('bKash execute payment response:', response.data);
 
-      // bKash returns statusCode: 0000 for successful payment
-      if (data.statusCode === '0000' && data.transactionStatus === 'Completed') {
-        return {
-          success: true,
-          paymentId: request.paymentId,
-          providerTransactionId: request.providerTransactionId,
-          amount: parseFloat(data.amount),
-          status: PaymentStatus.COMPLETED,
-          transactionId: data.trxID,
-          message: 'Payment completed successfully',
-        };
-      } else if (data.statusCode === '2031' || data.statusCode === '2025') {
-        // Payment cancelled or failed
-        return {
-          success: false,
-          paymentId: request.paymentId,
-          providerTransactionId: request.providerTransactionId,
-          status: PaymentStatus.CANCELLED,
-          message: data.statusMessage || 'Payment cancelled',
-        };
-      } else {
-        return {
-          success: false,
-          paymentId: request.paymentId,
-          providerTransactionId: request.providerTransactionId,
-          status: PaymentStatus.FAILED,
-          message: data.statusMessage || 'Payment execution failed',
-        };
-      }
+      return response.data;
     } catch (error: any) {
       console.error('bKash execute payment error:', error.response?.data || error.message);
 
-      return {
-        success: false,
-        paymentId: request.paymentId,
-        providerTransactionId: request.providerTransactionId,
-        status: PaymentStatus.FAILED,
-        message: error.response?.data?.statusMessage || 'Payment execution failed',
-      };
+      throw new BadRequestException(
+        error.response?.data?.statusMessage || 'Failed to execute bKash payment',
+      );
     }
   }
 
   /**
-   * Query payment status from bKash
+   * Query Payment
+   *
+   * Useful for verifying payment status.
    */
-  async queryPayment(request: QueryPaymentRequest): Promise<QueryPaymentResponse> {
-    const token = await this.getGrantToken();
+  async queryPayment(paymentID: string): Promise<BkashQueryResponse> {
+    if (!paymentID) {
+      throw new BadRequestException('bKash paymentID is required');
+    }
+
     const config = this.getConfig();
+    const token = await this.getGrantToken();
 
     try {
       const response = await this.axiosClient.post<BkashQueryResponse>(
         '/tokenized/checkout/payment/status',
         {
-          paymentID: request.providerTransactionId,
+          paymentID,
         },
         {
           headers: {
             Authorization: token,
-            'x-app-key': config.appKey,
+            'X-App-Key': config.appKey,
           },
         },
       );
 
-      const data = response.data;
+      console.log('bKash query payment response:', response.data);
 
-      let status: PaymentStatus;
-      if (data.transactionStatus === 'Completed') {
-        status = PaymentStatus.COMPLETED;
-      } else if (data.transactionStatus === 'Cancelled') {
-        status = PaymentStatus.CANCELLED;
-      } else if (data.transactionStatus === 'Failed') {
-        status = PaymentStatus.FAILED;
-      } else {
-        status = PaymentStatus.PROCESSING;
-      }
-
-      return {
-        paymentId: request.paymentId,
-        providerTransactionId: request.providerTransactionId,
-        amount: parseFloat(data.amount),
-        status,
-        transactionId: data.trxID,
-        completedAt: data.completedTime ? new Date(data.completedTime) : undefined,
-        metadata: {
-          transactionStatus: data.transactionStatus,
-          merchantInvoiceNumber: data.merchantInvoiceNumber,
-        },
-      };
+      return response.data;
     } catch (error: any) {
       console.error('bKash query payment error:', error.response?.data || error.message);
-      throw new BadRequestException('Failed to query bKash payment');
-    }
-  }
 
-  /**
-   * Refund payment
-   */
-  async refundPayment(request: RefundPaymentRequest): Promise<RefundPaymentResponse> {
-    const token = await this.getGrantToken();
-    const config = this.getConfig();
-
-    try {
-      // First get the payment details to find the transaction ID
-      const queryResponse = await this.queryPayment({
-        paymentId: request.paymentId,
-        providerTransactionId: '', // Will be populated by queryPayment
-      });
-
-      const trxId = queryResponse.transactionId;
-      if (!trxId) {
-        throw new BadRequestException('No transaction ID found for refund');
-      }
-
-      const refundAmount = request.amount || queryResponse.amount;
-
-      const response = await this.axiosClient.post<BkashRefundResponse>(
-        '/tokenized/checkout/payment/refund',
-        {
-          paymentID: request.paymentId,
-          trxID: trxId,
-          amount: refundAmount.toString(),
-          reason: request.reason || 'Customer refund',
-          sku: 'REFUND',
-        },
-        {
-          headers: {
-            Authorization: token,
-            'x-app-key': config.appKey,
-          },
-        },
+      throw new BadRequestException(
+        error.response?.data?.statusMessage || 'Failed to query bKash payment',
       );
-
-      const data = response.data;
-
-      if (data.statusCode === '0000' || data.transactionStatus === 'Completed') {
-        return {
-          success: true,
-          refundId: data.transactionId,
-          amount: parseFloat(data.amount),
-          message: 'Refund processed successfully',
-        };
-      } else {
-        return {
-          success: false,
-          amount: refundAmount,
-          message: data.status || 'Refund failed',
-        };
-      }
-    } catch (error: any) {
-      console.error('bKash refund error:', error.response?.data || error.message);
-      return {
-        success: false,
-        amount: request.amount || 0,
-        message: error.response?.data?.statusMessage || 'Refund failed',
-      };
     }
-  }
-
-  /**
-   * Verify webhook signature (bKash doesn't use webhooks, this is for future compatibility)
-   */
-  verifyWebhookSignature(data: any, signature: string): boolean {
-    // bKash doesn't use webhook signatures
-    // This is a placeholder for future compatibility
-    return true;
   }
 }

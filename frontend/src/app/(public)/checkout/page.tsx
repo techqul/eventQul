@@ -141,7 +141,7 @@ export default function CheckoutPage() {
       const checkoutData = {
         provider: 'bkash', // 'bkash' or 'sslcommerz'
         paymentMethod: "mobile_banking",
-        callbackUrl: `${window.location.origin}/payment/bkash/callback`,
+        callbackUrl: `${window.location.origin}/checkout/success`,
         payerReference: formValues.phoneNumber || "",
         amount: total,
       };

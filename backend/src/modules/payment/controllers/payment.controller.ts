@@ -1,44 +1,31 @@
-import {
-  Controller,
-  Post,
-  Body,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
+import { Controller, Post, Body, Get, Query, Res } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { PaymentService } from '../services/payment.service';
-import { CreatePaymentDto } from '../dto';
-import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { BkashCallbackDto, CreatePaymentDto } from '../dto';
 import { Public } from '../../../common/decorators/skip-auth.decorator';
-import { BkashService } from '../services/bkash.service';
+import type { Response } from 'express';
 
 @ApiTags('Payments')
 @Controller('payment')
 export class PaymentController {
-  constructor(private readonly paymentService: PaymentService,
-    private readonly bkashService: BkashService
-  ) {}
-
-  @Post('grant/token')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Get a new payment token' })
-  @ApiResponse({ status: 201, description: 'Payment token created successfully' })
-  @ApiResponse({ status: 400, description: 'Bad request' })
-  async getPaymentToken() {
-    return this.bkashService.getGrantToken();
-  }
+  constructor(private readonly paymentService: PaymentService) {}
 
   @Post('create')
   @Public()
   @ApiOperation({ summary: 'Create a new payment' })
-  @ApiResponse({ status: 201, description: 'Payment created successfully' })
+  @ApiResponse({ status: 201, description: 'Payment created successfzully' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   async createPayment(@Body() createPaymentDto: CreatePaymentDto) {
     return this.paymentService.createPayment(createPaymentDto);
+  }
+
+  @Get('bkash/callback')
+  @Public()
+  async bkashCallback(@Query() query: BkashCallbackDto, @Res() res: Response) {
+    const result = await this.paymentService.handleBkashCallback(query);
+
+    return res.redirect(
+      `${process.env.FRONTEND_URL}/checkout/success?orderId=${result.orderId}&status=${result.status}`,
+    );
   }
 }
