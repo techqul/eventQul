@@ -59,6 +59,9 @@ export class Order {
   @Column({ name: 'paid_at', type: 'timestamp', nullable: true })
   paidAt?: Date;
 
+  @Column({ type: 'jsonb', default: '{}' })
+  metadata!: Record<string, any>;
+
   @CreateDateColumn({
     name: 'created_at',
     type: 'timestamp',

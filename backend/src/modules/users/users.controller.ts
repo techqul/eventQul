@@ -19,6 +19,7 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { ResponseMessage } from '../../common/decorators/response-message.decorator';
 import { UserRole } from './types';
+import { Public } from 'src/common/decorators/skip-auth.decorator';
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -75,6 +76,17 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Profile retrieved successfully' })
   async getProfile(@Req() req: AuthenticatedRequest) {
     return this.usersService.getProfile(req.user?.id || '');
+  }
+
+  @Get('by-email/:email')
+  @Public()
+  @ApiBearerAuth('JWT-auth')
+  @ResponseMessage('User retrieved successfully')
+  @ApiOperation({ summary: 'Get user by email (Admin only)' })
+  @ApiResponse({ status: 200, description: 'User retrieved successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async findByEmail(@Param('email') email: string) {
+    return this.usersService.findByEmail(email);
   }
 
   @Get(':id')

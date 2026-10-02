@@ -7,6 +7,7 @@ export interface Event {
   slug: string;
   description: string;
   longDescription: string;
+  time: string;
   coverImage: string;
   gallery: string[];
   organizer: EventOrganizer;

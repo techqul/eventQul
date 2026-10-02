@@ -95,7 +95,7 @@ export class OrganizersController {
     return { success: true };
   }
 
-  @Post(':slug/verify')
+  @Get(':id/verify')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
@@ -103,11 +103,7 @@ export class OrganizersController {
   @ApiOperation({ summary: 'Verify organizer (Admin only)' })
   @ApiResponse({ status: 200, description: 'Organizer verified successfully' })
   @ApiResponse({ status: 404, description: 'Organizer not found' })
-  async verifyOrganizer(@Param('slug') slug: string) {
-    const organizer = await this.organizersService.findBySlug(slug);
-    if (!organizer) {
-      throw new Error('Organizer not found');
-    }
-    return this.organizersService.verifyOrganizer(organizer.id);
+  async verifyOrganizer(@Param('id') id: string) {
+    return this.organizersService.verifyOrganizer(id);
   }
 }

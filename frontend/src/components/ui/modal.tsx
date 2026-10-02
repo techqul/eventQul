@@ -72,7 +72,10 @@ export function Modal({
           {showSeparator && <Separator className="mt-4" />}
         </DialogHeader>
 
-        <ScrollArea className={maxHeight ? `max-h-[calc(${maxHeight}-140px)]` : undefined}>
+        <ScrollArea
+          className={maxHeight ? 'overflow-y-auto' : undefined}
+          style={maxHeight ? { maxHeight: `calc(${maxHeight} - 140px)` } : undefined}
+        >
           <div className={cn('px-6', className)}>{children}</div>
         </ScrollArea>
 

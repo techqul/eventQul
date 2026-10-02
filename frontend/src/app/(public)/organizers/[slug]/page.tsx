@@ -146,7 +146,7 @@ export default async function OrganizerDetailPage({ params }: OrganizerPageProps
             <div>
               <h2 className="text-2xl font-bold mb-4">Events by {organizer.name}</h2>
               {events.length > 0 ? (
-                <EventGrid events={events}  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6"/>
+                <EventGrid events={events} gridClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" />
               ) : (
                 <Card>
                   <CardContent className="p-12 text-center">

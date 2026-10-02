@@ -20,6 +20,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { OtpModule } from './modules/otp/otp.module';
+import { PaymentModule } from './modules/payment/payment.module';
 
 /**
  * Global Configuration Module
@@ -69,7 +70,8 @@ import { OtpModule } from './modules/otp/otp.module';
     OrganizersModule,
     EventsModule,
     OrdersModule,
-    OtpModule
+    OtpModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [

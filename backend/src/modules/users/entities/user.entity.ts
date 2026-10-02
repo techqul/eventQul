@@ -5,10 +5,12 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  OneToMany,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { dateTransformer } from '../../../common/utils/helper';
 import { UserRole, UserStatus, BloodGroup, Gender, TShirtSize } from '../types';
+import { Organizer } from 'src/modules/organizer/entities/organizer.entity';
 
 @Entity('users')
 export class User {
@@ -94,6 +96,9 @@ export class User {
 
   @Column({ name: 'email_verified', default: false })
   emailVerified!: boolean;
+
+  @OneToMany(() => Organizer, (organizer) => organizer.user)
+organizers!: Organizer[];
 
   @Column({ name: 'avatar_url', nullable: true })
   avatarUrl?: string;

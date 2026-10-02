@@ -8,6 +8,7 @@ interface EventGridProps {
   variant?: "default" | "featured" | "compact";
   showOrganizer?: boolean;
   className?: string;
+  gridClassName?: string;
 }
 
 export function EventGrid({
@@ -15,6 +16,7 @@ export function EventGrid({
   variant = "default",
   showOrganizer = true,
   className,
+  gridClassName,
 }: EventGridProps) {
   if (events.length === 0) {
     return (
@@ -29,7 +31,7 @@ export function EventGrid({
       className={
         variant === "compact"
           ? "space-y-3"
-          : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6"
+          : gridClassName || "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6"
       }
     >
       {events.map((event) => (

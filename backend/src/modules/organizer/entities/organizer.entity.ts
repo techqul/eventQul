@@ -7,6 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  ManyToOne,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
@@ -15,11 +16,11 @@ export class Organizer {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @OneToOne(() => User)
-  @JoinColumn({ name: 'user_id' })
-  user!: User;
+  @ManyToOne(() => User, (user) => user.organizers)
+@JoinColumn({ name: 'user_id' })
+user!: User;
 
-  @Column({ name: 'user_id', unique: true })
+  @Column({ name: 'user_id' })
   userId!: string;
 
   @Column({ unique: true })

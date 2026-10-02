@@ -20,6 +20,7 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  Building2,
 } from "lucide-react";
 
 interface SidebarItem {
@@ -69,7 +70,7 @@ const sidebarItems: Record<
     items: [
       { title: "Dashboard", href: "/admin", icon: LayoutDashboard },
       { title: "Users", href: "/admin/users", icon: Users },
-      { title: "Organizers", href: "/admin/organizers", icon: Users },
+      { title: "Organizers", href: "/admin/organizers", icon: Building2 },
       { title: "Events", href: "/admin/events", icon: Calendar },
       { title: "Categories", href: "/admin/categories", icon: FileText },
       { title: "Reports", href: "/admin/reports", icon: BarChart3 },

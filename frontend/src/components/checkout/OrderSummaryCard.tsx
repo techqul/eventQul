@@ -172,7 +172,7 @@ export function OrderSummaryCard(props: OrderSummaryCardProps) {
             Processing...
           </>
         ) : (
-          "Place Order"
+          "Buy Ticket"
         )}
       </button>
     </Card>

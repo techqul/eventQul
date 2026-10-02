@@ -38,6 +38,7 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto): Promise<AuthResponse> {
+    console.log('registerDto', registerDto);
     const existingUser = await this.usersService.findByEmail(registerDto.email);
 
     if (existingUser) {

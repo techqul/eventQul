@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { eventsApi } from "@/lib/api/events";
-import { ordersApi } from "@/lib/api/orders";
+import { paymentApi } from "@/lib/api/payment";
 import { authApi } from "@/lib/api/auth";
-import { Event, TicketType, UserRole, CreateOrderInput } from "@/types";
+import { usersApi } from "@/lib/api/users";
+import { Event, TicketType, UserRole } from "@/types";
 import { UserFormData, userFormSchema } from "@/lib/validations/user.schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,13 +21,12 @@ import { OrderSummaryCard } from "@/components/checkout/OrderSummaryCard";
 export default function CheckoutPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { toast } = useToast();
 
   const [quantity, setQuantity] = useState(1);
   const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [paymentMethod, setPaymentMethod] = useState("bkash"); // Default to bKash
   const [event, setEvent] = useState<Event | null>(null);
   const [ticketType, setTicketType] = useState<TicketType | null>(null);
 
@@ -73,28 +73,18 @@ export default function CheckoutPage() {
   }, [eventId]);
 
   const subtotal = Number(ticketType?.price) * quantity;
-  const convenienceFee = quantity * 10;
+  const convenienceFee = quantity * 0;
   const total = subtotal + convenienceFee - discount;
 
   const handleApplyCoupon = () => {
     if (couponCode.toLowerCase() === "eventqul10") {
       setDiscount(subtotal * 0.1);
-      toast({
-        title: "Coupon applied!",
-        description: "10% discount has been applied to your order.",
-      });
+      toast.success("Coupon applied! 10% discount has been applied to your order.");
     } else if (couponCode.toLowerCase() === "free") {
       setDiscount(subtotal);
-      toast({
-        title: "Wow! Free ticket!",
-        description: "Your ticket is now completely free!",
-      });
+      toast.success("Wow! Your ticket is now completely free!");
     } else {
-      toast({
-        title: "Invalid coupon",
-        description: "Please enter a valid coupon code.",
-        variant: "destructive",
-      });
+      toast.error("Invalid coupon. Please enter a valid coupon code.");
     }
   };
 
@@ -102,20 +92,12 @@ export default function CheckoutPage() {
     // Validate form
     const isValid = await form.trigger();
     if (!isValid) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields correctly.",
-        variant: "destructive",
-      });
+      toast.error("Please fill in all required fields correctly.");
       return;
     }
 
     if (!ticketType?.id || !eventId) {
-      toast({
-        title: "Missing Information",
-        description: "Unable to process order. Missing ticket or event information.",
-        variant: "destructive",
-      });
+      toast.error("Unable to process order. Missing ticket or event information.");
       return;
     }
 
@@ -125,60 +107,56 @@ export default function CheckoutPage() {
       const formValues = form.getValues();
       const DEFAULT_PASSWORD = "Admin@1234!";
 
-      // STEP 1: Register user
-      const registerData = {
-        email: formValues.email,
-        password: DEFAULT_PASSWORD,
-        firstName: formValues.firstName,
-        lastName: formValues.lastName,
-        nickName: formValues.nickName,
-        phoneNumber: formValues.phoneNumber,
-        instituteName: formValues.instituteName,
-        district: formValues.district,
-        dob: formValues.dob,
-        bloodGroup: formValues.bloodGroup,
-        gender: formValues.gender,
-        tshirtSize: formValues.tshirtSize,
-        role: UserRole.USER,
-      };
-
-      const authResponse = await authApi.register(registerData);
-
-      // STEP 2: Store JWT tokens for API call
-      if (authResponse?.data?.accessToken) {
-        if (typeof window !== "undefined") {
-          localStorage.setItem("access_token", authResponse.data.accessToken);
-          if (authResponse.data.refreshToken) {
-            localStorage.setItem("refresh_token", authResponse.data.refreshToken);
-          }
-        }
+      // STEP 1: Check if user exists by email, if not then register
+      let existingUser = null;
+      try {
+        existingUser = await usersApi.getByEmail(formValues.email);
+      } catch (error) {
+        // User doesn't exist, will register
       }
 
-      // STEP 3: Create order
-      const orderData: CreateOrderInput = {
-        tickets: [{ ticketTypeId: ticketType.id, quantity }],
-        couponCode: couponCode || undefined,
-        paymentMethod: paymentMethod || "card",
-        attendeeName: `${formValues.firstName} ${formValues.lastName}`.trim(),
-        attendeeEmail: formValues.email,
-        attendeePhone: formValues.phoneNumber || "",
+      console.log("existingUser", existingUser);
+
+      if (!existingUser?.data) {
+        const registerData = {
+          email: formValues.email,
+          password: DEFAULT_PASSWORD,
+          firstName: formValues.firstName,
+          lastName: formValues.lastName,
+          nickName: formValues.nickName,
+          phoneNumber: formValues.phoneNumber,
+          instituteName: formValues.instituteName,
+          district: formValues.district,
+          dob: formValues.dob,
+          bloodGroup: formValues.bloodGroup,
+          gender: formValues.gender,
+          tshirtSize: formValues.tshirtSize,
+          role: UserRole.USER,
+        };
+
+        await authApi.register(registerData);
+      }
+
+      // STEP 2: Complete checkout with payment
+      const checkoutData = {
+        provider: 'bkash', // 'bkash' or 'sslcommerz'
+        paymentMethod: "mobile_banking",
+        callbackUrl: `${window.location.origin}/checkout/success`,
+        payerReference: formValues.phoneNumber || "",
+        amount: total,
       };
 
-      const response = await ordersApi.create(orderData);
+      const response = await paymentApi.checkout(checkoutData);
 
-      // STEP 4: Show success
-      if (response.success && response.data) {
-        router.push(`/checkout/success?order=${response.data.orderNumber}`);
-      } else {
-        throw new Error("Failed to create order");
+   console.log("Checkout response:", response);
+
+      // Redirect to bKash payment page if redirectUrl is provided
+      if (response?.data?.redirectUrl) {
+        window.location.href = response.data.redirectUrl;
       }
     } catch (error: any) {
       console.error("Checkout error:", error);
-      toast({
-        title: "Order Failed",
-        description: error.message || "Unable to place your order. Please try again.",
-        variant: "destructive",
-      });
+      toast.error(error.message || "Unable to initiate payment. Please try again.");
     } finally {
       setIsProcessing(false);
     }

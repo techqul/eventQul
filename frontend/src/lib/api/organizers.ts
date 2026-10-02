@@ -12,6 +12,10 @@ export const organizersApi = {
 
   async getById(id: string): Promise<OrganizerResponse> {
     return apiClient.get<OrganizerResponse>(`/organizers/${id}`);
+  }, 
+  
+  async verifyOrganizer(id: string): Promise<OrganizerResponse> {
+    return apiClient.get<OrganizerResponse>(`/organizers/${id}/verify`);
   },
 
   async getBySlug(slug: string): Promise<OrganizerResponse> {

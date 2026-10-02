@@ -24,6 +24,13 @@ export const usersApi = {
   },
 
   /**
+   * Get user by email (Admin only)
+   */
+  async getByEmail(email: string): Promise<UserResponse> {
+    return apiClient.get<UserResponse>(`/users/by-email/${email}`);
+  },
+
+  /**
    * Get current user profile
    */
   async getProfile(): Promise<UserResponse> {

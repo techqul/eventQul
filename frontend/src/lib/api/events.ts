@@ -40,11 +40,11 @@ export const eventsApi = {
   },
 
   async getFeatured(): Promise<EventListResponse> {
-    return apiClient.get<EventListResponse>('/events/featured');
+    return apiClient.get<EventListResponse>('/events?featured=true');
   },
 
   async getTrending(): Promise<EventListResponse> {
-    return apiClient.get<EventListResponse>('/events/trending');
+    return apiClient.get<EventListResponse>('/events?trending=true');
   },
 
   async getByCategory(categoryId: string): Promise<EventListResponse> {
